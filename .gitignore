@@ -19,6 +19,7 @@
 /storage/*.key
 /storage/pail
 /vendor
+/laravel-ai-boilerplate
 Homestead.json
 Homestead.yaml
 Thumbs.db
