@@ -6,17 +6,17 @@
 
 ## Stack base
 
-| Herramienta | Estado |
-|---|---|
-| PHP | 8.4 |
-| Laravel | 12.x |
-| Composer | scripts de setup, dev, qa, test |
-| Docker / Sail | entorno local reproducible |
-| Pest | tests |
-| PHPStan + Larastan | análisis estático |
-| Pint | code style |
-| Rector + rector-laravel | refactorización automática |
-| SonarQube | quality gate adicional |
+| Herramienta             | Estado                          |
+| ----------------------- | ------------------------------- |
+| PHP                     | 8.4                             |
+| Laravel                 | 12.x                            |
+| Composer                | scripts de setup, dev, qa, test |
+| Docker / Sail           | entorno local reproducible      |
+| Pest                    | tests                           |
+| PHPStan + Larastan      | análisis estático               |
+| Pint                    | code style                      |
+| Rector + rector-laravel | refactorización automática      |
+| SonarQube               | quality gate adicional          |
 
 ---
 
@@ -97,6 +97,11 @@ El proyecto incluye SonarQube como capa adicional de calidad.
 ./sonar.sh
 ```
 
+## Muestra el resultado de los test y con ello se muestra la cobertura que tienen los test.
+
+mkdir -p build/logs
+XDEBUG_MODE=coverage ./vendor/bin/sail php vendor/bin/pest --coverage-clover build/logs/clover.xml
+
 ---
 
 ## Convenciones actuales
@@ -116,4 +121,3 @@ Este repositorio se está alineando con una base de trabajo más disciplinada:
 - herramientas estándar por Composer
 - infraestructura local reproducible
 - documentación más cercana al estado real del código
-

@@ -29,6 +29,14 @@ return static function (RectorConfig $rectorConfig): void {
     ]);
 
     $rectorConfig->skip([
-        //
+        // `Volt::route('/login', 'auth.login')` passes a Volt component alias,
+        // not a class name. StringToClassConstantRector falsely rewrites it to
+        // `\Illuminate\Auth\Events\Login::class`, which would break the route.
+        // The same rule also targets the test AuthRouteRegistrar, whose string
+        // controller FQCNs are documented as intentional (RED-phase loading).
+        Rector\Transform\Rector\String_\StringToClassConstantRector::class => [
+            __DIR__.'/routes/web.php',
+            __DIR__.'/tests/Auth/AuthRouteRegistrar.php',
+        ],
     ]);
 };
