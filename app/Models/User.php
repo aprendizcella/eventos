@@ -65,7 +65,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function currentOrganizer(): ?Organizer
     {
         /** @var Request $request */
-        $request = app('request');
+        $request = resolve('request');
 
         // Try request attribute first
         $organizer = $request->attributes->get('current_organizer');

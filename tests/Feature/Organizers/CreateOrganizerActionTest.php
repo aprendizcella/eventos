@@ -22,7 +22,7 @@ it('creates an organizer with valid data', function (): void {
         status: 'active',
     );
 
-    $action = app(CreateOrganizerAction::class);
+    $action = resolve(CreateOrganizerAction::class);
     $organizer = $action($dto, $user);
 
     expect($organizer)->toBeInstanceOf(Organizer::class)
@@ -41,7 +41,7 @@ it('logs activity when creating organizer', function (): void {
         slug: 'test-organizer',
     );
 
-    $action = app(CreateOrganizerAction::class);
+    $action = resolve(CreateOrganizerAction::class);
     $organizer = $action($dto, $user);
 
     $activity = Spatie\Activitylog\Models\Activity::query()
@@ -62,7 +62,7 @@ it('creates organizer with minimal data', function (): void {
         slug: 'minimal',
     );
 
-    $action = app(CreateOrganizerAction::class);
+    $action = resolve(CreateOrganizerAction::class);
     $organizer = $action($dto, $user);
 
     expect($organizer->name)->toBe('Minimal Organizer')

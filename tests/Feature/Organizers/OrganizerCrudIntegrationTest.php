@@ -15,7 +15,7 @@ beforeEach(function (): void {
     $this->withoutMiddleware([ValidateCsrfToken::class]);
 
     // Set team context for global roles (using 0 as sentinel for "no specific team")
-    app(\Spatie\Permission\PermissionRegistrar::class)->setPermissionsTeamId(0);
+    resolve(Spatie\Permission\PermissionRegistrar::class)->setPermissionsTeamId(0);
 
     // Create global roles
     Role::query()->firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web']);
@@ -53,10 +53,10 @@ it('allows super_admin to create organizer with valid data', function (): void {
     ]);
 
     // Activity log must record the creation
-    $organizer = Organizer::where('slug', 'test-organizer')->first();
+    $organizer = Organizer::query()->where('slug', 'test-organizer')->first();
     expect($organizer)->not->toBeNull();
 
-    $activity = \Spatie\Activitylog\Models\Activity::query()
+    $activity = Spatie\Activitylog\Models\Activity::query()
         ->where('subject_type', Organizer::class)
         ->where('subject_id', $organizer->id)
         ->where('event', 'created')
@@ -69,7 +69,7 @@ it('rejects duplicate slug on organizer creation', function (): void {
     $user = User::factory()->create();
     $user->assignRole('super_admin');
 
-    Organizer::create(['name' => 'Existing', 'slug' => 'fest-x']);
+    Organizer::query()->create(['name' => 'Existing', 'slug' => 'fest-x']);
 
     $response = $this->actingAs($user)->post(route('organizers.store'), [
         'name' => 'New Organizer',
@@ -99,8 +99,8 @@ it('allows admin to list organizers', function (): void {
     $user = User::factory()->create();
     $user->assignRole('super_admin');
 
-    Organizer::create(['name' => 'Org 1', 'slug' => 'org-1']);
-    Organizer::create(['name' => 'Org 2', 'slug' => 'org-2']);
+    Organizer::query()->create(['name' => 'Org 1', 'slug' => 'org-1']);
+    Organizer::query()->create(['name' => 'Org 2', 'slug' => 'org-2']);
 
     $response = $this->actingAs($user)->get(route('organizers.index'));
 
@@ -113,8 +113,8 @@ it('shows inactive organizers as distinguishable in list', function (): void {
     $user = User::factory()->create();
     $user->assignRole('super_admin');
 
-    Organizer::create(['name' => 'Active Org', 'slug' => 'active', 'status' => 'active']);
-    Organizer::create(['name' => 'Inactive Org', 'slug' => 'inactive', 'status' => 'inactive']);
+    Organizer::query()->create(['name' => 'Active Org', 'slug' => 'active', 'status' => 'active']);
+    Organizer::query()->create(['name' => 'Inactive Org', 'slug' => 'inactive', 'status' => 'inactive']);
 
     $response = $this->actingAs($user)->get(route('organizers.index'));
 
@@ -131,7 +131,7 @@ it('allows super_admin to update organizer name', function (): void {
     $user = User::factory()->create();
     $user->assignRole('super_admin');
 
-    $organizer = Organizer::create(['name' => 'Old Name', 'slug' => 'old-name']);
+    $organizer = Organizer::query()->create(['name' => 'Old Name', 'slug' => 'old-name']);
 
     $response = $this->actingAs($user)->put(route('organizers.update', $organizer), [
         'name' => 'New Name',
@@ -144,7 +144,7 @@ it('allows super_admin to update organizer name', function (): void {
     expect($organizer->name)->toBe('New Name');
 
     // Activity must be logged
-    $activity = \Spatie\Activitylog\Models\Activity::query()
+    $activity = Spatie\Activitylog\Models\Activity::query()
         ->where('subject_type', Organizer::class)
         ->where('subject_id', $organizer->id)
         ->where('event', 'updated')
@@ -157,8 +157,8 @@ it('rejects update to existing slug', function (): void {
     $user = User::factory()->create();
     $user->assignRole('super_admin');
 
-    $organizerA = Organizer::create(['name' => 'Org A', 'slug' => 'alpha']);
-    Organizer::create(['name' => 'Org B', 'slug' => 'beta']);
+    $organizerA = Organizer::query()->create(['name' => 'Org A', 'slug' => 'alpha']);
+    Organizer::query()->create(['name' => 'Org B', 'slug' => 'beta']);
 
     $response = $this->actingAs($user)->put(route('organizers.update', $organizerA), [
         'name' => 'Org A',
@@ -176,7 +176,7 @@ it('allows deactivating an organizer without deleting data', function (): void {
     $user = User::factory()->create();
     $user->assignRole('super_admin');
 
-    $organizer = Organizer::create(['name' => 'Test', 'slug' => 'test', 'status' => 'active']);
+    $organizer = Organizer::query()->create(['name' => 'Test', 'slug' => 'test', 'status' => 'active']);
 
     $response = $this->actingAs($user)->put(route('organizers.update', $organizer), [
         'name' => 'Test',
@@ -201,7 +201,7 @@ it('allows reactivating an organizer', function (): void {
     $user = User::factory()->create();
     $user->assignRole('super_admin');
 
-    $organizer = Organizer::create(['name' => 'Test', 'slug' => 'test', 'status' => 'inactive']);
+    $organizer = Organizer::query()->create(['name' => 'Test', 'slug' => 'test', 'status' => 'inactive']);
 
     $response = $this->actingAs($user)->put(route('organizers.update', $organizer), [
         'name' => 'Test',

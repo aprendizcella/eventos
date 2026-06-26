@@ -17,7 +17,7 @@ it('validates required fields', function (): void {
 });
 
 it('validates slug uniqueness', function (): void {
-    Organizer::create(['name' => 'Test', 'slug' => 'existing-slug']);
+    Organizer::query()->create(['name' => 'Test', 'slug' => 'existing-slug']);
 
     $request = new CreateOrganizerRequest;
     $request->merge([
@@ -25,14 +25,14 @@ it('validates slug uniqueness', function (): void {
         'slug' => 'existing-slug',
     ]);
 
-    $validator = app('validator')->make($request->all(), $request->rules());
+    $validator = resolve('validator')->make($request->all(), $request->rules());
 
     expect($validator->fails())->toBeTrue()
         ->and($validator->errors()->has('slug'))->toBeTrue();
 });
 
 it('validates domain uniqueness when provided', function (): void {
-    Organizer::create(['name' => 'Test', 'slug' => 'test', 'domain' => 'existing.com']);
+    Organizer::query()->create(['name' => 'Test', 'slug' => 'test', 'domain' => 'existing.com']);
 
     $request = new CreateOrganizerRequest;
     $request->merge([
@@ -41,7 +41,7 @@ it('validates domain uniqueness when provided', function (): void {
         'domain' => 'existing.com',
     ]);
 
-    $validator = app('validator')->make($request->all(), $request->rules());
+    $validator = resolve('validator')->make($request->all(), $request->rules());
 
     expect($validator->fails())->toBeTrue()
         ->and($validator->errors()->has('domain'))->toBeTrue();
@@ -57,7 +57,7 @@ it('converts to DTO', function (): void {
         'status' => 'active',
     ]);
 
-    $validator = app('validator')->make($request->all(), $request->rules());
+    $validator = resolve('validator')->make($request->all(), $request->rules());
     $request->setValidator($validator);
 
     $dto = $request->toDto();

@@ -13,7 +13,7 @@ uses(TestCase::class, LazilyRefreshDatabase::class);
 
 it('updates an organizer with valid data', function (): void {
     $user = User::factory()->create();
-    $organizer = Organizer::create([
+    $organizer = Organizer::query()->create([
         'name' => 'Old Name',
         'slug' => 'old-slug',
         'domain' => 'old.example.com',
@@ -29,7 +29,7 @@ it('updates an organizer with valid data', function (): void {
         status: 'inactive',
     );
 
-    $action = app(UpdateOrganizerAction::class);
+    $action = resolve(UpdateOrganizerAction::class);
     $updated = $action($organizer, $dto, $user);
 
     expect($updated->name)->toBe('New Name')
@@ -41,7 +41,7 @@ it('updates an organizer with valid data', function (): void {
 
 it('logs activity when updating organizer', function (): void {
     $user = User::factory()->create();
-    $organizer = Organizer::create([
+    $organizer = Organizer::query()->create([
         'name' => 'Test',
         'slug' => 'test',
     ]);
@@ -51,7 +51,7 @@ it('logs activity when updating organizer', function (): void {
         slug: 'updated',
     );
 
-    $action = app(UpdateOrganizerAction::class);
+    $action = resolve(UpdateOrganizerAction::class);
     $action($organizer, $dto, $user);
 
     $activity = Spatie\Activitylog\Models\Activity::query()
@@ -66,7 +66,7 @@ it('logs activity when updating organizer', function (): void {
 
 it('updates only provided fields', function (): void {
     $user = User::factory()->create();
-    $organizer = Organizer::create([
+    $organizer = Organizer::query()->create([
         'name' => 'Original',
         'slug' => 'original',
         'domain' => 'original.com',
@@ -78,7 +78,7 @@ it('updates only provided fields', function (): void {
         slug: 'original',
     );
 
-    $action = app(UpdateOrganizerAction::class);
+    $action = resolve(UpdateOrganizerAction::class);
     $updated = $action($organizer, $dto, $user);
 
     expect($updated->name)->toBe('Updated')

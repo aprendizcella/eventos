@@ -20,13 +20,13 @@ beforeEach(function (): void {
 });
 
 it('changes a team member role', function (): void {
-    $organizer = Organizer::create(['name' => 'Test', 'slug' => 'test']);
+    $organizer = Organizer::query()->create(['name' => 'Test', 'slug' => 'test']);
     $user = User::factory()->create();
     $admin = User::factory()->create();
-    $editorRole = Role::where('name', 'editor')->first();
-    $viewerRole = Role::where('name', 'viewer')->first();
+    $editorRole = Role::query()->where('name', 'editor')->first();
+    $viewerRole = Role::query()->where('name', 'viewer')->first();
 
-    $organizer->users()->attach($admin->id, ['role_id' => Role::where('name', 'admin')->first()->id]);
+    $organizer->users()->attach($admin->id, ['role_id' => Role::query()->where('name', 'admin')->first()->id]);
     $organizer->users()->attach($user->id, ['role_id' => $editorRole->id]);
 
     $dto = new ChangeTeamMemberRoleDto(
@@ -34,7 +34,7 @@ it('changes a team member role', function (): void {
         roleId: $viewerRole->id,
     );
 
-    $action = app(ChangeTeamMemberRoleAction::class);
+    $action = resolve(ChangeTeamMemberRoleAction::class);
     $action($organizer, $dto, $admin);
 
     $organizer->refresh();
@@ -43,13 +43,13 @@ it('changes a team member role', function (): void {
 });
 
 it('logs activity when changing team member role', function (): void {
-    $organizer = Organizer::create(['name' => 'Test', 'slug' => 'test']);
+    $organizer = Organizer::query()->create(['name' => 'Test', 'slug' => 'test']);
     $user = User::factory()->create();
     $admin = User::factory()->create();
-    $editorRole = Role::where('name', 'editor')->first();
-    $viewerRole = Role::where('name', 'viewer')->first();
+    $editorRole = Role::query()->where('name', 'editor')->first();
+    $viewerRole = Role::query()->where('name', 'viewer')->first();
 
-    $organizer->users()->attach($admin->id, ['role_id' => Role::where('name', 'admin')->first()->id]);
+    $organizer->users()->attach($admin->id, ['role_id' => Role::query()->where('name', 'admin')->first()->id]);
     $organizer->users()->attach($user->id, ['role_id' => $editorRole->id]);
 
     $dto = new ChangeTeamMemberRoleDto(
@@ -57,7 +57,7 @@ it('logs activity when changing team member role', function (): void {
         roleId: $viewerRole->id,
     );
 
-    $action = app(ChangeTeamMemberRoleAction::class);
+    $action = resolve(ChangeTeamMemberRoleAction::class);
     $action($organizer, $dto, $admin);
 
     $activity = Spatie\Activitylog\Models\Activity::query()
@@ -72,10 +72,10 @@ it('logs activity when changing team member role', function (): void {
 });
 
 it('prevents demoting last admin', function (): void {
-    $organizer = Organizer::create(['name' => 'Test', 'slug' => 'test']);
+    $organizer = Organizer::query()->create(['name' => 'Test', 'slug' => 'test']);
     $admin = User::factory()->create();
-    $adminRole = Role::where('name', 'admin')->first();
-    $editorRole = Role::where('name', 'editor')->first();
+    $adminRole = Role::query()->where('name', 'admin')->first();
+    $editorRole = Role::query()->where('name', 'editor')->first();
 
     $organizer->users()->attach($admin->id, ['role_id' => $adminRole->id]);
 
@@ -84,18 +84,18 @@ it('prevents demoting last admin', function (): void {
         roleId: $editorRole->id,
     );
 
-    $action = app(ChangeTeamMemberRoleAction::class);
+    $action = resolve(ChangeTeamMemberRoleAction::class);
 
     expect(fn () => $action($organizer, $dto, $admin))
         ->toThrow(LastAdminCannotBeRemovedException::class);
 });
 
 it('allows demoting admin if other admins exist', function (): void {
-    $organizer = Organizer::create(['name' => 'Test', 'slug' => 'test']);
+    $organizer = Organizer::query()->create(['name' => 'Test', 'slug' => 'test']);
     $admin1 = User::factory()->create();
     $admin2 = User::factory()->create();
-    $adminRole = Role::where('name', 'admin')->first();
-    $editorRole = Role::where('name', 'editor')->first();
+    $adminRole = Role::query()->where('name', 'admin')->first();
+    $editorRole = Role::query()->where('name', 'editor')->first();
 
     $organizer->users()->attach($admin1->id, ['role_id' => $adminRole->id]);
     $organizer->users()->attach($admin2->id, ['role_id' => $adminRole->id]);
@@ -105,7 +105,7 @@ it('allows demoting admin if other admins exist', function (): void {
         roleId: $editorRole->id,
     );
 
-    $action = app(ChangeTeamMemberRoleAction::class);
+    $action = resolve(ChangeTeamMemberRoleAction::class);
     $action($organizer, $dto, $admin1);
 
     $organizer->refresh();

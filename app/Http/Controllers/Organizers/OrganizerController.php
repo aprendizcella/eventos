@@ -30,7 +30,7 @@ final class OrganizerController extends Controller
     {
         $organizers = Organizer::query()->paginate(15);
 
-        return view('organizers.index', compact('organizers'));
+        return view('organizers.index', ['organizers' => $organizers]);
     }
 
     public function create(): View
@@ -46,8 +46,7 @@ final class OrganizerController extends Controller
 
         $organizer = ($this->createAction)($request->toDto(), $request->user());
 
-        return redirect()
-            ->route('organizers.show', $organizer)
+        return to_route('organizers.show', $organizer)
             ->with('success', 'Organizer created successfully.');
     }
 
@@ -55,14 +54,14 @@ final class OrganizerController extends Controller
     {
         $this->authorize('view', $organizer);
 
-        return view('organizers.show', compact('organizer'));
+        return view('organizers.show', ['organizer' => $organizer]);
     }
 
     public function edit(Organizer $organizer): View
     {
         $this->authorize('update', $organizer);
 
-        return view('organizers.edit', compact('organizer'));
+        return view('organizers.edit', ['organizer' => $organizer]);
     }
 
     public function update(UpdateOrganizerRequest $request, Organizer $organizer): RedirectResponse
@@ -71,8 +70,7 @@ final class OrganizerController extends Controller
 
         ($this->updateAction)($organizer, $request->toDto(), $request->user());
 
-        return redirect()
-            ->route('organizers.show', $organizer)
+        return to_route('organizers.show', $organizer)
             ->with('success', 'Organizer updated successfully.');
     }
 
@@ -82,8 +80,7 @@ final class OrganizerController extends Controller
 
         ($this->deleteAction)($organizer, $request->user());
 
-        return redirect()
-            ->route('organizers.index')
+        return to_route('organizers.index')
             ->with('success', 'Organizer deleted successfully.');
     }
 }

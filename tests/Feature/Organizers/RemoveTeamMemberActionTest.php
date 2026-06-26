@@ -17,17 +17,17 @@ beforeEach(function (): void {
 });
 
 it('removes a user from an organizer', function (): void {
-    $organizer = Organizer::create(['name' => 'Test', 'slug' => 'test']);
+    $organizer = Organizer::query()->create(['name' => 'Test', 'slug' => 'test']);
     $user = User::factory()->create();
     $admin1 = User::factory()->create();
     $admin2 = User::factory()->create();
-    $adminRole = Role::where('name', 'admin')->first();
+    $adminRole = Role::query()->where('name', 'admin')->first();
 
     $organizer->users()->attach($admin1->id, ['role_id' => $adminRole->id]);
     $organizer->users()->attach($admin2->id, ['role_id' => $adminRole->id]);
     $organizer->users()->attach($user->id, ['role_id' => $adminRole->id]);
 
-    $action = app(RemoveTeamMemberAction::class);
+    $action = resolve(RemoveTeamMemberAction::class);
     $action($organizer, $user, $admin1);
 
     $organizer->refresh();
@@ -36,17 +36,17 @@ it('removes a user from an organizer', function (): void {
 });
 
 it('logs activity when removing team member', function (): void {
-    $organizer = Organizer::create(['name' => 'Test', 'slug' => 'test']);
+    $organizer = Organizer::query()->create(['name' => 'Test', 'slug' => 'test']);
     $user = User::factory()->create();
     $admin1 = User::factory()->create();
     $admin2 = User::factory()->create();
-    $adminRole = Role::where('name', 'admin')->first();
+    $adminRole = Role::query()->where('name', 'admin')->first();
 
     $organizer->users()->attach($admin1->id, ['role_id' => $adminRole->id]);
     $organizer->users()->attach($admin2->id, ['role_id' => $adminRole->id]);
     $organizer->users()->attach($user->id, ['role_id' => $adminRole->id]);
 
-    $action = app(RemoveTeamMemberAction::class);
+    $action = resolve(RemoveTeamMemberAction::class);
     $action($organizer, $user, $admin1);
 
     $activity = Spatie\Activitylog\Models\Activity::query()
@@ -60,28 +60,28 @@ it('logs activity when removing team member', function (): void {
 });
 
 it('prevents removing last admin', function (): void {
-    $organizer = Organizer::create(['name' => 'Test', 'slug' => 'test']);
+    $organizer = Organizer::query()->create(['name' => 'Test', 'slug' => 'test']);
     $admin = User::factory()->create();
-    $adminRole = Role::where('name', 'admin')->first();
+    $adminRole = Role::query()->where('name', 'admin')->first();
 
     $organizer->users()->attach($admin->id, ['role_id' => $adminRole->id]);
 
-    $action = app(RemoveTeamMemberAction::class);
+    $action = resolve(RemoveTeamMemberAction::class);
 
     expect(fn () => $action($organizer, $admin, $admin))
         ->toThrow(App\Exceptions\LastAdminCannotBeRemovedException::class);
 });
 
 it('allows removing admin if other admins exist', function (): void {
-    $organizer = Organizer::create(['name' => 'Test', 'slug' => 'test']);
+    $organizer = Organizer::query()->create(['name' => 'Test', 'slug' => 'test']);
     $admin1 = User::factory()->create();
     $admin2 = User::factory()->create();
-    $adminRole = Role::where('name', 'admin')->first();
+    $adminRole = Role::query()->where('name', 'admin')->first();
 
     $organizer->users()->attach($admin1->id, ['role_id' => $adminRole->id]);
     $organizer->users()->attach($admin2->id, ['role_id' => $adminRole->id]);
 
-    $action = app(RemoveTeamMemberAction::class);
+    $action = resolve(RemoveTeamMemberAction::class);
     $action($organizer, $admin2, $admin1);
 
     $organizer->refresh();

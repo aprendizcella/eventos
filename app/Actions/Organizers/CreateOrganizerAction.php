@@ -14,7 +14,7 @@ final readonly class CreateOrganizerAction
     public function __invoke(CreateOrganizerDto $dto, User $creator): Organizer
     {
         return DB::transaction(function () use ($dto, $creator): Organizer {
-            $organizer = Organizer::create([
+            $organizer = Organizer::query()->create([
                 'name' => $dto->name,
                 'slug' => $dto->slug,
                 'domain' => $dto->domain,

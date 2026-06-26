@@ -25,7 +25,7 @@ it('does not seed organizer_admin as global role', function (): void {
     $seeder = new RoleSeeder;
     $seeder->run();
 
-    $role = Role::where('name', 'organizer_admin')->first();
+    $role = Role::query()->where('name', 'organizer_admin')->first();
 
     expect($role)->toBeNull();
 });
@@ -34,7 +34,7 @@ it('does not seed organizer_editor as global role', function (): void {
     $seeder = new RoleSeeder;
     $seeder->run();
 
-    $role = Role::where('name', 'organizer_editor')->first();
+    $role = Role::query()->where('name', 'organizer_editor')->first();
 
     expect($role)->toBeNull();
 });
@@ -43,7 +43,7 @@ it('does not seed organizer_viewer as global role', function (): void {
     $seeder = new RoleSeeder;
     $seeder->run();
 
-    $role = Role::where('name', 'organizer_viewer')->first();
+    $role = Role::query()->where('name', 'organizer_viewer')->first();
 
     expect($role)->toBeNull();
 });
@@ -52,10 +52,10 @@ it('seeder is idempotent', function (): void {
     $seeder = new RoleSeeder;
 
     $seeder->run();
-    $firstRun = Role::count();
+    $firstRun = Role::query()->count();
 
     $seeder->run();
-    $secondRun = Role::count();
+    $secondRun = Role::query()->count();
 
     expect($firstRun)->toBe($secondRun)->and($firstRun)->toBe(3);
 });

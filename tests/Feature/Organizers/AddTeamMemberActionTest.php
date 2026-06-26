@@ -19,17 +19,17 @@ beforeEach(function (): void {
 });
 
 it('adds a user to an organizer with a role', function (): void {
-    $organizer = Organizer::create(['name' => 'Test', 'slug' => 'test']);
+    $organizer = Organizer::query()->create(['name' => 'Test', 'slug' => 'test']);
     $user = User::factory()->create();
     $admin = User::factory()->create();
-    $role = Role::where('name', 'editor')->first();
+    $role = Role::query()->where('name', 'editor')->first();
 
     $dto = new AddTeamMemberDto(
         userId: $user->id,
         roleId: $role->id,
     );
 
-    $action = app(AddTeamMemberAction::class);
+    $action = resolve(AddTeamMemberAction::class);
     $action($organizer, $dto, $admin);
 
     expect($organizer->users)->toHaveCount(1)
@@ -38,17 +38,17 @@ it('adds a user to an organizer with a role', function (): void {
 });
 
 it('logs activity when adding team member', function (): void {
-    $organizer = Organizer::create(['name' => 'Test', 'slug' => 'test']);
+    $organizer = Organizer::query()->create(['name' => 'Test', 'slug' => 'test']);
     $user = User::factory()->create();
     $admin = User::factory()->create();
-    $role = Role::where('name', 'admin')->first();
+    $role = Role::query()->where('name', 'admin')->first();
 
     $dto = new AddTeamMemberDto(
         userId: $user->id,
         roleId: $role->id,
     );
 
-    $action = app(AddTeamMemberAction::class);
+    $action = resolve(AddTeamMemberAction::class);
     $action($organizer, $dto, $admin);
 
     $activity = Spatie\Activitylog\Models\Activity::query()
@@ -63,17 +63,17 @@ it('logs activity when adding team member', function (): void {
 });
 
 it('prevents adding same user twice', function (): void {
-    $organizer = Organizer::create(['name' => 'Test', 'slug' => 'test']);
+    $organizer = Organizer::query()->create(['name' => 'Test', 'slug' => 'test']);
     $user = User::factory()->create();
     $admin = User::factory()->create();
-    $role = Role::where('name', 'editor')->first();
+    $role = Role::query()->where('name', 'editor')->first();
 
     $dto = new AddTeamMemberDto(
         userId: $user->id,
         roleId: $role->id,
     );
 
-    $action = app(AddTeamMemberAction::class);
+    $action = resolve(AddTeamMemberAction::class);
     $action($organizer, $dto, $admin);
 
     expect(fn () => $action($organizer, $dto, $admin))

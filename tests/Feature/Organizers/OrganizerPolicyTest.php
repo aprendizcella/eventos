@@ -21,8 +21,8 @@ beforeEach(function (): void {
 
 it('allows organizer admin to view organizer', function (): void {
     $user = User::factory()->create();
-    $organizer = Organizer::create(['name' => 'Test', 'slug' => 'test']);
-    $adminRole = Role::where('name', 'admin')->first();
+    $organizer = Organizer::query()->create(['name' => 'Test', 'slug' => 'test']);
+    $adminRole = Role::query()->where('name', 'admin')->first();
     $organizer->users()->attach($user->id, ['role_id' => $adminRole->id]);
 
     $policy = new OrganizerPolicy;
@@ -32,7 +32,7 @@ it('allows organizer admin to view organizer', function (): void {
 
 it('denies non-member from viewing organizer', function (): void {
     $user = User::factory()->create();
-    $organizer = Organizer::create(['name' => 'Test', 'slug' => 'test']);
+    $organizer = Organizer::query()->create(['name' => 'Test', 'slug' => 'test']);
 
     $policy = new OrganizerPolicy;
 
@@ -41,8 +41,8 @@ it('denies non-member from viewing organizer', function (): void {
 
 it('allows organizer admin to manage team', function (): void {
     $user = User::factory()->create();
-    $organizer = Organizer::create(['name' => 'Test', 'slug' => 'test']);
-    $adminRole = Role::where('name', 'admin')->first();
+    $organizer = Organizer::query()->create(['name' => 'Test', 'slug' => 'test']);
+    $adminRole = Role::query()->where('name', 'admin')->first();
     $organizer->users()->attach($user->id, ['role_id' => $adminRole->id]);
 
     $policy = new OrganizerPolicy;
@@ -52,8 +52,8 @@ it('allows organizer admin to manage team', function (): void {
 
 it('denies organizer editor from managing team', function (): void {
     $user = User::factory()->create();
-    $organizer = Organizer::create(['name' => 'Test', 'slug' => 'test']);
-    $editorRole = Role::where('name', 'editor')->first();
+    $organizer = Organizer::query()->create(['name' => 'Test', 'slug' => 'test']);
+    $editorRole = Role::query()->where('name', 'editor')->first();
     $organizer->users()->attach($user->id, ['role_id' => $editorRole->id]);
 
     $policy = new OrganizerPolicy;

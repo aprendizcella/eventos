@@ -5,7 +5,6 @@ declare(strict_types=1);
 use App\Models\User;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use Tests\Authorization\AuthorizationRouteRegistrar;
 use Tests\TestCase;
@@ -25,7 +24,7 @@ it('permits an authenticated user who has the required role', function (): void 
     $user = User::factory()->create();
     // With Spatie teams enabled, we need to set a team context for global roles
     // Using team ID 0 as a sentinel for "no specific team" (global role)
-    app(\Spatie\Permission\PermissionRegistrar::class)->setPermissionsTeamId(0);
+    resolve(Spatie\Permission\PermissionRegistrar::class)->setPermissionsTeamId(0);
     $user->assignRole('super_admin');
 
     $this->actingAs($user)

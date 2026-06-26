@@ -10,7 +10,7 @@ use Tests\TestCase;
 uses(TestCase::class, LazilyRefreshDatabase::class);
 
 it('creates an organizer with valid attributes', function (): void {
-    $organizer = Organizer::create([
+    $organizer = Organizer::query()->create([
         'name' => 'Test Organizer',
         'slug' => 'test-organizer',
         'domain' => 'test.example.com',
@@ -27,7 +27,7 @@ it('creates an organizer with valid attributes', function (): void {
 });
 
 it('casts settings to array', function (): void {
-    $organizer = Organizer::create([
+    $organizer = Organizer::query()->create([
         'name' => 'Test',
         'slug' => 'test',
         'settings' => ['key' => 'value'],
@@ -40,7 +40,7 @@ it('casts settings to array', function (): void {
 });
 
 it('has users relationship', function (): void {
-    $organizer = Organizer::create([
+    $organizer = Organizer::query()->create([
         'name' => 'Test',
         'slug' => 'test',
     ]);
@@ -55,33 +55,33 @@ it('has users relationship', function (): void {
 });
 
 it('has active scope', function (): void {
-    Organizer::create(['name' => 'Active', 'slug' => 'active', 'status' => 'active']);
-    Organizer::create(['name' => 'Inactive', 'slug' => 'inactive', 'status' => 'inactive']);
+    Organizer::query()->create(['name' => 'Active', 'slug' => 'active', 'status' => 'active']);
+    Organizer::query()->create(['name' => 'Inactive', 'slug' => 'inactive', 'status' => 'inactive']);
 
-    $activeOrganizers = Organizer::active()->get();
+    $activeOrganizers = Organizer::query()->active()->get();
 
     expect($activeOrganizers)->toHaveCount(1)
         ->and($activeOrganizers->first()->name)->toBe('Active');
 });
 
 it('has withDomain scope', function (): void {
-    Organizer::create(['name' => 'With Domain', 'slug' => 'with-domain', 'domain' => 'example.com']);
-    Organizer::create(['name' => 'No Domain', 'slug' => 'no-domain']);
+    Organizer::query()->create(['name' => 'With Domain', 'slug' => 'with-domain', 'domain' => 'example.com']);
+    Organizer::query()->create(['name' => 'No Domain', 'slug' => 'no-domain']);
 
-    $withDomain = Organizer::withDomain()->get();
+    $withDomain = Organizer::query()->withDomain()->get();
 
     expect($withDomain)->toHaveCount(1)
         ->and($withDomain->first()->name)->toBe('With Domain');
 });
 
 it('uses soft deletes', function (): void {
-    $organizer = Organizer::create([
+    $organizer = Organizer::query()->create([
         'name' => 'Test',
         'slug' => 'test',
     ]);
 
     $organizer->delete();
 
-    expect(Organizer::count())->toBe(0)
+    expect(Organizer::query()->count())->toBe(0)
         ->and(Organizer::withTrashed()->count())->toBe(1);
 });

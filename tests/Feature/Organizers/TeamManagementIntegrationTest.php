@@ -15,7 +15,7 @@ beforeEach(function (): void {
     $this->withoutMiddleware([ValidateCsrfToken::class]);
 
     // Set team context for global roles (using 0 as sentinel for "no specific team")
-    app(\Spatie\Permission\PermissionRegistrar::class)->setPermissionsTeamId(0);
+    resolve(Spatie\Permission\PermissionRegistrar::class)->setPermissionsTeamId(0);
 
     // Create global roles
     Role::query()->firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web']);
@@ -32,13 +32,13 @@ beforeEach(function (): void {
 // =============================================================================
 
 it('allows organizer admin to add existing user as editor', function (): void {
-    $organizer = Organizer::create(['name' => 'Test', 'slug' => 'test']);
+    $organizer = Organizer::query()->create(['name' => 'Test', 'slug' => 'test']);
     $admin = User::factory()->create();
-    $adminRole = Role::where('name', 'admin')->first();
+    $adminRole = Role::query()->where('name', 'admin')->first();
     $organizer->users()->attach($admin->id, ['role_id' => $adminRole->id]);
 
     $newUser = User::factory()->create();
-    $editorRole = Role::where('name', 'editor')->first();
+    $editorRole = Role::query()->where('name', 'editor')->first();
 
     // Set current organizer context
     $this->actingAs($admin)->withSession(['current_organizer_id' => $organizer->id]);
@@ -57,7 +57,7 @@ it('allows organizer admin to add existing user as editor', function (): void {
     ]);
 
     // Activity must be logged
-    $activity = \Spatie\Activitylog\Models\Activity::query()
+    $activity = Spatie\Activitylog\Models\Activity::query()
         ->where('subject_type', Organizer::class)
         ->where('subject_id', $organizer->id)
         ->where('description', 'team_member_added')
@@ -69,13 +69,13 @@ it('allows organizer admin to add existing user as editor', function (): void {
 });
 
 it('rejects adding already-existing member', function (): void {
-    $organizer = Organizer::create(['name' => 'Test', 'slug' => 'test']);
+    $organizer = Organizer::query()->create(['name' => 'Test', 'slug' => 'test']);
     $admin = User::factory()->create();
-    $adminRole = Role::where('name', 'admin')->first();
+    $adminRole = Role::query()->where('name', 'admin')->first();
     $organizer->users()->attach($admin->id, ['role_id' => $adminRole->id]);
 
     $existingUser = User::factory()->create();
-    $editorRole = Role::where('name', 'editor')->first();
+    $editorRole = Role::query()->where('name', 'editor')->first();
     $organizer->users()->attach($existingUser->id, ['role_id' => $editorRole->id]);
 
     $this->actingAs($admin)->withSession(['current_organizer_id' => $organizer->id]);
@@ -90,12 +90,12 @@ it('rejects adding already-existing member', function (): void {
 });
 
 it('rejects adding non-existent user', function (): void {
-    $organizer = Organizer::create(['name' => 'Test', 'slug' => 'test']);
+    $organizer = Organizer::query()->create(['name' => 'Test', 'slug' => 'test']);
     $admin = User::factory()->create();
-    $adminRole = Role::where('name', 'admin')->first();
+    $adminRole = Role::query()->where('name', 'admin')->first();
     $organizer->users()->attach($admin->id, ['role_id' => $adminRole->id]);
 
-    $editorRole = Role::where('name', 'editor')->first();
+    $editorRole = Role::query()->where('name', 'editor')->first();
 
     $this->actingAs($admin)->withSession(['current_organizer_id' => $organizer->id]);
 
@@ -108,13 +108,13 @@ it('rejects adding non-existent user', function (): void {
 });
 
 it('denies team member addition to viewer', function (): void {
-    $organizer = Organizer::create(['name' => 'Test', 'slug' => 'test']);
+    $organizer = Organizer::query()->create(['name' => 'Test', 'slug' => 'test']);
     $viewer = User::factory()->create();
-    $viewerRole = Role::where('name', 'viewer')->first();
+    $viewerRole = Role::query()->where('name', 'viewer')->first();
     $organizer->users()->attach($viewer->id, ['role_id' => $viewerRole->id]);
 
     $newUser = User::factory()->create();
-    $editorRole = Role::where('name', 'editor')->first();
+    $editorRole = Role::query()->where('name', 'editor')->first();
 
     $this->actingAs($viewer)->withSession(['current_organizer_id' => $organizer->id]);
 
@@ -131,12 +131,12 @@ it('denies team member addition to viewer', function (): void {
 // =============================================================================
 
 it('allows admin to remove a member when multiple admins exist', function (): void {
-    $organizer = Organizer::create(['name' => 'Test', 'slug' => 'test']);
+    $organizer = Organizer::query()->create(['name' => 'Test', 'slug' => 'test']);
     $admin1 = User::factory()->create();
     $admin2 = User::factory()->create();
     $member = User::factory()->create();
-    $adminRole = Role::where('name', 'admin')->first();
-    $editorRole = Role::where('name', 'editor')->first();
+    $adminRole = Role::query()->where('name', 'admin')->first();
+    $editorRole = Role::query()->where('name', 'editor')->first();
 
     $organizer->users()->attach($admin1->id, ['role_id' => $adminRole->id]);
     $organizer->users()->attach($admin2->id, ['role_id' => $adminRole->id]);
@@ -154,7 +154,7 @@ it('allows admin to remove a member when multiple admins exist', function (): vo
     ]);
 
     // Activity must be logged
-    $activity = \Spatie\Activitylog\Models\Activity::query()
+    $activity = Spatie\Activitylog\Models\Activity::query()
         ->where('subject_type', Organizer::class)
         ->where('subject_id', $organizer->id)
         ->where('description', 'team_member_removed')
@@ -164,9 +164,9 @@ it('allows admin to remove a member when multiple admins exist', function (): vo
 });
 
 it('prevents removing last admin', function (): void {
-    $organizer = Organizer::create(['name' => 'Test', 'slug' => 'test']);
+    $organizer = Organizer::query()->create(['name' => 'Test', 'slug' => 'test']);
     $admin = User::factory()->create();
-    $adminRole = Role::where('name', 'admin')->first();
+    $adminRole = Role::query()->where('name', 'admin')->first();
     $organizer->users()->attach($admin->id, ['role_id' => $adminRole->id]);
 
     $this->actingAs($admin)->withSession(['current_organizer_id' => $organizer->id]);
@@ -178,9 +178,9 @@ it('prevents removing last admin', function (): void {
 });
 
 it('prevents admin from removing themselves as last admin', function (): void {
-    $organizer = Organizer::create(['name' => 'Test', 'slug' => 'test']);
+    $organizer = Organizer::query()->create(['name' => 'Test', 'slug' => 'test']);
     $admin = User::factory()->create();
-    $adminRole = Role::where('name', 'admin')->first();
+    $adminRole = Role::query()->where('name', 'admin')->first();
     $organizer->users()->attach($admin->id, ['role_id' => $adminRole->id]);
 
     $this->actingAs($admin)->withSession(['current_organizer_id' => $organizer->id]);
@@ -195,11 +195,11 @@ it('prevents admin from removing themselves as last admin', function (): void {
 // =============================================================================
 
 it('allows admin to change member role from editor to admin', function (): void {
-    $organizer = Organizer::create(['name' => 'Test', 'slug' => 'test']);
+    $organizer = Organizer::query()->create(['name' => 'Test', 'slug' => 'test']);
     $admin = User::factory()->create();
     $editor = User::factory()->create();
-    $adminRole = Role::where('name', 'admin')->first();
-    $editorRole = Role::where('name', 'editor')->first();
+    $adminRole = Role::query()->where('name', 'admin')->first();
+    $editorRole = Role::query()->where('name', 'editor')->first();
 
     $organizer->users()->attach($admin->id, ['role_id' => $adminRole->id]);
     $organizer->users()->attach($editor->id, ['role_id' => $editorRole->id]);
@@ -220,7 +220,7 @@ it('allows admin to change member role from editor to admin', function (): void 
     ]);
 
     // Activity must be logged
-    $activity = \Spatie\Activitylog\Models\Activity::query()
+    $activity = Spatie\Activitylog\Models\Activity::query()
         ->where('subject_type', Organizer::class)
         ->where('subject_id', $organizer->id)
         ->where('description', 'team_member_role_changed')
@@ -230,10 +230,10 @@ it('allows admin to change member role from editor to admin', function (): void 
 });
 
 it('prevents demoting last admin', function (): void {
-    $organizer = Organizer::create(['name' => 'Test', 'slug' => 'test']);
+    $organizer = Organizer::query()->create(['name' => 'Test', 'slug' => 'test']);
     $admin = User::factory()->create();
-    $adminRole = Role::where('name', 'admin')->first();
-    $editorRole = Role::where('name', 'editor')->first();
+    $adminRole = Role::query()->where('name', 'admin')->first();
+    $editorRole = Role::query()->where('name', 'editor')->first();
     $organizer->users()->attach($admin->id, ['role_id' => $adminRole->id]);
 
     $this->actingAs($admin)->withSession(['current_organizer_id' => $organizer->id]);
@@ -251,11 +251,11 @@ it('prevents demoting last admin', function (): void {
 // =============================================================================
 
 it('allows user to have different roles in different organizers', function (): void {
-    $organizerA = Organizer::create(['name' => 'Org A', 'slug' => 'org-a']);
-    $organizerB = Organizer::create(['name' => 'Org B', 'slug' => 'org-b']);
+    $organizerA = Organizer::query()->create(['name' => 'Org A', 'slug' => 'org-a']);
+    $organizerB = Organizer::query()->create(['name' => 'Org B', 'slug' => 'org-b']);
     $user = User::factory()->create();
-    $adminRole = Role::where('name', 'admin')->first();
-    $viewerRole = Role::where('name', 'viewer')->first();
+    $adminRole = Role::query()->where('name', 'admin')->first();
+    $viewerRole = Role::query()->where('name', 'viewer')->first();
 
     $organizerA->users()->attach($user->id, ['role_id' => $adminRole->id]);
     $organizerB->users()->attach($user->id, ['role_id' => $viewerRole->id]);

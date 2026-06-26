@@ -13,10 +13,10 @@ use App\Http\Requests\Organizers\AddTeamMemberRequest;
 use App\Http\Requests\Organizers\ChangeTeamMemberRoleRequest;
 use App\Models\Organizer;
 use App\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Database\QueryException;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
@@ -36,7 +36,7 @@ final class TeamController extends Controller
 
         $members = $organizer->users;
 
-        return view('organizers.team.index', compact('organizer', 'members'));
+        return view('organizers.team.index', ['organizer' => $organizer, 'members' => $members]);
     }
 
     public function store(AddTeamMemberRequest $request, Organizer $organizer): RedirectResponse
@@ -52,11 +52,11 @@ final class TeamController extends Controller
                     'user_id' => 'This user is already a member of this organizer.',
                 ]);
             }
+
             throw $e;
         }
 
-        return redirect()
-            ->route('organizers.team.index', $organizer)
+        return to_route('organizers.team.index', $organizer)
             ->with('success', 'Team member added successfully.');
     }
 
@@ -72,8 +72,7 @@ final class TeamController extends Controller
             ]);
         }
 
-        return redirect()
-            ->route('organizers.team.index', $organizer)
+        return to_route('organizers.team.index', $organizer)
             ->with('success', 'Team member role updated successfully.');
     }
 
@@ -89,8 +88,7 @@ final class TeamController extends Controller
             ]);
         }
 
-        return redirect()
-            ->route('organizers.team.index', $organizer)
+        return to_route('organizers.team.index', $organizer)
             ->with('success', 'Team member removed successfully.');
     }
 }

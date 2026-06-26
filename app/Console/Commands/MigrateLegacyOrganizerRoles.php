@@ -8,6 +8,7 @@ use App\Models\Organizer;
 use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use InvalidArgumentException;
 use Spatie\Permission\Models\Role;
 
 class MigrateLegacyOrganizerRoles extends Command
@@ -36,6 +37,7 @@ class MigrateLegacyOrganizerRoles extends Command
         }
 
         $this->warn("Found {$legacyRoles->count()} legacy role(s):");
+
         foreach ($legacyRoles as $role) {
             $userCount = DB::table('model_has_roles')
                 ->where('role_id', $role->id)
@@ -46,7 +48,7 @@ class MigrateLegacyOrganizerRoles extends Command
 
         // Find users with legacy roles
         $usersWithLegacyRoles = User::query()
-            ->whereHas('roles', function ($query) use ($legacyRoles): void {
+            ->whereHas('roles', function ($query): void {
                 $query->whereIn('name', ['organizer_admin', 'organizer_editor', 'organizer_viewer']);
             })
             ->with('roles')
@@ -60,6 +62,7 @@ class MigrateLegacyOrganizerRoles extends Command
         }
 
         $this->warn("Found {$usersWithLegacyRoles->count()} user(s) with legacy roles:");
+
         foreach ($usersWithLegacyRoles as $user) {
             $legacyRoleNames = $user->roles->pluck('name')->intersect(['organizer_admin', 'organizer_editor', 'organizer_viewer'])->implode(', ');
             $this->line("  - {$user->name} ({$user->email}): {$legacyRoleNames}");
@@ -69,13 +72,13 @@ class MigrateLegacyOrganizerRoles extends Command
         // Dry run mode
         if ($this->option('dry-run')) {
             $this->info('DRY RUN: No changes will be made.');
-            $this->analyzeMigration($usersWithLegacyRoles, $legacyRoles);
+            $this->analyzeMigration($usersWithLegacyRoles);
 
             return self::SUCCESS;
         }
 
         // Confirmation
-        if (! $this->option('force') && ! $this->confirm('Proceed with migration? This will modify user roles and cannot be easily undone.')) {
+        if (!$this->option('force') && !$this->confirm('Proceed with migration? This will modify user roles and cannot be easily undone.')) {
             $this->info('Migration cancelled.');
 
             return self::SUCCESS;
@@ -87,7 +90,7 @@ class MigrateLegacyOrganizerRoles extends Command
         $skipped = 0;
 
         foreach ($usersWithLegacyRoles as $user) {
-            $result = $this->migrateUser($user, $legacyRoles);
+            $result = $this->migrateUser($user);
             $migrated += $result['migrated'];
             $skipped += $result['skipped'];
         }
@@ -99,13 +102,13 @@ class MigrateLegacyOrganizerRoles extends Command
         $this->cleanupLegacyRoles($legacyRoles);
 
         // Clear permission cache
-        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+        resolve(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
         $this->info('✓ Permission cache cleared.');
 
         return self::SUCCESS;
     }
 
-    private function analyzeMigration($users, $legacyRoles): void
+    private function analyzeMigration($users): void
     {
         $this->newLine();
         $this->info('Analysis:');
@@ -126,6 +129,7 @@ class MigrateLegacyOrganizerRoles extends Command
                 } else {
                     $this->line("  ✓ {$user->email}:");
                     $this->line("    Legacy role: {$legacyRole->name} → Would map to: {$mappedRole}");
+
                     foreach ($organizers as $organizer) {
                         $this->line("    Organizer: {$organizer->name} ({$organizer->slug})");
                     }
@@ -134,7 +138,7 @@ class MigrateLegacyOrganizerRoles extends Command
         }
     }
 
-    private function migrateUser(User $user, $legacyRoles): array
+    private function migrateUser(User $user): array
     {
         $migrated = 0;
         $skipped = 0;
@@ -158,7 +162,7 @@ class MigrateLegacyOrganizerRoles extends Command
             foreach ($organizers as $organizer) {
                 $roleModel = Role::query()->where('name', $mappedRole)->first();
 
-                if (! $roleModel) {
+                if (!$roleModel) {
                     $this->error("  ✗ Role '{$mappedRole}' not found. Skipping.");
                     $skipped++;
 
@@ -205,7 +209,7 @@ class MigrateLegacyOrganizerRoles extends Command
             'organizer_admin' => 'admin',
             'organizer_editor' => 'editor',
             'organizer_viewer' => 'viewer',
-            default => throw new \InvalidArgumentException("Unknown legacy role: {$legacyRole}"),
+            default => throw new InvalidArgumentException("Unknown legacy role: {$legacyRole}"),
         };
     }
 

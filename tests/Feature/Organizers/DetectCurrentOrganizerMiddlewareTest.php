@@ -12,15 +12,13 @@ use Tests\TestCase;
 uses(TestCase::class, LazilyRefreshDatabase::class);
 
 it('sets current organizer from route parameter', function (): void {
-    $organizer = Organizer::create(['name' => 'Test', 'slug' => 'test']);
+    $organizer = Organizer::query()->create(['name' => 'Test', 'slug' => 'test']);
 
     $request = Request::create('/organizers/test', 'GET');
     $request->attributes->set('current_organizer', $organizer);
 
     $middleware = new DetectCurrentOrganizer;
-    $response = $middleware->handle($request, function ($req) {
-        return new Response;
-    });
+    $response = $middleware->handle($request, fn ($req) => new Response);
 
     expect($request->attributes->get('current_organizer'))->toBe($organizer);
 });
@@ -29,9 +27,7 @@ it('passes through when no organizer in route', function (): void {
     $request = Request::create('/dashboard', 'GET');
 
     $middleware = new DetectCurrentOrganizer;
-    $response = $middleware->handle($request, function ($req) {
-        return new Response;
-    });
+    $response = $middleware->handle($request, fn ($req) => new Response);
 
     expect($request->attributes->get('current_organizer'))->toBeNull();
 });

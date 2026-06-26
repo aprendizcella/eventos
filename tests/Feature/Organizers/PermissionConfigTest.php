@@ -15,5 +15,5 @@ it('sets team_foreign_key to organizer_id', function (): void {
 });
 
 it('sets team model to Organizer class', function (): void {
-    expect(config('permission.models.team'))->toBe('App\Models\Organizer');
+    expect(config('permission.models.team'))->toBe(App\Models\Organizer::class);
 });

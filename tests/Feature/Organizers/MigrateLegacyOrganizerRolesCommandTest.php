@@ -12,7 +12,7 @@ uses(TestCase::class, LazilyRefreshDatabase::class);
 
 beforeEach(function (): void {
     // Set team context for global roles
-    app(\Spatie\Permission\PermissionRegistrar::class)->setPermissionsTeamId(0);
+    resolve(Spatie\Permission\PermissionRegistrar::class)->setPermissionsTeamId(0);
 
     // Create organizer-scoped roles
     Role::query()->firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
@@ -52,7 +52,7 @@ it('detects legacy organizer_viewer role', function (): void {
 
 it('skips users with no organizer membership', function (): void {
     // Use team ID 0 for global roles
-    app(\Spatie\Permission\PermissionRegistrar::class)->setPermissionsTeamId(0);
+    resolve(Spatie\Permission\PermissionRegistrar::class)->setPermissionsTeamId(0);
     $legacyRole = Role::query()->firstOrCreate(['name' => 'organizer_admin', 'guard_name' => 'web']);
     $user = User::factory()->create();
     $user->assignRole($legacyRole->name);
@@ -67,16 +67,16 @@ it('skips users with no organizer membership', function (): void {
 
 it('migrates user with organizer membership to pivot role', function (): void {
     // Use team ID 0 for global roles
-    app(\Spatie\Permission\PermissionRegistrar::class)->setPermissionsTeamId(0);
+    resolve(Spatie\Permission\PermissionRegistrar::class)->setPermissionsTeamId(0);
     $legacyRole = Role::query()->firstOrCreate(['name' => 'organizer_admin', 'guard_name' => 'web']);
     $user = User::factory()->create();
-    $organizer = Organizer::create(['name' => 'Test', 'slug' => 'test']);
+    $organizer = Organizer::query()->create(['name' => 'Test', 'slug' => 'test']);
 
     // Give user legacy role
     $user->assignRole($legacyRole->name);
 
     // Give user organizer membership (with any role)
-    $viewerRole = Role::where('name', 'viewer')->first();
+    $viewerRole = Role::query()->where('name', 'viewer')->first();
     $organizer->users()->attach($user->id, ['role_id' => $viewerRole->id]);
 
     $this->artisan('organizers:migrate-legacy-roles --force')
@@ -92,7 +92,7 @@ it('migrates user with organizer membership to pivot role', function (): void {
         ->where('user_id', $user->id)
         ->first();
 
-    $adminRole = Role::where('name', 'admin')->first();
+    $adminRole = Role::query()->where('name', 'admin')->first();
     expect($pivot->role_id)->toBe($adminRole->id);
 });
 
@@ -123,7 +123,7 @@ it('is idempotent when run multiple times', function (): void {
 
 it('clears permission cache after migration', function (): void {
     // Use team ID 0 for global roles
-    app(\Spatie\Permission\PermissionRegistrar::class)->setPermissionsTeamId(0);
+    resolve(Spatie\Permission\PermissionRegistrar::class)->setPermissionsTeamId(0);
     $legacyRole = Role::query()->firstOrCreate(['name' => 'organizer_admin', 'guard_name' => 'web']);
     $user = User::factory()->create();
     $user->assignRole($legacyRole->name);
@@ -135,7 +135,7 @@ it('clears permission cache after migration', function (): void {
 
 it('supports dry-run mode without making changes', function (): void {
     // Use team ID 0 for global roles
-    app(\Spatie\Permission\PermissionRegistrar::class)->setPermissionsTeamId(0);
+    resolve(Spatie\Permission\PermissionRegistrar::class)->setPermissionsTeamId(0);
     $legacyRole = Role::query()->firstOrCreate(['name' => 'organizer_admin', 'guard_name' => 'web']);
     $user = User::factory()->create();
     $user->assignRole($legacyRole->name);

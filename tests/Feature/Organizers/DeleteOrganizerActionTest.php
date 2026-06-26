@@ -12,13 +12,13 @@ uses(TestCase::class, LazilyRefreshDatabase::class);
 
 it('soft deletes an organizer', function (): void {
     $user = User::factory()->create();
-    $organizer = Organizer::create([
+    $organizer = Organizer::query()->create([
         'name' => 'Test Organizer',
         'slug' => 'test-organizer',
         'status' => 'active',
     ]);
 
-    $action = app(DeleteOrganizerAction::class);
+    $action = resolve(DeleteOrganizerAction::class);
     $action($organizer, $user);
 
     expect(Organizer::query()->where('id', $organizer->id)->exists())->toBeFalse()
@@ -27,12 +27,12 @@ it('soft deletes an organizer', function (): void {
 
 it('logs activity when deleting organizer', function (): void {
     $user = User::factory()->create();
-    $organizer = Organizer::create([
+    $organizer = Organizer::query()->create([
         'name' => 'Test Organizer',
         'slug' => 'test-organizer',
     ]);
 
-    $action = app(DeleteOrganizerAction::class);
+    $action = resolve(DeleteOrganizerAction::class);
     $action($organizer, $user);
 
     $activity = Spatie\Activitylog\Models\Activity::query()
@@ -47,14 +47,14 @@ it('logs activity when deleting organizer', function (): void {
 
 it('preserves organizer data after soft delete', function (): void {
     $user = User::factory()->create();
-    $organizer = Organizer::create([
+    $organizer = Organizer::query()->create([
         'name' => 'Test Organizer',
         'slug' => 'test-organizer',
         'domain' => 'test.example.com',
         'settings' => ['theme' => 'dark'],
     ]);
 
-    $action = app(DeleteOrganizerAction::class);
+    $action = resolve(DeleteOrganizerAction::class);
     $action($organizer, $user);
 
     $deletedOrganizer = Organizer::withTrashed()->find($organizer->id);
