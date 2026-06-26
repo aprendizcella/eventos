@@ -30,11 +30,11 @@
   - [x] TeamController (index, store, update, destroy)
   - [x] Thin controllers delegate to actions
 
-## Phase 5: Middleware & Policies (PR 2 - CURRENT)
-- [ ] 5.1 Create Middleware and Policies
-  - DetectCurrentOrganizer middleware
-  - OrganizerPolicy (view, create, update, delete, manageTeam)
-  - Register middleware alias in bootstrap/app.php
+## Phase 5: Middleware & Policies (PR 2 - COMPLETE)
+- [x] 5.1 Create Middleware and Policies
+  - [x] DetectCurrentOrganizer middleware
+  - [x] OrganizerPolicy (view, create, update, delete, manageTeam)
+  - [x] Register middleware alias in bootstrap/app.php
 
 ## Phase 6: UI Components (PR 3 - DEFERRED)
 - [ ] 6.1 Livewire/Volt components for organizer CRUD
