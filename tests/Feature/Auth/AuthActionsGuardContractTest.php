@@ -18,7 +18,7 @@ it('type-hints the stateful guard contract so stateful auth methods are statical
     ];
 
     foreach ($actions as $action) {
-        $type = (new ReflectionClass($action))
+        $type = new ReflectionClass($action)
             ->getConstructor()
             ->getParameters()[0]
             ->getType();

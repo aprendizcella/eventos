@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Exceptions\Auth\NonStatefulAuthGuardException;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Support\ServiceProvider;
 use Override;
-use RuntimeException;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,13 +24,11 @@ class AppServiceProvider extends ServiceProvider
         // logout), so depending on StatefulGuard makes the contract correct for
         // both static analysis and runtime. Surfacing a non-stateful default
         // guard here is a config error worth failing loudly at resolution time.
-        $this->app->bind(StatefulGuard::class, static function ($app): StatefulGuard {
+        $this->app->bind(static function ($app): StatefulGuard {
             $guard = $app->make(AuthManager::class)->guard();
 
             if (!$guard instanceof StatefulGuard) {
-                throw new RuntimeException(
-                    'The default auth guard must be stateful for the auth Actions, received ['.$guard::class.'].',
-                );
+                throw NonStatefulAuthGuardException::forGuard($guard::class);
             }
 
             return $guard;

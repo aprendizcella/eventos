@@ -25,8 +25,7 @@ final class ResetPasswordController extends Controller
         // Keep the user on the reset-password form so the error surfaces there
         // (and the email input + token are preserved), instead of redirecting
         // to "/". The token is replayed so the form can submit again.
-        return redirect()
-            ->route('password.reset', ['token' => $request->string('token')->toString()])
+        return to_route('password.reset', ['token' => $request->string('token')->toString()])
             ->withErrors(['email' => __($status)])
             ->withInput(['email' => $request->string('email')->toString()]);
     }
