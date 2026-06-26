@@ -50,7 +50,7 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/{organizer}', [OrganizerController::class, 'update'])->name('update');
         Route::delete('/{organizer}', [OrganizerController::class, 'destroy'])->name('destroy');
 
-        Route::prefix('{organizer}/team')->name('team.')->group(function () {
+        Route::prefix('{organizer}/team')->name('team.')->middleware('organizer.detect')->group(function () {
             Route::get('/', [TeamController::class, 'index'])->name('index');
             Route::post('/', [TeamController::class, 'store'])->name('store');
             Route::put('/{user}', [TeamController::class, 'update'])->name('update');
