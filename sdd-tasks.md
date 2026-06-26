@@ -11,16 +11,16 @@
 - [x] 2.1 Create Organizer model with relationships, scopes, casts
 - [x] 2.2 Update User model with organizers() relationship and currentOrganizer()
 
-## Phase 3: Actions & DTOs (PR 2 - CURRENT)
-- [ ] 3.1 Create Organizer Actions and DTOs
-  - CreateOrganizerAction + CreateOrganizerDto
-  - UpdateOrganizerAction + UpdateOrganizerDto
-  - DeleteOrganizerAction
-  - AddTeamMemberAction + AddTeamMemberDto
-  - RemoveTeamMemberAction
-  - ChangeTeamMemberRoleAction + ChangeTeamMemberRoleDto
-  - All actions transactional with activity logging (organizer_id)
-  - Last-admin guard in RemoveTeamMember and ChangeTeamMemberRole
+## Phase 3: Actions & DTOs (PR 2 - COMPLETE)
+- [x] 3.1 Create Organizer Actions and DTOs
+  - [x] CreateOrganizerAction + CreateOrganizerDto
+  - [x] UpdateOrganizerAction + UpdateOrganizerDto
+  - [x] DeleteOrganizerAction
+  - [x] AddTeamMemberAction + AddTeamMemberDto
+  - [x] RemoveTeamMemberAction
+  - [x] ChangeTeamMemberRoleAction + ChangeTeamMemberRoleDto
+  - [x] All actions transactional with activity logging (organizer_id)
+  - [x] Last-admin guard in RemoveTeamMember and ChangeTeamMemberRole
 
 ## Phase 4: FormRequests & Controllers (PR 2 - CURRENT)
 - [ ] 4.1 Create FormRequests and Controllers
