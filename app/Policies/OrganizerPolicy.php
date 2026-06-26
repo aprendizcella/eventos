@@ -12,6 +12,11 @@ class OrganizerPolicy
 {
     public function view(User $user, Organizer $organizer): bool
     {
+        // Global admins can view any organizer
+        if ($user->hasRole(['super_admin', 'platform_admin'])) {
+            return true;
+        }
+
         return $organizer->users()->where('users.id', $user->id)->exists();
     }
 
@@ -22,6 +27,11 @@ class OrganizerPolicy
 
     public function update(User $user, Organizer $organizer): bool
     {
+        // Global admins can update any organizer
+        if ($user->hasRole(['super_admin', 'platform_admin'])) {
+            return true;
+        }
+
         return $this->isOrganizerAdmin($user, $organizer);
     }
 

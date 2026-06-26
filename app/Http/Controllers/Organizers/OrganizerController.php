@@ -11,12 +11,15 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Organizers\CreateOrganizerRequest;
 use App\Http\Requests\Organizers\UpdateOrganizerRequest;
 use App\Models\Organizer;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 final class OrganizerController extends Controller
 {
+    use AuthorizesRequests;
+
     public function __construct(
         private readonly CreateOrganizerAction $createAction,
         private readonly UpdateOrganizerAction $updateAction,
@@ -32,11 +35,15 @@ final class OrganizerController extends Controller
 
     public function create(): View
     {
+        $this->authorize('create', Organizer::class);
+
         return view('organizers.create');
     }
 
     public function store(CreateOrganizerRequest $request): RedirectResponse
     {
+        $this->authorize('create', Organizer::class);
+
         $organizer = ($this->createAction)($request->toDto(), $request->user());
 
         return redirect()
@@ -46,16 +53,22 @@ final class OrganizerController extends Controller
 
     public function show(Organizer $organizer): View
     {
+        $this->authorize('view', $organizer);
+
         return view('organizers.show', compact('organizer'));
     }
 
     public function edit(Organizer $organizer): View
     {
+        $this->authorize('update', $organizer);
+
         return view('organizers.edit', compact('organizer'));
     }
 
     public function update(UpdateOrganizerRequest $request, Organizer $organizer): RedirectResponse
     {
+        $this->authorize('update', $organizer);
+
         ($this->updateAction)($organizer, $request->toDto(), $request->user());
 
         return redirect()
@@ -65,6 +78,8 @@ final class OrganizerController extends Controller
 
     public function destroy(Request $request, Organizer $organizer): RedirectResponse
     {
+        $this->authorize('delete', $organizer);
+
         ($this->deleteAction)($organizer, $request->user());
 
         return redirect()

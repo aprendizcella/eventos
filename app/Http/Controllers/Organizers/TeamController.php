@@ -7,17 +7,23 @@ namespace App\Http\Controllers\Organizers;
 use App\Actions\Organizers\AddTeamMemberAction;
 use App\Actions\Organizers\ChangeTeamMemberRoleAction;
 use App\Actions\Organizers\RemoveTeamMemberAction;
+use App\Exceptions\LastAdminCannotBeRemovedException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Organizers\AddTeamMemberRequest;
 use App\Http\Requests\Organizers\ChangeTeamMemberRoleRequest;
 use App\Models\Organizer;
 use App\Models\User;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Database\QueryException;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 final class TeamController extends Controller
 {
+    use AuthorizesRequests;
+
     public function __construct(
         private readonly AddTeamMemberAction $addAction,
         private readonly RemoveTeamMemberAction $removeAction,
@@ -26,6 +32,8 @@ final class TeamController extends Controller
 
     public function index(Organizer $organizer): View
     {
+        $this->authorize('view', $organizer);
+
         $members = $organizer->users;
 
         return view('organizers.team.index', compact('organizer', 'members'));
@@ -33,7 +41,19 @@ final class TeamController extends Controller
 
     public function store(AddTeamMemberRequest $request, Organizer $organizer): RedirectResponse
     {
-        ($this->addAction)($organizer, $request->toDto(), $request->user());
+        $this->authorize('manageTeam', $organizer);
+
+        try {
+            ($this->addAction)($organizer, $request->toDto(), $request->user());
+        } catch (QueryException $e) {
+            // Handle unique constraint violation (user already a member)
+            if (str_contains($e->getMessage(), 'UNIQUE constraint failed')) {
+                throw ValidationException::withMessages([
+                    'user_id' => 'This user is already a member of this organizer.',
+                ]);
+            }
+            throw $e;
+        }
 
         return redirect()
             ->route('organizers.team.index', $organizer)
@@ -42,7 +62,15 @@ final class TeamController extends Controller
 
     public function update(ChangeTeamMemberRoleRequest $request, Organizer $organizer, User $user): RedirectResponse
     {
-        ($this->changeRoleAction)($organizer, $request->toDto(), $request->user());
+        $this->authorize('manageTeam', $organizer);
+
+        try {
+            ($this->changeRoleAction)($organizer, $request->toDto(), $request->user());
+        } catch (LastAdminCannotBeRemovedException $e) {
+            throw ValidationException::withMessages([
+                'role_id' => $e->getMessage(),
+            ]);
+        }
 
         return redirect()
             ->route('organizers.team.index', $organizer)
@@ -51,7 +79,15 @@ final class TeamController extends Controller
 
     public function destroy(Request $request, Organizer $organizer, User $user): RedirectResponse
     {
-        ($this->removeAction)($organizer, $user, $request->user());
+        $this->authorize('manageTeam', $organizer);
+
+        try {
+            ($this->removeAction)($organizer, $user, $request->user());
+        } catch (LastAdminCannotBeRemovedException $e) {
+            throw ValidationException::withMessages([
+                'user_id' => $e->getMessage(),
+            ]);
+        }
 
         return redirect()
             ->route('organizers.team.index', $organizer)
