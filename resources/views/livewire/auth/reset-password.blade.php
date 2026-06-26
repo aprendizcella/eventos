@@ -12,9 +12,9 @@ layout('layouts.auth');
 
     <h1 class="text-2xl font-semibold mb-6">Set New Password</h1>
 
-    <x-auth.field name="email" label="Email" type="email" :value="old('email', request()->string('email')->toString())" required autofocus />
-    <x-auth.password-input name="password" label="Password" required autocomplete="new-password" />
-    <x-auth.password-input name="password_confirmation" label="Confirm Password" required autocomplete="new-password" />
+    <x-form.field name="email" label="Email" type="email" :value="old('email', request()->string('email')->toString())" required autofocus />
+    <x-form.password-input name="password" label="Password" required autocomplete="new-password" />
+    <x-form.password-input name="password_confirmation" label="Confirm Password" required autocomplete="new-password" />
 
-    <x-auth.button>Reset Password</x-auth.button>
+    <x-ui.button>Reset Password</x-ui.button>
 </form>

@@ -14,15 +14,15 @@ layout('layouts.auth');
         Enter your email address and we will send you a password reset link.
     </p>
 
-    <x-auth.field name="email" label="Email" type="email" :value="old('email')" required autofocus />
+    <x-form.field name="email" label="Email" type="email" :value="old('email')" required autofocus />
 
     @if (session('status'))
         <p class="text-sm text-green-600 mb-4">{{ __(session('status')) }}</p>
     @endif
 
-    <x-auth.button>Send Reset Link</x-auth.button>
+    <x-ui.button>Send Reset Link</x-ui.button>
 
     <p class="text-sm text-center mt-4">
-        <x-auth.link :href="route('login')">Back to sign in</x-auth.link>
+        <x-ui.link :href="route('login')">Back to sign in</x-ui.link>
     </p>
 </form>
