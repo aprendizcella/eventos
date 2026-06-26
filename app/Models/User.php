@@ -9,8 +9,8 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Http\Request;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Request;
 use Laravel\Sanctum\HasApiTokens;
 use Override;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
@@ -55,20 +55,6 @@ class User extends Authenticatable implements MustVerifyEmail
             ->useLogName('user');
     }
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    #[Override]
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
-
     public function organizers(): BelongsToMany
     {
         return $this->belongsToMany(Organizer::class, 'organizer_user')
@@ -83,6 +69,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
         // Try request attribute first
         $organizer = $request->attributes->get('current_organizer');
+
         if ($organizer instanceof Organizer) {
             return $organizer;
         }
@@ -90,12 +77,29 @@ class User extends Authenticatable implements MustVerifyEmail
         // Try session (if available)
         if ($request->hasSession()) {
             $organizerId = $request->session()->get('current_organizer_id');
+
             if ($organizerId) {
-                return $this->organizers()->find($organizerId);
+                /** @var Organizer|null $organizer */
+                $organizer = $this->organizers()->where('organizers.id', $organizerId)->first();
+
+                return $organizer;
             }
         }
 
         return null;
     }
-}
 
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    #[Override]
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+}

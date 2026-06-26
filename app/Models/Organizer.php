@@ -24,13 +24,6 @@ class Organizer extends Model
         'status',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'settings' => 'array',
-        ];
-    }
-
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
@@ -54,5 +47,12 @@ class Organizer extends Model
     public function scopeWithDomain(Builder $query): Builder
     {
         return $query->whereNotNull('domain');
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'settings' => 'array',
+        ];
     }
 }

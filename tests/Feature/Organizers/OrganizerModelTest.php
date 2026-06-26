@@ -46,7 +46,7 @@ it('has users relationship', function (): void {
     ]);
 
     $user = User::factory()->create();
-    $role = \Spatie\Permission\Models\Role::create(['name' => 'admin', 'guard_name' => 'web']);
+    $role = Spatie\Permission\Models\Role::create(['name' => 'admin', 'guard_name' => 'web']);
 
     $organizer->users()->attach($user->id, ['role_id' => $role->id]);
 

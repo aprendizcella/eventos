@@ -10,7 +10,7 @@ use Tests\TestCase;
 uses(TestCase::class, LazilyRefreshDatabase::class);
 
 it('seeds only three global roles', function (): void {
-    $seeder = new RoleSeeder();
+    $seeder = new RoleSeeder;
     $seeder->run();
 
     $roles = Role::all()->pluck('name')->toArray();
@@ -22,7 +22,7 @@ it('seeds only three global roles', function (): void {
 });
 
 it('does not seed organizer_admin as global role', function (): void {
-    $seeder = new RoleSeeder();
+    $seeder = new RoleSeeder;
     $seeder->run();
 
     $role = Role::where('name', 'organizer_admin')->first();
@@ -31,7 +31,7 @@ it('does not seed organizer_admin as global role', function (): void {
 });
 
 it('does not seed organizer_editor as global role', function (): void {
-    $seeder = new RoleSeeder();
+    $seeder = new RoleSeeder;
     $seeder->run();
 
     $role = Role::where('name', 'organizer_editor')->first();
@@ -40,7 +40,7 @@ it('does not seed organizer_editor as global role', function (): void {
 });
 
 it('does not seed organizer_viewer as global role', function (): void {
-    $seeder = new RoleSeeder();
+    $seeder = new RoleSeeder;
     $seeder->run();
 
     $role = Role::where('name', 'organizer_viewer')->first();
@@ -49,11 +49,11 @@ it('does not seed organizer_viewer as global role', function (): void {
 });
 
 it('seeder is idempotent', function (): void {
-    $seeder = new RoleSeeder();
-    
+    $seeder = new RoleSeeder;
+
     $seeder->run();
     $firstRun = Role::count();
-    
+
     $seeder->run();
     $secondRun = Role::count();
 
