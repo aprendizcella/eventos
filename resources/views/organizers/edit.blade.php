@@ -1,4 +1,5 @@
-<x-layout.app>
+@extends('layouts.app')
+@section('content')
     <div class="mx-auto max-w-2xl space-y-6">
         {{-- Header --}}
         <div>
@@ -43,4 +44,4 @@
             </div>
         </form>
     </div>
-</x-layout.app>
+@endsection

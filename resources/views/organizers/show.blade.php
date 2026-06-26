@@ -1,4 +1,5 @@
-<x-layout.app>
+@extends('layouts.app')
+@section('content')
     <div class="space-y-6">
         {{-- Header --}}
         <div class="flex items-center justify-between">
@@ -102,4 +103,4 @@
             </a>
         </div>
     </div>
-</x-layout.app>
+@endsection

@@ -3,7 +3,8 @@
     $roles = Role::whereIn('name', ['admin', 'editor', 'viewer'])->get();
 @endphp
 
-<x-layout.app>
+@extends('layouts.app')
+@section('content')
     <div class="space-y-6" x-data="{
         showModal: false,
         showRoleModal: false,
@@ -226,4 +227,4 @@
             </div>
         @endcan
     </div>
-</x-layout.app>
+@endsection
