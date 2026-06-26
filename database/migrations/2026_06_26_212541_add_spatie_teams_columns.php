@@ -10,20 +10,26 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('roles', static function (Blueprint $table): void {
-            $table->unsignedBigInteger('organizer_id')->nullable()->after('id');
-            $table->index('organizer_id', 'roles_team_foreign_key_index');
-        });
+        if (! Schema::hasColumn('roles', 'organizer_id')) {
+            Schema::table('roles', static function (Blueprint $table): void {
+                $table->unsignedBigInteger('organizer_id')->nullable()->after('id');
+                $table->index('organizer_id', 'roles_team_foreign_key_index');
+            });
+        }
 
-        Schema::table('model_has_roles', static function (Blueprint $table): void {
-            $table->unsignedBigInteger('organizer_id')->after('role_id');
-            $table->index('organizer_id', 'model_has_roles_team_foreign_key_index');
-        });
+        if (! Schema::hasColumn('model_has_roles', 'organizer_id')) {
+            Schema::table('model_has_roles', static function (Blueprint $table): void {
+                $table->unsignedBigInteger('organizer_id')->after('role_id');
+                $table->index('organizer_id', 'model_has_roles_team_foreign_key_index');
+            });
+        }
 
-        Schema::table('model_has_permissions', static function (Blueprint $table): void {
-            $table->unsignedBigInteger('organizer_id')->after('permission_id');
-            $table->index('organizer_id', 'model_has_permissions_team_foreign_key_index');
-        });
+        if (! Schema::hasColumn('model_has_permissions', 'organizer_id')) {
+            Schema::table('model_has_permissions', static function (Blueprint $table): void {
+                $table->unsignedBigInteger('organizer_id')->after('permission_id');
+                $table->index('organizer_id', 'model_has_permissions_team_foreign_key_index');
+            });
+        }
     }
 
     public function down(): void
