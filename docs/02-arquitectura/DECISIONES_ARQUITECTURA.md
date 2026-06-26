@@ -28,7 +28,7 @@
 
 - **IDs:** ¿autoincremental (`{model}_id`) o UUID v7? Hoy vale la convención del boilerplate (autoincremental). Si se migra a UUID, debe quedar registrado aquí.
 - **Repositories:** opcionales según complejidad de la Action. Falta criterio escrito de "cuándo sí, cuándo no".
-- **Estructura UI:** movimiento de `components/auth/` a `components/form/` + `components/ui/`. Ver [`03-ux-ui/COMPONENTES_UI.md`](../03-ux-ui/COMPONENTES_UI.md).
+- **Estructura UI:** ~~movimiento de `components/auth/` a `components/form/` + `components/ui/`~~ → **hecho**. Ver [`03-ux-ui/COMPONENTES_UI.md`](../03-ux-ui/COMPONENTES_UI.md).
 
 ---
 

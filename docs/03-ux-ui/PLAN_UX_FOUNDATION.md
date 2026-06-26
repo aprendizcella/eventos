@@ -19,10 +19,10 @@ Esto permitirá que las próximas pantallas de administración y organizadores s
 | Orden | Trabajo | Resultado esperado |
 |---|---|---|
 | 1 | Commit limpio del estado actual | Punto de restauración antes de nuevos refactors. |
-| 2 | Mover componentes genéricos fuera de `components/auth/` | `components/form/` y `components/ui/` como base reutilizable. |
+| 2 | ~~Mover componentes genéricos fuera de `components/auth/`~~ | ✅ Hecho. `components/form/` y `components/ui/` como base reutilizable. |
 | 3 | Formalizar decisiones UX | `DECISIONES_UX.md`, `COMPONENTES_UI.md` y este plan actualizados. |
-| 4 | Implementar dark/light mode real | Toggle reutilizable con `light`, `dark` y `system`. |
-| 5 | Crear layout base de panel admin | Sidebar/header/breadcrumbs/contenedor principal. |
+| 4 | ~~Implementar dark/light mode real~~ | ✅ Hecho. Toggle reutilizable con `light`, `dark` y `system`, persistencia en `localStorage`, clase `dark` en `documentElement`. |
+| 5 | ~~Crear layout base de panel admin~~ | ✅ Hecho. Sidebar, topbar, main content slot, responsive. |
 | 6 | Crear componentes mínimos de panel | Cards, page header, table shell, empty state, action buttons. |
 | 7 | Empezar Sprint 1.2 | Organizadores/Eventos ya sobre la base UX. |
 
@@ -52,23 +52,25 @@ Antes de seguir, debe existir un commit limpio con lo que ya está estable:
 
 ## 4. Trabajo 2 — Migrar componentes genéricos
 
-### Estado actual
+### Estado actual (actualizado)
 
-Los componentes creados durante el refactor de auth están bajo:
+Los componentes se han movido a:
 
 ```txt
-resources/views/components/auth/
-├── field.blade.php
-├── password-input.blade.php
-├── button.blade.php
-└── link.blade.php
+resources/views/components/
+├── form/
+│   ├── field.blade.php
+│   └── password-input.blade.php
+└── ui/
+    ├── button.blade.php
+    └── link.blade.php
 ```
 
-Funcionan, pero su ubicación comunica mal la intención: no son componentes exclusivamente de autenticación.
+La carpeta `components/auth/` se eliminó. Las vistas de auth usan `<x-form.*>` y `<x-ui.*>`.
 
-### Objetivo
+### Objetivo (completado)
 
-Moverlos a:
+Componentes movidos a:
 
 ```txt
 resources/views/components/
@@ -115,52 +117,65 @@ Regla: **si una decisión UX no está documentada, no existe como estándar del 
 
 ### Estado actual
 
-Existen clases `dark:*`, pero no hay sistema completo de cambio de tema.
+✅ Implementado. Toggle reutilizable con soporte para `light`, `dark` y `system`.
 
-### Decisión propuesta
+### Implementación
 
-Implementar:
-
-- `light`;
-- `dark`;
-- `system`;
-- persistencia en `localStorage`;
-- toggle reutilizable para layout auth y panel admin.
+- `resources/views/components/ui/theme-init.blade.php` — script inline para prevenir FOUC (corre antes de Alpine).
+- `resources/views/components/ui/theme-toggle.blade.php` — dropdown accesible con 3 opciones, manejado por Alpine.js (`x-data` con `theme`, `open`, `setTheme()`, `applyTheme()`).
+- `resources/js/app.js` — importa y arranca Alpine.js.
+- `resources/css/app.css` — `@custom-variant dark (&:where(.dark, .dark *));` para modo oscuro basado en clase.
+- `resources/js/theme.js` — eliminado; Alpine.js maneja ahora la lógica de tema.
 
 ### Criterio de aceptación
 
-- El usuario puede cambiar tema desde UI.
-- La preferencia sobrevive al refresh.
-- `system` respeta `prefers-color-scheme`.
-- El componente se podrá reutilizar en el dashboard.
+- ✅ El usuario puede cambiar tema desde UI.
+- ✅ La preferencia sobrevive al refresh.
+- ✅ `system` respeta `prefers-color-scheme`.
+- ✅ El componente se reutiliza en auth layout y dashboard.
 
 ---
 
 ## 7. Trabajo 5 — Layout base de panel admin
 
-Antes de construir pantallas de Organizadores/Eventos, debe existir un layout base.
+### Estado actual
 
-### Componentes esperados
+✅ Implementado. Layout base de panel admin con sidebar, topbar y main content slot.
+
+### Componentes creados
 
 ```txt
 resources/views/components/layout/
-├── app-shell.blade.php
-├── page-header.blade.php
-└── content-card.blade.php
+└── app-shell.blade.php
 
 resources/views/components/navigation/
 ├── sidebar.blade.php
-├── sidebar-link.blade.php
 └── topbar.blade.php
+
+resources/views/layouts/
+└── app.blade.php
 ```
 
-### Decisiones pendientes
+### Implementación
 
-| Tema | Decisión pendiente |
+- `layouts/app.blade.php` — layout principal del panel admin.
+- `layout/app-shell.blade.php` — estructura: sidebar + topbar + main.
+- `navigation/sidebar.blade.php` — sidebar con links de navegación (Dashboard, Events, Organizers).
+- `navigation/topbar.blade.php` — topbar con toggle de sidebar (mobile) y theme toggle.
+- Responsive: sidebar oculto en mobile, visible en lg+. Toggle con overlay en mobile. Estado manejado por Alpine.js (`x-data="{ sidebarOpen: false }"` en `app-shell`).
+
+### Dashboard placeholder
+
+- `resources/views/livewire/dashboard.blade.php` — página Volt mínima para verificar el layout.
+- `routes/web.php` — ruta `/dashboard` protegida con middleware `auth`.
+
+### Decisiones tomadas
+
+| Tema | Decisión |
 |---|---|
-| Sidebar | Fijo, colapsable o responsive-only. |
-| Topbar | Necesaria para usuario, tema y acciones globales. |
-| Breadcrumbs | Recomendados para panel admin. |
+| Sidebar | Fijo en desktop (lg+), oculto en mobile con toggle. |
+| Topbar | Incluye theme toggle y placeholder para menú de usuario. |
+| Breadcrumbs | No incluidos aún. Se agregarán cuando haya navegación profunda. |
 | Densidad visual | TailAdmin como referencia: limpio, SaaS, profesional. |
 
 ---
@@ -216,15 +231,15 @@ No se adopta como base por ahora porque introducir Bootstrap junto a Tailwind au
 No empezar Sprint 1.2 de dominio hasta completar, como mínimo:
 
 - [ ] commit limpio del estado actual;
-- [ ] componentes movidos a `form/` y `ui/`;
-- [ ] decisión de dark/light mode;
-- [ ] layout admin base definido o implementado.
+- [x] componentes movidos a `form/` y `ui/`;
+- [x] decisión de dark/light mode;
+- [x] layout admin base definido o implementado.
 
 ---
 
 ## 11. Próximo paso inmediato
 
-Ejecutar el mini-refactor:
+~~Ejecutar el mini-refactor:~~ ✅ Hecho.
 
 ```txt
 components/auth/ → components/form/ + components/ui/

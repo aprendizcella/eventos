@@ -35,3 +35,7 @@ Route::post('/forgot-password', RequestPasswordResetController::class)
 
 Route::post('/reset-password', ResetPasswordController::class)
     ->name('password.reset.post');
+
+Route::middleware(['auth'])->group(function () {
+    Volt::route('/dashboard', 'dashboard')->name('dashboard');
+});
