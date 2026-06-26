@@ -7,8 +7,10 @@ namespace App\Models;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Request;
 use Laravel\Sanctum\HasApiTokens;
 use Override;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
@@ -66,4 +68,34 @@ class User extends Authenticatable implements MustVerifyEmail
             'password' => 'hashed',
         ];
     }
+
+    public function organizers(): BelongsToMany
+    {
+        return $this->belongsToMany(Organizer::class, 'organizer_user')
+            ->withPivot('role_id')
+            ->withTimestamps();
+    }
+
+    public function currentOrganizer(): ?Organizer
+    {
+        /** @var Request $request */
+        $request = app('request');
+
+        // Try request attribute first
+        $organizer = $request->attributes->get('current_organizer');
+        if ($organizer instanceof Organizer) {
+            return $organizer;
+        }
+
+        // Try session (if available)
+        if ($request->hasSession()) {
+            $organizerId = $request->session()->get('current_organizer_id');
+            if ($organizerId) {
+                return $this->organizers()->find($organizerId);
+            }
+        }
+
+        return null;
+    }
 }
+
