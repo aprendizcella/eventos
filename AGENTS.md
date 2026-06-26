@@ -38,6 +38,7 @@ Antes de cualquier commit de implementación, debe pasar el siguiente pipeline:
 - **OpenSpec/SDD:** Use la tool `sdd-` para cualquier mejora funcional.
 - **Documentación de Procesos:** Use el skill `cognitive-doc-design` para crear documentación que no sea código.
 - **Consultar el proceso SDD:** Ejecutar `sdd-onboard` para recordatorios del workflow.
+- **Mapa de documentación:** ver [`docs/README.md`](docs/README.md) para el índice completo (estado, producto, arquitectura, UX/UI, librerías).
 
 ===
 
