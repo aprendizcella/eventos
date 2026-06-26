@@ -31,6 +31,8 @@ it('renders the login page with a form posting to the backend', function (): voi
         ->assertOk()
         ->assertSee('Email')
         ->assertSee('Password')
+        ->assertSee('Forgot your password?')
+        ->assertSee('href="'.route('forgot-password').'"', false)
         ->assertSee('action="'.route('login.post').'"', false);
 });
 
@@ -40,6 +42,10 @@ it('renders the registration page with a form posting to the backend', function 
         ->assertSee('Name')
         ->assertSee('Email')
         ->assertSee('Password')
+        ->assertSee('Confirm password')
+        ->assertSee('name="password_confirmation"', false)
+        ->assertSee('data-password-toggle="password"', false)
+        ->assertSee('data-password-toggle="password_confirmation"', false)
         ->assertSee('action="'.route('register.post').'"', false);
 });
 
