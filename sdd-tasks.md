@@ -22,13 +22,13 @@
   - [x] All actions transactional with activity logging (organizer_id)
   - [x] Last-admin guard in RemoveTeamMember and ChangeTeamMemberRole
 
-## Phase 4: FormRequests & Controllers (PR 2 - CURRENT)
-- [ ] 4.1 Create FormRequests and Controllers
-  - CreateOrganizerRequest, UpdateOrganizerRequest
-  - AddTeamMemberRequest, ChangeTeamMemberRoleRequest
-  - OrganizerController (index, create, store, edit, update, destroy)
-  - TeamController (index, store, update, destroy)
-  - Thin controllers delegate to actions
+## Phase 4: FormRequests & Controllers (PR 2 - COMPLETE)
+- [x] 4.1 Create FormRequests and Controllers
+  - [x] CreateOrganizerRequest, UpdateOrganizerRequest
+  - [x] AddTeamMemberRequest, ChangeTeamMemberRoleRequest
+  - [x] OrganizerController (index, create, store, edit, update, destroy)
+  - [x] TeamController (index, store, update, destroy)
+  - [x] Thin controllers delegate to actions
 
 ## Phase 5: Middleware & Policies (PR 2 - CURRENT)
 - [ ] 5.1 Create Middleware and Policies
