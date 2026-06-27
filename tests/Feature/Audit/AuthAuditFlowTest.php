@@ -24,7 +24,7 @@ it('records an auth activity when a guest registers through the flow', function 
         'email' => 'auditregister@example.com',
         'password' => 'Sup3rSecret!',
         'password_confirmation' => 'Sup3rSecret!',
-    ])->assertRedirect('/');
+    ])->assertRedirect(route('verification.notice'));
 
     $user = User::query()->where('email', 'auditregister@example.com')->sole();
 

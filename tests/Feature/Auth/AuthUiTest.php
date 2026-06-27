@@ -23,7 +23,10 @@ it('exposes named guest and auth routes', function (): void {
         ->and(Route::has('forgot-password'))->toBeTruthy()
         ->and(Route::has('forgot-password.post'))->toBeTruthy()
         ->and(Route::has('password.reset'))->toBeTruthy()
-        ->and(Route::has('password.reset.post'))->toBeTruthy();
+        ->and(Route::has('password.reset.post'))->toBeTruthy()
+        ->and(Route::has('verification.notice'))->toBeTruthy()
+        ->and(Route::has('verification.verify'))->toBeTruthy()
+        ->and(Route::has('verification.send'))->toBeTruthy();
 });
 
 it('renders the login page with a form posting to the backend', function (): void {
@@ -88,13 +91,24 @@ it('renders the reset-password page with a form posting to the backend', functio
         ->assertSee('action="'.route('password.reset.post').'"', false);
 });
 
+it('renders the verification notice page for an authenticated unverified user', function (): void {
+    $user = User::factory()->unverified()->create();
+
+    $this->actingAs($user)
+        ->get(route('verification.notice'))
+        ->assertOk()
+        ->assertSee('Verify Your Email Address', false)
+        ->assertSee('action="'.route('verification.send').'"', false)
+        ->assertSee('action="'.route('logout').'"', false);
+});
+
 it('submits registration through the real backend route and authenticates', function (): void {
     $this->post('/register', [
         'name' => 'UI User',
         'email' => 'uiuser@example.com',
         'password' => 'Sup3rSecret!',
         'password_confirmation' => 'Sup3rSecret!',
-    ])->assertRedirect('/');
+    ])->assertRedirect(route('verification.notice'));
 
     $this->assertAuthenticated();
 });

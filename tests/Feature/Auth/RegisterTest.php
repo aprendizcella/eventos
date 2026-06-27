@@ -23,7 +23,7 @@ it('registers and authenticates a new guest, leaving the email unverified', func
         'password_confirmation' => 'Sup3rSecret!',
     ]);
 
-    $response->assertRedirect('/');
+    $response->assertRedirect(route('verification.notice'));
 
     $this->assertAuthenticated();
 
@@ -38,7 +38,7 @@ it('registers and authenticates a new guest, leaving the email unverified', func
         ->and($registered->email_verified_at)->toBeNull();
 });
 
-it('keeps access available even though the email is unverified (non-blocking readiness)', function (): void {
+it('redirects to verification notice after registration even though the email is unverified', function (): void {
     $this->post('/register', [
         'name' => 'Unverified User',
         'email' => 'unverified@example.com',
@@ -48,8 +48,8 @@ it('keeps access available even though the email is unverified (non-blocking rea
 
     $this->assertAuthenticated();
 
-    // Access MUST continue even if email is unverified: no redirect to a verify page.
-    $this->get('/')->assertOk();
+    // After registration, unverified users MUST be redirected to the verification notice.
+    $this->get(route('verification.notice'))->assertOk();
 });
 
 it('rejects registration with a duplicate email and persists no new user', function (): void {
