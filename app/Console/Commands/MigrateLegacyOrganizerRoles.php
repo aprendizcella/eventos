@@ -6,7 +6,9 @@ namespace App\Console\Commands;
 
 use App\Models\Organizer;
 use App\Models\User;
+use App\Support\Organizers\OrganizerRoles;
 use Illuminate\Console\Command;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 use Spatie\Permission\Models\Role;
@@ -32,10 +34,18 @@ class MigrateLegacyOrganizerRoles extends Command
 
         if ($legacyRoles->isEmpty()) {
             $this->info('✓ No legacy organizer_* roles found. Nothing to migrate.');
-
-            return self::SUCCESS;
+        } else {
+            $this->processLegacyRoles($legacyRoles);
         }
 
+        return self::SUCCESS;
+    }
+
+    /**
+     * @param  EloquentCollection<int, Role>  $legacyRoles
+     */
+    private function processLegacyRoles(EloquentCollection $legacyRoles): void
+    {
         $this->warn("Found {$legacyRoles->count()} legacy role(s):");
 
         foreach ($legacyRoles as $role) {
@@ -46,7 +56,6 @@ class MigrateLegacyOrganizerRoles extends Command
         }
         $this->newLine();
 
-        // Find users with legacy roles
         $usersWithLegacyRoles = User::query()
             ->whereHas('roles', function ($query): void {
                 $query->whereIn('name', ['organizer_admin', 'organizer_editor', 'organizer_viewer']);
@@ -58,9 +67,18 @@ class MigrateLegacyOrganizerRoles extends Command
             $this->info('✓ No users found with legacy organizer_* roles.');
             $this->cleanupLegacyRoles($legacyRoles);
 
-            return self::SUCCESS;
+            return;
         }
 
+        $this->processUsersWithLegacyRoles($usersWithLegacyRoles, $legacyRoles);
+    }
+
+    /**
+     * @param  EloquentCollection<int, User>  $usersWithLegacyRoles
+     * @param  EloquentCollection<int, Role>  $legacyRoles
+     */
+    private function processUsersWithLegacyRoles(EloquentCollection $usersWithLegacyRoles, EloquentCollection $legacyRoles): void
+    {
         $this->warn("Found {$usersWithLegacyRoles->count()} user(s) with legacy roles:");
 
         foreach ($usersWithLegacyRoles as $user) {
@@ -69,22 +87,28 @@ class MigrateLegacyOrganizerRoles extends Command
         }
         $this->newLine();
 
-        // Dry run mode
         if ($this->option('dry-run')) {
             $this->info('DRY RUN: No changes will be made.');
             $this->analyzeMigration($usersWithLegacyRoles);
 
-            return self::SUCCESS;
+            return;
         }
 
-        // Confirmation
         if (!$this->option('force') && !$this->confirm('Proceed with migration? This will modify user roles and cannot be easily undone.')) {
             $this->info('Migration cancelled.');
 
-            return self::SUCCESS;
+            return;
         }
 
-        // Perform migration
+        $this->performMigration($usersWithLegacyRoles, $legacyRoles);
+    }
+
+    /**
+     * @param  EloquentCollection<int, User>  $usersWithLegacyRoles
+     * @param  EloquentCollection<int, Role>  $legacyRoles
+     */
+    private function performMigration(EloquentCollection $usersWithLegacyRoles, EloquentCollection $legacyRoles): void
+    {
         $this->info('Migrating roles...');
         $migrated = 0;
         $skipped = 0;
@@ -98,37 +122,41 @@ class MigrateLegacyOrganizerRoles extends Command
         $this->newLine();
         $this->info("Migration complete: {$migrated} role(s) migrated, {$skipped} skipped.");
 
-        // Cleanup legacy roles
         $this->cleanupLegacyRoles($legacyRoles);
 
-        // Clear permission cache
         resolve(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
         $this->info('✓ Permission cache cleared.');
-
-        return self::SUCCESS;
     }
 
-    private function analyzeMigration($users): void
+    /**
+     * @param  EloquentCollection<int, User>  $users
+     */
+    private function analyzeMigration(EloquentCollection $users): void
     {
         $this->newLine();
         $this->info('Analysis:');
 
         foreach ($users as $user) {
-            $userLegacyRoles = $user->roles->filter(fn ($role) => in_array($role->name, ['organizer_admin', 'organizer_editor', 'organizer_viewer']));
+            $legacyNames = ['organizer_admin', 'organizer_editor', 'organizer_viewer'];
 
-            foreach ($userLegacyRoles as $legacyRole) {
-                $mappedRole = $this->mapLegacyRole($legacyRole->name);
+            foreach ($user->roles as $role) {
+                if (!$role instanceof Role || !in_array($role->name, $legacyNames, true)) {
+                    continue;
+                }
+
+                $mappedRole = $this->mapLegacyRole($role->name);
 
                 // Try to infer organizer from user's memberships
+                /** @var EloquentCollection<int, Organizer> $organizers */
                 $organizers = $user->organizers;
 
                 if ($organizers->isEmpty()) {
                     $this->warn("  ⚠ {$user->email}: No organizer membership found. Cannot infer target organizer.");
-                    $this->line("    Legacy role: {$legacyRole->name} → Would map to: {$mappedRole}");
+                    $this->line("    Legacy role: {$role->name} → Would map to: {$mappedRole}");
                     $this->line('    ACTION REQUIRED: Manual assignment needed.');
                 } else {
                     $this->line("  ✓ {$user->email}:");
-                    $this->line("    Legacy role: {$legacyRole->name} → Would map to: {$mappedRole}");
+                    $this->line("    Legacy role: {$role->name} → Would map to: {$mappedRole}");
 
                     foreach ($organizers as $organizer) {
                         $this->line("    Organizer: {$organizer->name} ({$organizer->slug})");
@@ -138,21 +166,29 @@ class MigrateLegacyOrganizerRoles extends Command
         }
     }
 
+    /**
+     * @return array<string, int>
+     */
     private function migrateUser(User $user): array
     {
         $migrated = 0;
         $skipped = 0;
 
-        $userLegacyRoles = $user->roles->filter(fn ($role) => in_array($role->name, ['organizer_admin', 'organizer_editor', 'organizer_viewer']));
+        $legacyNames = ['organizer_admin', 'organizer_editor', 'organizer_viewer'];
 
-        foreach ($userLegacyRoles as $legacyRole) {
-            $mappedRole = $this->mapLegacyRole($legacyRole->name);
+        foreach ($user->roles as $role) {
+            if (!$role instanceof Role || !in_array($role->name, $legacyNames, true)) {
+                continue;
+            }
+
+            $mappedRole = $this->mapLegacyRole($role->name);
 
             // Try to infer organizer from user's memberships
+            /** @var EloquentCollection<int, Organizer> $organizers */
             $organizers = $user->organizers;
 
             if ($organizers->isEmpty()) {
-                $this->warn("  ⚠ {$user->email}: No organizer membership found. Skipping {$legacyRole->name}.");
+                $this->warn("  ⚠ {$user->email}: No organizer membership found. Skipping {$role->name}.");
                 $skipped++;
 
                 continue;
@@ -160,16 +196,7 @@ class MigrateLegacyOrganizerRoles extends Command
 
             // Assign mapped role to each organizer the user belongs to
             foreach ($organizers as $organizer) {
-                $roleModel = Role::query()->where('name', $mappedRole)->first();
-
-                if (!$roleModel) {
-                    $this->error("  ✗ Role '{$mappedRole}' not found. Skipping.");
-                    $skipped++;
-
-                    continue;
-                }
-
-                // Check if user already has this role in this organizer
+                // Check if user already has a pivot entry for this organizer
                 $existingPivot = DB::table('organizer_user')
                     ->where('organizer_id', $organizer->id)
                     ->where('user_id', $user->id)
@@ -180,13 +207,13 @@ class MigrateLegacyOrganizerRoles extends Command
                     DB::table('organizer_user')
                         ->where('organizer_id', $organizer->id)
                         ->where('user_id', $user->id)
-                        ->update(['role_id' => $roleModel->id]);
+                        ->update(['role' => $mappedRole]);
                 } else {
                     // Create new pivot
                     DB::table('organizer_user')->insert([
                         'organizer_id' => $organizer->id,
                         'user_id' => $user->id,
-                        'role_id' => $roleModel->id,
+                        'role' => $mappedRole,
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);
@@ -197,7 +224,7 @@ class MigrateLegacyOrganizerRoles extends Command
             }
 
             // Remove legacy role
-            $user->roles()->detach($legacyRole->id);
+            $user->roles()->detach($role->id);
         }
 
         return ['migrated' => $migrated, 'skipped' => $skipped];
@@ -206,14 +233,17 @@ class MigrateLegacyOrganizerRoles extends Command
     private function mapLegacyRole(string $legacyRole): string
     {
         return match ($legacyRole) {
-            'organizer_admin' => 'admin',
-            'organizer_editor' => 'editor',
-            'organizer_viewer' => 'viewer',
+            'organizer_admin' => OrganizerRoles::Admin->value,
+            'organizer_editor' => OrganizerRoles::Editor->value,
+            'organizer_viewer' => OrganizerRoles::Viewer->value,
             default => throw new InvalidArgumentException("Unknown legacy role: {$legacyRole}"),
         };
     }
 
-    private function cleanupLegacyRoles($legacyRoles): void
+    /**
+     * @param  EloquentCollection<int, Role>  $legacyRoles
+     */
+    private function cleanupLegacyRoles(EloquentCollection $legacyRoles): void
     {
         $this->newLine();
         $this->info('Cleaning up legacy roles...');

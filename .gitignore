@@ -1,6 +1,6 @@
 *.log
 testing
-/build/logs/
+/build/
 .DS_Store
 .env
 .env.backup

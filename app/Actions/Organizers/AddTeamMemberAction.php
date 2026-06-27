@@ -15,7 +15,7 @@ final readonly class AddTeamMemberAction
     {
         DB::transaction(function () use ($organizer, $dto, $addedBy): void {
             $organizer->users()->attach($dto->userId, [
-                'role_id' => $dto->roleId,
+                'role' => $dto->role,
             ]);
 
             activity()
@@ -23,7 +23,7 @@ final readonly class AddTeamMemberAction
                 ->causedBy($addedBy)
                 ->withProperties([
                     'user_id' => $dto->userId,
-                    'role_id' => $dto->roleId,
+                    'role' => $dto->role,
                 ])
                 ->log('team_member_added');
         });

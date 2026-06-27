@@ -8,8 +8,8 @@ use App\DataTransferObjects\Organizers\ChangeTeamMemberRoleDto;
 use App\Exceptions\LastAdminCannotBeRemovedException;
 use App\Models\Organizer;
 use App\Models\User;
+use App\Support\Organizers\OrganizerRoles;
 use Illuminate\Support\Facades\DB;
-use Spatie\Permission\Models\Role;
 
 final readonly class ChangeTeamMemberRoleAction
 {
@@ -24,12 +24,11 @@ final readonly class ChangeTeamMemberRoleAction
                 return;
             }
 
-            $currentRoleId = $pivot->pivot->role_id;
-            $adminRole = Role::query()->where('name', 'admin')->first();
+            $currentRole = $pivot->pivot->getAttribute('role');
 
-            if ($adminRole && $currentRoleId === $adminRole->id && $dto->roleId !== $adminRole->id) {
+            if ($currentRole === OrganizerRoles::Admin->value && $dto->role !== OrganizerRoles::Admin->value) {
                 $adminCount = $organizer->users()
-                    ->where('organizer_user.role_id', $adminRole->id)
+                    ->where('organizer_user.role', OrganizerRoles::Admin->value)
                     ->count();
 
                 if ($adminCount <= 1) {
@@ -38,7 +37,7 @@ final readonly class ChangeTeamMemberRoleAction
             }
 
             $organizer->users()->updateExistingPivot($dto->userId, [
-                'role_id' => $dto->roleId,
+                'role' => $dto->role,
             ]);
 
             activity()
@@ -46,7 +45,7 @@ final readonly class ChangeTeamMemberRoleAction
                 ->causedBy($changedBy)
                 ->withProperties([
                     'user_id' => $dto->userId,
-                    'new_role_id' => $dto->roleId,
+                    'new_role' => $dto->role,
                 ])
                 ->log('team_member_role_changed');
         });

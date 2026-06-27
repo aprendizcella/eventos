@@ -6,27 +6,20 @@ use App\Actions\Organizers\AddTeamMemberAction;
 use App\DataTransferObjects\Organizers\AddTeamMemberDto;
 use App\Models\Organizer;
 use App\Models\User;
+use App\Support\Organizers\OrganizerRoles;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 uses(TestCase::class, LazilyRefreshDatabase::class);
-
-beforeEach(function (): void {
-    Role::create(['name' => 'admin', 'guard_name' => 'web']);
-    Role::create(['name' => 'editor', 'guard_name' => 'web']);
-    Role::create(['name' => 'viewer', 'guard_name' => 'web']);
-});
 
 it('adds a user to an organizer with a role', function (): void {
     $organizer = Organizer::query()->create(['name' => 'Test', 'slug' => 'test']);
     $user = User::factory()->create();
     $admin = User::factory()->create();
-    $role = Role::query()->where('name', 'editor')->first();
 
     $dto = new AddTeamMemberDto(
         userId: $user->id,
-        roleId: $role->id,
+        role: OrganizerRoles::Editor->value,
     );
 
     $action = resolve(AddTeamMemberAction::class);
@@ -34,18 +27,17 @@ it('adds a user to an organizer with a role', function (): void {
 
     expect($organizer->users)->toHaveCount(1)
         ->and($organizer->users->first()->id)->toBe($user->id)
-        ->and($organizer->users->first()->pivot->role_id)->toBe($role->id);
+        ->and($organizer->users->first()->pivot->role)->toBe(OrganizerRoles::Editor->value);
 });
 
 it('logs activity when adding team member', function (): void {
     $organizer = Organizer::query()->create(['name' => 'Test', 'slug' => 'test']);
     $user = User::factory()->create();
     $admin = User::factory()->create();
-    $role = Role::query()->where('name', 'admin')->first();
 
     $dto = new AddTeamMemberDto(
         userId: $user->id,
-        roleId: $role->id,
+        role: OrganizerRoles::Admin->value,
     );
 
     $action = resolve(AddTeamMemberAction::class);
@@ -59,18 +51,17 @@ it('logs activity when adding team member', function (): void {
 
     expect($activity)->not->toBeNull()
         ->and($activity->properties['user_id'])->toBe($user->id)
-        ->and($activity->properties['role_id'])->toBe($role->id);
+        ->and($activity->properties['role'])->toBe(OrganizerRoles::Admin->value);
 });
 
 it('prevents adding same user twice', function (): void {
     $organizer = Organizer::query()->create(['name' => 'Test', 'slug' => 'test']);
     $user = User::factory()->create();
     $admin = User::factory()->create();
-    $role = Role::query()->where('name', 'editor')->first();
 
     $dto = new AddTeamMemberDto(
         userId: $user->id,
-        roleId: $role->id,
+        role: OrganizerRoles::Editor->value,
     );
 
     $action = resolve(AddTeamMemberAction::class);

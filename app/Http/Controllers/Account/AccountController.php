@@ -25,7 +25,7 @@ final class AccountController extends Controller
         $user = $request->user();
         $action($user, $request->name());
 
-        return redirect()->route('account.profile.edit')
+        return to_route('account.profile.edit')
             ->with('status', __('Profile updated successfully.'));
     }
 
@@ -40,7 +40,7 @@ final class AccountController extends Controller
         $user = $request->user();
         $action($user, $request->newPassword());
 
-        return redirect()->route('account.password.edit')
+        return to_route('account.password.edit')
             ->with('status', __('Password updated successfully.'));
     }
 }

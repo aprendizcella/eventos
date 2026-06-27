@@ -7,8 +7,8 @@ namespace App\Actions\Organizers;
 use App\Exceptions\LastAdminCannotBeRemovedException;
 use App\Models\Organizer;
 use App\Models\User;
+use App\Support\Organizers\OrganizerRoles;
 use Illuminate\Support\Facades\DB;
-use Spatie\Permission\Models\Role;
 
 final readonly class RemoveTeamMemberAction
 {
@@ -23,12 +23,11 @@ final readonly class RemoveTeamMemberAction
                 return;
             }
 
-            $roleId = $pivot->pivot->role_id;
-            $adminRole = Role::query()->where('name', 'admin')->first();
+            $role = $pivot->pivot->getAttribute('role');
 
-            if ($adminRole && $roleId === $adminRole->id) {
+            if ($role === OrganizerRoles::Admin->value) {
                 $adminCount = $organizer->users()
-                    ->where('organizer_user.role_id', $adminRole->id)
+                    ->where('organizer_user.role', OrganizerRoles::Admin->value)
                     ->count();
 
                 if ($adminCount <= 1) {

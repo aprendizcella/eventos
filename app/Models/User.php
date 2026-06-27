@@ -55,10 +55,13 @@ class User extends Authenticatable implements MustVerifyEmail
             ->useLogName('user');
     }
 
+    /**
+     * @return BelongsToMany<Organizer, $this, \Illuminate\Database\Eloquent\Relations\Pivot>
+     */
     public function organizers(): BelongsToMany
     {
         return $this->belongsToMany(Organizer::class, 'organizer_user')
-            ->withPivot('role_id')
+            ->withPivot('role')
             ->withTimestamps();
     }
 
@@ -79,10 +82,8 @@ class User extends Authenticatable implements MustVerifyEmail
             $organizerId = $request->session()->get('current_organizer_id');
 
             if ($organizerId) {
-                /** @var Organizer|null $organizer */
-                $organizer = $this->organizers()->where('organizers.id', $organizerId)->first();
-
-                return $organizer;
+                /** @var Organizer|null */
+                return $this->organizers()->where('organizers.id', $organizerId)->first();
             }
         }
 

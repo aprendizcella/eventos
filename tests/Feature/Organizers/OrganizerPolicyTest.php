@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Models\Organizer;
 use App\Models\User;
 use App\Policies\OrganizerPolicy;
+use App\Support\Organizers\OrganizerRoles;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -12,18 +13,16 @@ use Tests\TestCase;
 uses(TestCase::class, LazilyRefreshDatabase::class);
 
 beforeEach(function (): void {
+    resolve(Spatie\Permission\PermissionRegistrar::class)->setPermissionsTeamId(0);
+
     Role::create(['name' => 'super_admin', 'guard_name' => 'web']);
     Role::create(['name' => 'platform_admin', 'guard_name' => 'web']);
-    Role::create(['name' => 'admin', 'guard_name' => 'web']);
-    Role::create(['name' => 'editor', 'guard_name' => 'web']);
-    Role::create(['name' => 'viewer', 'guard_name' => 'web']);
 });
 
 it('allows organizer admin to view organizer', function (): void {
     $user = User::factory()->create();
     $organizer = Organizer::query()->create(['name' => 'Test', 'slug' => 'test']);
-    $adminRole = Role::query()->where('name', 'admin')->first();
-    $organizer->users()->attach($user->id, ['role_id' => $adminRole->id]);
+    $organizer->users()->attach($user->id, ['role' => OrganizerRoles::Admin->value]);
 
     $policy = new OrganizerPolicy;
 
@@ -42,8 +41,27 @@ it('denies non-member from viewing organizer', function (): void {
 it('allows organizer admin to manage team', function (): void {
     $user = User::factory()->create();
     $organizer = Organizer::query()->create(['name' => 'Test', 'slug' => 'test']);
-    $adminRole = Role::query()->where('name', 'admin')->first();
-    $organizer->users()->attach($user->id, ['role_id' => $adminRole->id]);
+    $organizer->users()->attach($user->id, ['role' => OrganizerRoles::Admin->value]);
+
+    $policy = new OrganizerPolicy;
+
+    expect($policy->manageTeam($user, $organizer))->toBeTrue();
+});
+
+it('allows super admin to manage team', function (): void {
+    $user = User::factory()->create();
+    $user->assignRole('super_admin');
+    $organizer = Organizer::query()->create(['name' => 'Test', 'slug' => 'test']);
+
+    $policy = new OrganizerPolicy;
+
+    expect($policy->manageTeam($user, $organizer))->toBeTrue();
+});
+
+it('allows platform admin to manage team', function (): void {
+    $user = User::factory()->create();
+    $user->assignRole('platform_admin');
+    $organizer = Organizer::query()->create(['name' => 'Test', 'slug' => 'test']);
 
     $policy = new OrganizerPolicy;
 
@@ -53,8 +71,7 @@ it('allows organizer admin to manage team', function (): void {
 it('denies organizer editor from managing team', function (): void {
     $user = User::factory()->create();
     $organizer = Organizer::query()->create(['name' => 'Test', 'slug' => 'test']);
-    $editorRole = Role::query()->where('name', 'editor')->first();
-    $organizer->users()->attach($user->id, ['role_id' => $editorRole->id]);
+    $organizer->users()->attach($user->id, ['role' => OrganizerRoles::Editor->value]);
 
     $policy = new OrganizerPolicy;
 

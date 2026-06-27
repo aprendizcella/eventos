@@ -13,6 +13,7 @@ use App\Http\Requests\Organizers\AddTeamMemberRequest;
 use App\Http\Requests\Organizers\ChangeTeamMemberRoleRequest;
 use App\Models\Organizer;
 use App\Models\User;
+use App\Support\Organizers\UniqueConstraintViolationClassifier;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
@@ -43,11 +44,16 @@ final class TeamController extends Controller
     {
         $this->authorize('manageTeam', $organizer);
 
+        $user = $request->user();
+
+        if (!$user instanceof User) {
+            abort(403);
+        }
+
         try {
-            ($this->addAction)($organizer, $request->toDto(), $request->user());
+            ($this->addAction)($organizer, $request->toDto(), $user);
         } catch (QueryException $e) {
-            // Handle unique constraint violation (user already a member)
-            if (str_contains($e->getMessage(), 'UNIQUE constraint failed')) {
+            if (UniqueConstraintViolationClassifier::isUniqueViolation($e, ['organizer_id', 'user_id'])) {
                 throw ValidationException::withMessages([
                     'user_id' => 'This user is already a member of this organizer.',
                 ]);
@@ -64,11 +70,22 @@ final class TeamController extends Controller
     {
         $this->authorize('manageTeam', $organizer);
 
+        $changedBy = $request->user();
+        $dto = $request->toDto();
+
+        if (!$changedBy instanceof User) {
+            abort(403);
+        }
+
+        if ($user->getKey() !== $dto->userId) {
+            abort(404);
+        }
+
         try {
-            ($this->changeRoleAction)($organizer, $request->toDto(), $request->user());
+            ($this->changeRoleAction)($organizer, $dto, $changedBy);
         } catch (LastAdminCannotBeRemovedException $e) {
             throw ValidationException::withMessages([
-                'role_id' => $e->getMessage(),
+                'role' => $e->getMessage(),
             ]);
         }
 
@@ -80,8 +97,14 @@ final class TeamController extends Controller
     {
         $this->authorize('manageTeam', $organizer);
 
+        $removedBy = $request->user();
+
+        if (!$removedBy instanceof User) {
+            abort(403);
+        }
+
         try {
-            ($this->removeAction)($organizer, $user, $request->user());
+            ($this->removeAction)($organizer, $user, $removedBy);
         } catch (LastAdminCannotBeRemovedException $e) {
             throw ValidationException::withMessages([
                 'user_id' => $e->getMessage(),

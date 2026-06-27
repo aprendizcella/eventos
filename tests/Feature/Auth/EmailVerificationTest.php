@@ -158,7 +158,7 @@ it('verifies the user email via a valid signed callback URL', function (): void 
     $verificationUrl = URL::temporarySignedRoute(
         'verification.verify',
         now()->addMinutes(60),
-        ['id' => $user->id, 'hash' => sha1($user->email)],
+        ['id' => $user->id, 'hash' => sha1((string) $user->email)],
     );
 
     $this->actingAs($user)
@@ -172,7 +172,7 @@ it('rejects an invalid signature on the verification callback', function (): voi
     $user = User::factory()->unverified()->create();
 
     $this->actingAs($user)
-        ->get(route('verification.verify', ['id' => $user->id, 'hash' => sha1($user->email)]))
+        ->get(route('verification.verify', ['id' => $user->id, 'hash' => sha1((string) $user->email)]))
         ->assertForbidden();
 
     expect($user->fresh()->hasVerifiedEmail())->toBeFalse();
@@ -185,7 +185,7 @@ it('rejects verification when a different user attempts to verify another accoun
     $verificationUrl = URL::temporarySignedRoute(
         'verification.verify',
         now()->addMinutes(60),
-        ['id' => $target->id, 'hash' => sha1($target->email)],
+        ['id' => $target->id, 'hash' => sha1((string) $target->email)],
     );
 
     $this->actingAs($attacker)

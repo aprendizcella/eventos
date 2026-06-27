@@ -14,7 +14,7 @@ it('creates the organizer_user pivot table with correct columns', function (): v
     $this->assertTrue(Schema::hasColumns('organizer_user', [
         'organizer_id',
         'user_id',
-        'role_id',
+        'role',
         'created_at',
         'updated_at',
     ]));
@@ -23,13 +23,12 @@ it('creates the organizer_user pivot table with correct columns', function (): v
 it('organizer_user table has foreign key constraints', function (): void {
     $foreignKeys = Schema::getForeignKeys('organizer_user');
 
-    expect($foreignKeys)->toHaveCount(3);
+    expect($foreignKeys)->toHaveCount(2);
 
     $fkColumns = array_map(fn ($fk) => $fk['foreign_table'], $foreignKeys);
 
     expect($fkColumns)->toContain('organizers')
-        ->and($fkColumns)->toContain('users')
-        ->and($fkColumns)->toContain('roles');
+        ->and($fkColumns)->toContain('users');
 });
 
 it('organizer_user table has unique composite index', function (): void {
@@ -52,11 +51,11 @@ it('organizer_user table has index on user_id', function (): void {
     expect($indexNames)->toContain('organizer_user_user_id_index');
 });
 
-it('organizer_user table has index on organizer_id and role_id', function (): void {
+it('organizer_user table has index on organizer_id and role', function (): void {
     $indexes = Schema::getIndexes('organizer_user');
 
     $roleIndex = collect($indexes)->first(
-        fn ($idx) => in_array('role_id', $idx['columns'], true) && in_array('organizer_id', $idx['columns'], true),
+        fn ($idx) => in_array('role', $idx['columns'], true) && in_array('organizer_id', $idx['columns'], true),
     );
 
     expect($roleIndex)->not->toBeNull();

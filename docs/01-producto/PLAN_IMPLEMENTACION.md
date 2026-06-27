@@ -113,6 +113,11 @@ Fase 6: Admin/Pulido       ░░░░░░░░░░░░░░░░░�
 **Spec:** Configurar el stack base y sistema de autenticacion.
 **Estado:** Completado y archivado en OpenSpec (`openspec/changes/archive/2026-06-25-sprint-1-1-setup-auth`).
 
+**Checks realizados:**
+- [x] Auth flows verificados en navegador y tests
+- [x] Roles globales y audit logging validados
+- [x] QA/Sonar previos sin bloqueos críticos
+
 | Tarea | Detalle | Entregable |
 |---|---|---|
 | 1.1.1 | Instalar librerias Fase 1 | `composer.json` actualizado |
@@ -149,7 +154,7 @@ Stack y artefactos entregados en el repositorio:
 | Migraciones | `personal_access_tokens_table`, `activity_log_table`, `permission_tables` (2026-06-23) |
 | Modelo `User` | `HasApiTokens`, `HasRoles`, `LogsActivity`, `Notifiable`; implementa `MustVerifyEmail`; activity log privacy-safe (`logOnly(['name','email'])`, `logOnlyDirty`, log name `user`) |
 | Actions de auth | `app/Actions/Auth/`: `RegisterUserAction`, `LoginUserAction`, `LogoutUserAction`, `RequestPasswordResetAction`, `ResetPasswordAction`, `RecordAuthActivityAction` |
-| Seeders | `DatabaseSeeder`, `RoleSeeder` (seis roles: `super_admin`, `platform_admin`, `organizer_admin`, `organizer_editor`, `organizer_viewer`, `attendee`; idempotente via `firstOrCreate`) |
+| Seeders | `DatabaseSeeder`, `RoleSeeder` (roles globales: `super_admin`, `platform_admin`, `attendee`; idempotente via `firstOrCreate`). Los roles de equipo del organizador (`admin`, `editor`, `viewer`) son catalogo de dominio en `App\Support\Organizers\OrganizerRoles`, no roles Spatie. |
 | Componentes Volt | `resources/views/livewire/auth/`: `login`, `register`, `forgot-password`, `reset-password` |
 | Rutas (`routes/web.php`) | Volt routes `/login`, `/register`, `/forgot-password`, `/reset-password/{token}` + POST controllers (`LoginController`, `RegisterController`, `LogoutController`, `RequestPasswordResetController`, `ResetPasswordController`) con throttle en login y reset request |
 | Tests | `tests/Feature/Auth/` (Login, Logout, Register, PasswordReset, Throttling, AuthUi, AuthActionsGuardContract, AuthAuditSafety, PackageReadiness, UserReadiness), `tests/Feature/Audit/` (AuthAudit, AuthAuditFlow), `tests/Feature/Authorization/` (RoleMiddleware, RoleSeeder) |
@@ -164,9 +169,19 @@ Stack y artefactos entregados en el repositorio:
 
 ---
 
-### Sprint 1.2: Organizadores y Equipos (Semana 2)
+### Sprint 1.2: Organizadores y Equipos (Semana 2) — IMPLEMENTADO
 
 **Spec:** Sistema de organizadores con gestion de equipos.
+
+**Estado:** Implementado, verificado y fusionado a `main`.
+
+**Checks realizados:**
+- [x] CRUD de organizer verificado (list/create/show/edit/delete)
+- [x] Team management verificado (add/change/remove)
+- [x] Policies y permisos de global admin verificados
+- [x] Layout admin y formularios reutilizables validados
+- [x] QA (`composer qa`) y Sonar verificados en su momento
+- [x] Roles del organizer documentados como catálogo propio del dominio (`admin/editor/viewer`)
 
 | Tarea | Detalle | Entregable |
 |---|---|---|
@@ -178,22 +193,27 @@ Stack y artefactos entregados en el repositorio:
 | 1.2.6 | FormRequests | `StoreOrganizerRequest`, `UpdateOrganizerRequest` |
 | 1.2.7 | Componentes Volt de organizador | `organizer-dashboard`, `organizer-settings`, `team-management` |
 | 1.2.8 | Policies | `OrganizerPolicy` |
-| 1.2.9 | Roles por organizador | `organizer_admin`, `organizer_editor`, `organizer_viewer` |
+| 1.2.9 | Roles por organizador | Catalogo de dominio `App\Support\Organizers\OrganizerRoles`: `admin`, `editor`, `viewer` (pivot `organizer_user.role`, no Spatie) |
 | 1.2.10 | Tests de organizador | CRUD, team management, policies |
 
 **Criterios de aceptacion:**
-- [ ] Usuario puede crear un organizador
-- [ ] Usuario puede invitar miembros al equipo con rol
-- [ ] Solo admin puede anadir/eliminar miembros
-- [ ] Dashboard de organizador muestra info basica
-- [ ] Settings de organizador (nombre, logo, color) editables
-- [ ] QA pipeline pasa limpio
+- [x] Usuario puede crear un organizador
+- [x] Usuario puede invitar miembros al equipo con rol
+- [x] Solo admin puede anadir/eliminar miembros (global admins habilitados por policy)
+- [x] Dashboard de organizador muestra info basica
+- [x] Settings de organizador (nombre, logo, color) editables
+- [x] QA pipeline pasa limpio
 
 **Dependencias:** Sprint 1.1 (User, Auth, Permission).
 
+**Notas de implementacion:**
+- Los roles del organizer (`admin`, `editor`, `viewer`) se modelan como catálogo propio del dominio, no como roles globales Spatie.
+- El selector de usuarios del team no filtra por tenant/dominio en esta fase; el filtro de acceso lo resuelve la policy.
+- La alta directa de usuarios asociados a organizer se difiere a Sprint 1.5.
+
 ---
 
-### Sprint 1.3: Eventos Basicos (Semana 3)
+### Sprint 1.3: Eventos Basicos (Semana 3) — PENDIENTE
 
 **Spec:** CRUD de eventos con configuracion basica.
 
@@ -224,7 +244,7 @@ Stack y artefactos entregados en el repositorio:
 
 ---
 
-### Sprint 1.4: Panel de Organizador (Semana 4)
+### Sprint 1.4: Panel de Organizador (Semana 4) — PENDIENTE
 
 **Spec:** Dashboard del organizador con metricas basicas y navegacion.
 
@@ -250,6 +270,27 @@ Stack y artefactos entregados en el repositorio:
 - [ ] Fase 1 completa: Auth + Organizer + Event + Panel
 
 **Dependencias:** Sprints 1.1, 1.2, 1.3.
+
+---
+
+### Sprint 1.5: Onboarding de usuarios e invitaciones (Sprint posterior) — PENDIENTE
+
+**Spec:** Flujo de alta de usuarios asociados a un organizer, con invitaciones y creación asistida de cuentas cuando tenga sentido de producto.
+
+| Tarea | Detalle | Entregable |
+|---|---|---|
+| 1.5.1 | Definir si el alta es por invitación o creación asistida | Decision/Spec |
+| 1.5.2 | Crear flujo de invitación de miembros | Invite flow |
+| 1.5.3 | Crear alta asistida de usuario organizer (si aplica) | Form/Action |
+| 1.5.4 | Estados de invitación y aceptación | Pending/accepted |
+| 1.5.5 | Tests de onboarding | Invitation and onboarding tests |
+
+**Criterios de aceptacion:**
+- [ ] El flujo de alta de usuarios queda definido como invitación o creación asistida.
+- [ ] Se puede incorporar un miembro al organizer sin mezclar roles globales con roles del organizer.
+- [ ] El flujo está cubierto por tests y QA.
+
+**Dependencias:** Sprint 1.2 (Organizer), Sprint 1.4 (Panel de Organizador).
 
 ---
 
@@ -939,6 +980,201 @@ vendor/bin/sail artisan cache:clear
 vendor/bin/sail artisan config:clear
 vendor/bin/sail artisan view:clear
 vendor/bin/sail artisan route:clear
+```
+
+---
+
+## Apendice C: Checklist de despliegue para migraciones
+
+Usar este checklist antes de desplegar migraciones a produccion, especialmente para migraciones con logica de transformacion de datos (como la migracion de roles de organizizador `2026_06_27_000001_change_organizer_user_role_id_to_role_string.php`).
+
+### Antes de migrar
+
+- [ ] **Backup de base de datos** completo antes de cualquier migracion destructiva.
+- [ ] **Verificar datos limpios**: ejecutar queries de validacion para confirmar que no hay datos sucios o huérfanos que puedan causar fallos en el preflight.
+  ```sql
+  -- Ejemplo para migracion de roles: verificar que todos los role_id existen en roles
+  SELECT COUNT(*) FROM organizer_user ou
+  LEFT JOIN roles r ON ou.role_id = r.id
+  WHERE r.id IS NULL AND ou.role_id IS NOT NULL;
+  ```
+- [ ] **Orden de migraciones**: confirmar que las migraciones dependientes se ejecutan en el orden correcto (verificar timestamps y dependencias de tablas/columnas).
+- [ ] **Rollback probado en staging**: ejecutar `migrate:rollback` en un entorno de staging con datos reales antes de produccion.
+- [ ] **Seeders actualizados**: si la migracion depende de datos seedeados (ej. roles legacy), confirmar que el seeder los recrea o que la migracion los crea internamente.
+
+### Durante la migracion
+
+- [ ] **Ejecutar en ventana de mantenimiento** si la migracion es destructiva o bloquea tablas.
+- [ ] **Monitorear logs** para detectar errores de preflight o timeouts.
+- [ ] **No interrumpir** el proceso una vez iniciado (las migraciones son transaccionales por defecto en Laravel, pero operaciones DDL pueden no serlo en MySQL/MariaDB).
+
+### Despues de migrar
+
+- [ ] **Verificar schema**: confirmar que las columnas/indices esperados existen y los obsoletos fueron eliminados.
+  ```bash
+  vendor/bin/sail artisan db:show --counts
+  ```
+- [ ] **Verificar datos**: ejecutar queries de validacion post-migracion para confirmar que los datos fueron transformados correctamente.
+  ```sql
+  -- Ejemplo post-migracion de roles: verificar que todos los roles fueron migrados
+  SELECT role, COUNT(*) FROM organizer_user GROUP BY role;
+  ```
+- [ ] **Ejecutar tests**: correr el suite de tests para confirmar que la aplicacion funciona correctamente con el nuevo schema.
+  ```bash
+  vendor/bin/sail composer qa
+  ```
+- [ ] **Limpiar cache** si el schema cambio y hay consultas cacheadas.
+
+### Rollback (si es necesario)
+
+- [ ] **Evaluar fix-forward vs rollback**: si la migracion fallo parcialmente, considerar si es mas seguro avanzar con una migracion correctiva que hacer rollback.
+- [ ] **Backup antes de rollback**: incluso si ya hay backup pre-migracion, hacer un backup adicional antes de rollback.
+- [ ] **Probar rollback en staging** con los datos actuales de produccion (restaurados en staging).
+- [ ] **Verificar que rollback es determinista**: la migracion debe recrear datos dependientes (ej. roles legacy) si fueron eliminados.
+- [ ] **Ejecutar rollback**:
+  ```bash
+  vendor/bin/sail artisan migrate:rollback --path=database/migrations/2026_06_27_000001_change_organizer_user_role_id_to_role_string.php
+  ```
+- [ ] **Verificar schema restaurado** y datos intactos post-rollback.
+
+### Notas especificas para la migracion de roles de organizizador
+
+- **Preflight check**: la migracion valida que todos los `role_id` (en `up()`) o `role` (en `down()`) sean mapeables antes de cualquier cambio de schema. Si hay datos sucios, lanza `RuntimeException` sin mutar el schema ni la tabla `roles`.
+- **Roles legacy**: el `down()` recrea los roles `admin`, `editor`, `viewer` en la tabla `roles` si no existen, ya que el `RoleSeeder` actual ya no los seedea (ver A13). Solo se ejecuta si la validacion de datos pasa.
+- **Orden**: esta migracion debe ejecutarse despues de `create_organizer_user_table` y antes de cualquier migracion que dependa de la columna `role` string.
+
+### Plan de despliegue no-rolling para migraciones destructivas
+
+Esta migracion es destructiva (elimina la columna `role_id` y la reemplaza por `role` string). **NO debe desplegarse con estrategia rolling** porque distintas instancias de la aplicacion verian schemas incompatibles durante el despliegue.
+
+#### Checklist de despliegue en modo mantenimiento (single-step)
+
+- [ ] **1. Backup completo** de la base de datos antes de cualquier operacion.
+  ```bash
+  vendor/bin/sail artisan db:show --counts  # documentar estado pre-migracion
+  mysqldump -u root -p eventos > backup_pre_migration.sql
+  ```
+- [ ] **2. Activar modo mantenimiento**.
+  ```bash
+  vendor/bin/sail artisan down --retry=60 --refresh=5
+  ```
+- [ ] **3. Desplegar codigo nuevo** (una sola vez, sin rolling).
+  ```bash
+  git pull origin main
+  composer install --no-dev --optimize-autoloader
+  ```
+- [ ] **4. Ejecutar migracion**.
+  ```bash
+  vendor/bin/sail artisan migrate --force
+  ```
+- [ ] **5. Verificar schema y datos**.
+  ```bash
+  vendor/bin/sail artisan db:show --counts
+  # SQL de verificacion:
+  # SELECT role, COUNT(*) FROM organizer_user GROUP BY role;
+  # SELECT COUNT(*) FROM organizer_user WHERE role IS NULL;  -- debe ser 0
+  ```
+- [ ] **6. Ejecutar comando de verificacion legacy** (si existe) para validar consistencia post-migracion.
+  ```bash
+  vendor/bin/sail artisan organizers:verify-legacy-roles  # si aplica
+  ```
+- [ ] **7. Desactivar modo mantenimiento**.
+  ```bash
+  vendor/bin/sail artisan up
+  ```
+- [ ] **8. Ejecutar QA suite en entorno local/dev** para confirmar que la aplicacion funciona con el nuevo schema. En produccion con `--no-dev`, usar las verificaciones manuales y logs porque las herramientas QA pueden no estar instaladas.
+  ```bash
+  vendor/bin/sail composer qa
+  ```
+
+#### Alternativa: Expand/Contract (para futuras migraciones destructivas)
+
+Para migraciones destructivas en produccion con multiples instancias, considerar el patron expand/contract:
+1. **Expand**: anadir la nueva columna `role` sin eliminar `role_id`. Escribir en ambas.
+2. **Migrate**: backfill de datos de `role_id` a `role`.
+3. **Contract**: eliminar `role_id` una vez que todas las instancias usan `role`.
+
+Este patron permite despliegue rolling pero requiere mas ciclos de desarrollo. Para este proyecto (solo/local), el modo mantenimiento es suficiente.
+
+#### SQL de deteccion de datos no mapeables antes de `up()`
+
+Ejecutar ANTES de la migracion `up()` para detectar problemas en el schema legacy (`role_id` existe, `role` aun no existe):
+
+```sql
+-- 1. Detectar role_id huérfanos (no existen en tabla roles)
+SELECT COUNT(*) AS orphan_role_ids
+FROM organizer_user ou
+LEFT JOIN roles r ON ou.role_id = r.id
+WHERE r.id IS NULL AND ou.role_id IS NOT NULL;
+
+-- 2. Detectar role_id que existen pero no son mapeables (no son admin/editor/viewer)
+SELECT COUNT(*) AS unmapped_role_ids
+FROM organizer_user ou
+INNER JOIN roles r ON ou.role_id = r.id
+WHERE r.name NOT IN ('admin', 'editor', 'viewer');
+
+-- 3. Detectar role_id NULL inesperados
+SELECT COUNT(*) AS null_role_ids
+FROM organizer_user
+WHERE role_id IS NULL;
+```
+
+Si cualquiera de estas queries retorna un valor > 0, **NO ejecutar la migracion `up()`**. Limpiar los datos primero.
+
+#### SQL de deteccion antes de rollback / `down()`
+
+Ejecutar solo si la migracion `up()` ya se aplico (`role` existe, `role_id` ya no existe):
+
+```sql
+-- 1. Detectar role strings no mapeables
+SELECT COUNT(*) AS unmapped_role_strings
+FROM organizer_user
+WHERE role NOT IN ('admin', 'editor', 'viewer') AND role IS NOT NULL;
+
+-- 2. Detectar valores NULL inesperados
+SELECT COUNT(*) AS null_roles
+FROM organizer_user
+WHERE role IS NULL;
+```
+
+Si cualquiera de estas queries retorna un valor > 0, **NO ejecutar rollback**. Aplicar fix-forward o limpiar datos primero.
+
+#### Monitoreo y triggers de rollback (proyecto solo/local)
+
+Para un proyecto local o de un solo desarrollador, no se requiere Sentry ni herramientas complejas de monitoreo. Usar:
+
+- **Logs de Laravel**: revisar `storage/logs/laravel.log` despues de la migracion.
+  ```bash
+  tail -100 storage/logs/laravel.log | grep -i "error\|exception\|migration"
+  ```
+- **QA suite**: ejecutar `composer qa` despues de la migracion para confirmar que todos los tests pasan.
+- **Verificacion manual**: navegar las vistas de organizador y confirmar que los roles se muestran correctamente.
+
+**Triggers para fix-forward (avanzar con correccion):**
+- La migracion fallo pero el schema esta parcialmente mutado (ej. columna `role` creada pero `role_id` no eliminado).
+- Los datos migrados son incorrectos (ej. roles NULL o valores inesperados).
+- Los tests fallan despues de la migracion.
+
+**Triggers para rollback:**
+- La migracion fallo completamente y el schema no fue mutado (safe to rollback).
+- Se detectan datos corruptos post-migracion que no pueden corregirse con una migracion correctiva.
+
+**Procedimiento de rollback:**
+```bash
+# 1. Activar modo mantenimiento
+vendor/bin/sail artisan down
+
+# 2. Rollback de la migracion
+vendor/bin/sail artisan migrate:rollback --path=database/migrations/2026_06_27_000001_change_organizer_user_role_id_to_role_string.php --force
+
+# 3. Verificar schema restaurado
+vendor/bin/sail artisan db:show --counts
+
+# 4. Restaurar codigo anterior si es necesario
+git checkout HEAD~1 -- .
+
+# 5. Desactivar modo mantenimiento
+vendor/bin/sail artisan up
 ```
 
 ---

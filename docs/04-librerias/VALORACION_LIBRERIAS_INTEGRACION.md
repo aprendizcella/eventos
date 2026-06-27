@@ -480,16 +480,18 @@ En fase multi-DB:
 
 **Roles y permisos propuestos para el proyecto:**
 
-```php
-// Roles del sistema:
-'super_admin'          // Admin de la plataforma
-'platform_admin'       // Gestiona contenido y moderacion
-'organizer_admin'      // Admin de un organizador
-'organizer_editor'     // Edita eventos de un organizador
-'organizer_viewer'     // Solo lectura en un organizador
-'attendee'             // Usuario que compra entradas
+> **SUPERSEDED by A13 (organizer-scoped roles):** The original proposal below listed `organizer_admin`, `organizer_editor`, `organizer_viewer` as global Spatie roles. This was revised: organizer team roles are now stored as a string column (`role`) on the `organizer_user` pivot table, managed via the `App\Support\Organizers\OrganizerRoles` enum. Spatie Permission is only used for global roles (`super_admin`, `platform_admin`, `attendee`). See migration `2026_06_27_000001_change_organizer_user_role_id_to_role_string.php` and `App\Support\Organizers\OrganizerRoles` for the current implementation.
 
-// Permisos granulares:
+```php
+// Roles del sistema (ACTUALIZADO post A13):
+'super_admin'          // Admin de la plataforma (Spatie global)
+'platform_admin'       // Gestiona contenido y moderacion (Spatie global)
+'attendee'             // Usuario que compra entradas (Spatie global)
+
+// Organizer team roles (NO son Spatie roles — son strings en pivot organizer_user):
+// admin, editor, viewer — gestionados via App\Support\Organizers\OrganizerRoles enum
+
+// Permisos granulares (Spatie):
 'event.create'
 'event.update'
 'event.delete'
@@ -509,8 +511,8 @@ En fase multi-DB:
 'invoice.view'
 'webhook.manage'
 
-// Asignacion de permisos por rol:
-$role = Role::create(['name' => 'organizer_admin']);
+// Asignacion de permisos por rol global (ejemplo):
+$role = Role::create(['name' => 'platform_admin']);
 $role->givePermissionTo([
     'event.create', 'event.update', 'event.delete', 'event.publish', 'event.cancel',
     'product.manage', 'product.pricing',
@@ -534,12 +536,8 @@ class EventPolicy
     }
 }
 
-// En middleware de rutas:
-Route::middleware(['auth', 'role:organizer_admin|organizer_editor'])
-    ->prefix('organizer')
-    ->group(function () {
-        // rutas del panel de organizador
-    });
+// Organizer team role check (NO usa Spatie):
+// $member->pivot->role === OrganizerRoles::Admin->value
 ```
 
 **Integracion con Sanctum:**
