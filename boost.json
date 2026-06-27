@@ -1,16 +1,25 @@
 {
     "agents": [
         "claude_code",
-        "codex"
+        "codex",
+        "opencode"
     ],
     "cloud": false,
     "guidelines": true,
     "mcp": true,
     "nightwatch": false,
+    "packages": [
+        "spatie/laravel-activitylog",
+        "spatie/laravel-permission"
+    ],
     "sail": true,
     "skills": [
         "laravel-best-practices",
+        "livewire-development",
+        "volt-development",
         "pest-testing",
+        "tailwindcss-development",
+        "laravel-permission-development",
         "action",
         "controller",
         "conventional-commits",
