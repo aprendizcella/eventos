@@ -8,6 +8,6 @@ final readonly class AddTeamMemberDto
 {
     public function __construct(
         public int $userId,
-        public int $roleId,
+        public string $role,
     ) {}
 }

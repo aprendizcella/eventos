@@ -21,6 +21,8 @@
 | A9 | QA pipeline = Rector → Pint → PHPStan → Pest → SonarQube | Obligatorio antes de cada commit. | `AGENTS.md` · sección QA |
 | A10 | Domain Events = sistema nativo de Laravel Events | No se introduce un dispatcher propio. | [`MAPING_PROPUESTA_DDD_A_BOILERPLATE.md`](./MAPING_PROPUESTA_DDD_A_BOILERPLATE.md) §1 |
 | A11 | Multi-tenencia = `spatie/laravel-multitenancy`, aplazado a Fase 4 | Compatible con L12, pero fuera del alcance de la fundación. | [`VALORACION_LIBRERIAS_INTEGRACION.md`](../04-librerias/VALORACION_LIBRERIAS_INTEGRACION.md) |
+| A12 | Onboarding de usuarios = invitación/alta asistida en sprint posterior | La creación directa de usuarios asociados a organizer se pospone para decidir el mejor flujo de producto sin mezclarlo con el CRUD de organizers y roles del equipo. | `docs/01-producto/PLAN_IMPLEMENTACION.md` §Sprint 1.5 |
+| A13 | Organizer roles = catálogo propio del dominio | Los roles `admin`, `editor`, `viewer` del organizer no se modelan con Spatie Permission porque son pivot/domain roles, no roles globales. | `docs/01-producto/PLAN_IMPLEMENTACION.md` §Sprint 1.2 + implementación en `app/Support/Organizers/OrganizerRoles.php` |
 
 ---
 

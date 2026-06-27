@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 use App\Models\Organizer;
 use App\Models\User;
+use App\Support\Organizers\OrganizerRoles;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
@@ -13,11 +15,6 @@ uses(TestCase::class, LazilyRefreshDatabase::class);
 beforeEach(function (): void {
     // Set team context for global roles
     resolve(Spatie\Permission\PermissionRegistrar::class)->setPermissionsTeamId(0);
-
-    // Create organizer-scoped roles
-    Role::query()->firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
-    Role::query()->firstOrCreate(['name' => 'editor', 'guard_name' => 'web']);
-    Role::query()->firstOrCreate(['name' => 'viewer', 'guard_name' => 'web']);
 });
 
 it('reports success when no legacy roles exist', function (): void {
@@ -76,8 +73,7 @@ it('migrates user with organizer membership to pivot role', function (): void {
     $user->assignRole($legacyRole->name);
 
     // Give user organizer membership (with any role)
-    $viewerRole = Role::query()->where('name', 'viewer')->first();
-    $organizer->users()->attach($user->id, ['role_id' => $viewerRole->id]);
+    $organizer->users()->attach($user->id, ['role' => OrganizerRoles::Viewer->value]);
 
     $this->artisan('organizers:migrate-legacy-roles --force')
         ->expectsOutputToContain('Migration complete')
@@ -92,8 +88,7 @@ it('migrates user with organizer membership to pivot role', function (): void {
         ->where('user_id', $user->id)
         ->first();
 
-    $adminRole = Role::query()->where('name', 'admin')->first();
-    expect($pivot->role_id)->toBe($adminRole->id);
+    expect($pivot->role)->toBe(OrganizerRoles::Admin->value);
 });
 
 it('deletes legacy roles after migration when no users remain', function (): void {

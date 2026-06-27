@@ -1,6 +1,6 @@
 # Estado de ejecución
 
-> **Resumen en una línea:** Sprint 1.1 (Setup y Auth) está **implementado, verificado y cerrado**. La base UX Foundation (dark/light mode, layout admin) está **implementada**. El siguiente bloque de trabajo es Sprint 1.2 (primeros flujos de dominio: Event / Organizer).
+> **Resumen en una línea:** Sprint 1.1 (Setup y Auth), Sprint 1.2 (Organizadores y Equipos), Account UX y Email Verification Gate están **implementados, verificados y cerrados**. La base UX Foundation (dark/light mode, layout admin) está **implementada**. El siguiente bloque recomendado es Sprint 1.3 (primeros flujos de evento) o el plan de implementación pendiente.
 
 ---
 
@@ -14,6 +14,7 @@
 - **Trazabilidad:** Spatie Activitylog activo sobre `User` y entidades relevantes.
 - **Migraciones y seeders:** `permission_tables`, `activity_log`, `personal_access_tokens` desplegados.
 - **Tests en verde** y pipeline QA (`composer qa`: rector → pint → phpstan → tests) limpio.
+- **Checks confirmados post-merge:** login/logout/reset, email verification gate, account profile/password, team management y organizer CRUD.
 
 ### Refactor de componentes Auth (UI)
 
@@ -58,12 +59,32 @@
   - Ruta `/dashboard` protegida con middleware `auth`.
   - Tests de contrato en `tests/Feature/AdminLayoutTest.php`.
 
+### Sprint 1.2 — Organizadores y Equipos ✅
+
+- CRUD de organizers implementado y verificado.
+- Team management implementado y verificado.
+- Roles del organizer modelados como catálogo propio (`admin`, `editor`, `viewer`) separado de Spatie.
+- Policies y test coverage para global admins y organizer admins en verde.
+
+### Account UX ✅
+
+- Menú de usuario en topbar con nombre, rol, organizer, Profile y Sign out.
+- Perfil editable para nombre; email visible pero read-only.
+- Cambio de contraseña accesible desde profile y topbar.
+- Remember me opt-in en login.
+
+### Email Verification Gate ✅
+
+- Usuarios no verificados bloqueados de dashboard, account y organizers.
+- Notice / resend / callback / logout accesibles.
+- Registro redirige a verificación.
+- Seed/admin users pueden quedar pre-verificados.
+
 ---
 
 ## Qué NO está hecho
 
-- Sprint 1.2 — Primeros flujos de dominio (Event / Organizer).
-- Sprint 1.3 — Modelos y acciones de Product / Ticket.
+- Sprint 1.3 — Primeros flujos de dominio de Event.
 - Sprint 1.4 — Cierre de Fase 1 (integración end-to-end de Fundacion).
 - Fases 2–6: ticketing, operación, monetización, discovery, administración.
 
@@ -79,4 +100,5 @@ Ninguno conocido a cierre de UX Foundation.
 
 ## Próximo paso
 
-Arrancar Sprint 1.2: definir spec (`sdd-spec`) y design (`sdd-design`) de los primeros casos de uso de dominio (crear/editar evento, crear organizer).
+- El siguiente bloque recomendado es continuar con **Sprint 1.3** (eventos) o, si se prefiere cerrar primero la línea de producto, abordar el sprint posterior de **onboarding de usuarios e invitaciones**.
+- La creación asistida de usuarios asociados a organizer queda documentada para un sprint posterior.

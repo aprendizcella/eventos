@@ -194,9 +194,6 @@ it('renders organizer edit page with reusable select component for status', func
 
 it('renders organizer team index with reusable select components in modals', function (): void {
     Role::query()->firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web']);
-    Role::query()->firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
-    Role::query()->firstOrCreate(['name' => 'editor', 'guard_name' => 'web']);
-    Role::query()->firstOrCreate(['name' => 'viewer', 'guard_name' => 'web']);
 
     $user = User::factory()->create();
     $user->assignRole('super_admin');
@@ -204,13 +201,13 @@ it('renders organizer team index with reusable select components in modals', fun
     $organizer = Organizer::query()->create(['name' => 'Test Org', 'slug' => 'test-org']);
 
     // Assign user as admin of the organizer so they can manage team
-    $organizer->users()->attach($user->id, ['role_id' => Role::where('name', 'admin')->first()->id]);
+    $organizer->users()->attach($user->id, ['role' => App\Support\Organizers\OrganizerRoles::Admin->value]);
 
     $response = $this->actingAs($user)->get(route('organizers.team.index', $organizer));
 
     $response->assertOk()
         ->assertSee('name="user_id"', false)
-        ->assertSee('name="role_id"', false)
+        ->assertSee('name="role"', false)
         ->assertSee('Select a user', false);
 });
 

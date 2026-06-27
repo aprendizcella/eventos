@@ -6,7 +6,7 @@ namespace App\Policies;
 
 use App\Models\Organizer;
 use App\Models\User;
-use Spatie\Permission\Models\Role;
+use App\Support\Organizers\OrganizerRoles;
 
 class OrganizerPolicy
 {
@@ -37,26 +37,20 @@ class OrganizerPolicy
 
     public function delete(User $user, Organizer $organizer): bool
     {
-        return $user->hasRole(['super_admin', 'platform_admin']);
+        return $organizer->exists && $user->hasRole(['super_admin', 'platform_admin']);
     }
 
     public function manageTeam(User $user, Organizer $organizer): bool
     {
-        return $this->isOrganizerAdmin($user, $organizer);
+        return $this->update($user, $organizer);
     }
 
     private function isOrganizerAdmin(User $user, Organizer $organizer): bool
     {
-        $adminRole = Role::query()->where('name', 'admin')->first();
-
-        if (!$adminRole) {
-            return false;
-        }
-
         $pivot = $organizer->users()
             ->where('users.id', $user->id)
             ->first();
 
-        return $pivot && $pivot->pivot->role_id === $adminRole->id;
+        return $pivot && $pivot->pivot->getAttribute('role') === OrganizerRoles::Admin->value;
     }
 }

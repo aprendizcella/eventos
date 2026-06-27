@@ -14,7 +14,8 @@ final class UpdateOrganizerRequest extends FormRequest
      */
     public function rules(): array
     {
-        $organizerId = $this->route('organizer')?->id;
+        $routeParam = $this->route('organizer');
+        $organizerId = $routeParam instanceof \App\Models\Organizer ? $routeParam->id : null;
 
         return [
             'name' => ['required', 'string', 'max:255'],

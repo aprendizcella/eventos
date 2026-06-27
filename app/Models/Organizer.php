@@ -13,8 +13,12 @@ use Override;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 
+/**
+ * @phpstan-use \Illuminate\Database\Eloquent\Factories\HasFactory<\Database\Factories\OrganizerFactory>
+ */
 class Organizer extends Model
 {
+    /** @use \Illuminate\Database\Eloquent\Factories\HasFactory<\Database\Factories\OrganizerFactory> */
     use HasFactory, LogsActivity, SoftDeletes;
 
     protected $fillable = [
@@ -33,19 +37,30 @@ class Organizer extends Model
             ->useLogName('organizer');
     }
 
+    /**
+     * @return BelongsToMany<User, $this, \Illuminate\Database\Eloquent\Relations\Pivot>
+     */
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'organizer_user')
-            ->withPivot('role_id')
+            ->withPivot('role')
             ->withTimestamps();
     }
 
+    /**
+     * @param  Builder<$this>  $query
+     * @return Builder<$this>
+     */
     #[\Illuminate\Database\Eloquent\Attributes\Scope]
     protected function active(Builder $query): Builder
     {
         return $query->where('status', 'active');
     }
 
+    /**
+     * @param  Builder<$this>  $query
+     * @return Builder<$this>
+     */
     #[\Illuminate\Database\Eloquent\Attributes\Scope]
     protected function withDomain(Builder $query): Builder
     {

@@ -17,7 +17,7 @@ final class UpdatePasswordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'current_password' => ['required', 'string', function (string $attribute, mixed $value, Closure $fail): void {
+            'current_password' => ['required', 'string', function (string $_, mixed $value, Closure $fail): void {
                 /** @var \App\Models\User|null $user */
                 $user = $this->user();
 

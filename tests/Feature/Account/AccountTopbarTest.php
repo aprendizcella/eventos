@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Models\Organizer;
 use App\Models\User;
+use App\Support\Organizers\OrganizerRoles;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -50,8 +51,7 @@ it('displays role label when user has a global role', function (): void {
 it('displays organizer name when user has a current organizer', function (): void {
     $user = User::factory()->create();
     $organizer = Organizer::query()->create(['name' => 'Acme Corp', 'slug' => 'acme']);
-    $role = Role::findOrCreate('admin', 'web');
-    $user->organizers()->attach($organizer->id, ['role_id' => $role->id]);
+    $user->organizers()->attach($organizer->id, ['role' => OrganizerRoles::Admin->value]);
 
     $this->withSession(['current_organizer_id' => $organizer->id]);
 

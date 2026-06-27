@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Models\Organizer;
 use App\Models\User;
+use App\Support\Organizers\OrganizerRoles;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Tests\TestCase;
 
@@ -46,9 +47,8 @@ it('has users relationship', function (): void {
     ]);
 
     $user = User::factory()->create();
-    $role = Spatie\Permission\Models\Role::create(['name' => 'admin', 'guard_name' => 'web']);
 
-    $organizer->users()->attach($user->id, ['role_id' => $role->id]);
+    $organizer->users()->attach($user->id, ['role' => OrganizerRoles::Admin->value]);
 
     expect($organizer->users)->toHaveCount(1)
         ->and($organizer->users->first()->id)->toBe($user->id);

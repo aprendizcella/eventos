@@ -11,6 +11,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Organizers\CreateOrganizerRequest;
 use App\Http\Requests\Organizers\UpdateOrganizerRequest;
 use App\Models\Organizer;
+use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -44,7 +45,13 @@ final class OrganizerController extends Controller
     {
         $this->authorize('create', Organizer::class);
 
-        $organizer = ($this->createAction)($request->toDto(), $request->user());
+        $user = $request->user();
+
+        if (!$user instanceof User) {
+            abort(403);
+        }
+
+        $organizer = ($this->createAction)($request->toDto(), $user);
 
         return to_route('organizers.show', $organizer)
             ->with('success', 'Organizer created successfully.');
@@ -68,7 +75,13 @@ final class OrganizerController extends Controller
     {
         $this->authorize('update', $organizer);
 
-        ($this->updateAction)($organizer, $request->toDto(), $request->user());
+        $user = $request->user();
+
+        if (!$user instanceof User) {
+            abort(403);
+        }
+
+        ($this->updateAction)($organizer, $request->toDto(), $user);
 
         return to_route('organizers.show', $organizer)
             ->with('success', 'Organizer updated successfully.');
@@ -78,7 +91,13 @@ final class OrganizerController extends Controller
     {
         $this->authorize('delete', $organizer);
 
-        ($this->deleteAction)($organizer, $request->user());
+        $user = $request->user();
+
+        if (!$user instanceof User) {
+            abort(403);
+        }
+
+        ($this->deleteAction)($organizer, $user);
 
         return to_route('organizers.index')
             ->with('success', 'Organizer deleted successfully.');

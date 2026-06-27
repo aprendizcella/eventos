@@ -5,18 +5,20 @@ declare(strict_types=1);
 namespace App\Http\Requests\Organizers;
 
 use App\DataTransferObjects\Organizers\ChangeTeamMemberRoleDto;
+use App\Support\Organizers\OrganizerRoles;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 final class ChangeTeamMemberRoleRequest extends FormRequest
 {
     /**
-     * @return array<string, list<string>>
+     * @return array<string, list<string|\Illuminate\Contracts\Validation\Rule|\Illuminate\Validation\Rules\In>>
      */
     public function rules(): array
     {
         return [
             'user_id' => ['required', 'integer', 'exists:users,id'],
-            'role_id' => ['required', 'integer', 'exists:roles,id'],
+            'role' => ['required', 'string', Rule::in(OrganizerRoles::values())],
         ];
     }
 
@@ -26,7 +28,7 @@ final class ChangeTeamMemberRoleRequest extends FormRequest
 
         return new ChangeTeamMemberRoleDto(
             userId: (int) $data['user_id'],
-            roleId: (int) $data['role_id'],
+            role: (string) $data['role'],
         );
     }
 }

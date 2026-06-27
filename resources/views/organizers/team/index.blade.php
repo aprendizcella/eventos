@@ -1,6 +1,5 @@
 @php
-    use Spatie\Permission\Models\Role;
-    $roles = Role::whereIn('name', ['admin', 'editor', 'viewer'])->get();
+    use App\Support\Organizers\OrganizerRoles;
 @endphp
 
 @extends('layouts.app')
@@ -9,10 +8,10 @@
         showModal: false,
         showRoleModal: false,
         selectedUser: null,
-        selectedRoleId: null,
+        selectedRole: null,
         resetForm() {
             this.selectedUser = null;
-            this.selectedRoleId = null;
+            this.selectedRole = null;
         }
     }">
         {{-- Header --}}
@@ -73,7 +72,7 @@
                 <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900">
                     @forelse ($members as $member)
                         @php
-                            $memberRole = $roles->firstWhere('id', $member->pivot->role_id);
+                            $memberRole = OrganizerRoles::tryFrom($member->pivot->role);
                         @endphp
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
                             <td class="whitespace-nowrap px-6 py-4">
@@ -90,15 +89,11 @@
                             <td class="whitespace-nowrap px-6 py-4">
                                 @if ($memberRole)
                                     @php
-                                        $roleColors = [
-                                            'admin' => 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
-                                            'editor' => 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
-                                            'viewer' => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
-                                        ];
-                                        $colorClass = $roleColors[$memberRole->name] ?? $roleColors['viewer'];
+                                        $colors = $memberRole->badgeColors();
+                                        $colorClass = $colors['bg'] . ' ' . $colors['text'] . ' ' . $colors['dark_bg'] . ' ' . $colors['dark_text'];
                                     @endphp
                                     <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {{ $colorClass }}">
-                                        {{ ucfirst($memberRole->name) }}
+                                        {{ $memberRole->label() }}
                                     </span>
                                 @else
                                     <span class="text-sm text-gray-500 dark:text-gray-400">Unknown</span>
@@ -111,7 +106,7 @@
                                 @can('manageTeam', $organizer)
                                     <div class="flex items-center justify-end gap-2">
                                         <button type="button"
-                                                @click="selectedUser = {{ $member->id }}; selectedRoleId = {{ $member->pivot->role_id }}; showRoleModal = true"
+                                                @click="selectedUser = {{ $member->id }}; selectedRole = '{{ $member->pivot->role }}'; showRoleModal = true"
                                                 class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
                                             Change Role
                                         </button>
@@ -166,10 +161,10 @@
 
                             <div>
                                 <x-form.select
-                                    name="role_id"
+                                    name="role"
                                     label="Role"
-                                    :options="$roles->pluck('name', 'id')->map(fn ($name) => ucfirst($name))->toArray()"
-                                    :selected="old('role_id')"
+                                    :options="OrganizerRoles::selectOptions()"
+                                    :selected="old('role')"
                                     required
                                 />
                             </div>
@@ -200,10 +195,10 @@
                             <div class="space-y-4 px-6 py-4">
                                 <div>
                                     <x-form.select
-                                        name="role_id"
+                                        name="role"
                                         label="New Role"
-                                        :options="$roles->pluck('name', 'id')->map(fn ($name) => ucfirst($name))->toArray()"
-                                        x-model="selectedRoleId"
+                                        :options="OrganizerRoles::selectOptions()"
+                                        x-model="selectedRole"
                                         required
                                     />
                                 </div>
