@@ -44,8 +44,8 @@ it('renders the registration page with a form posting to the backend', function 
         ->assertSee('Password')
         ->assertSee('Confirm password')
         ->assertSee('name="password_confirmation"', false)
-        ->assertSee('data-password-toggle="password"', false)
-        ->assertSee('data-password-toggle="password_confirmation"', false)
+        ->assertSee('x-data="{ shown: false }"', false)
+        ->assertSee(':type="shown ? \'text\' : \'password\'"', false)
         ->assertSee('action="'.route('register.post').'"', false);
 });
 

@@ -4,7 +4,6 @@
     'id' => null,
     'required' => false,
     'autocomplete' => null,
-    'ariaLabel' => null,
     'placeholder' => null,
     'disabled' => false,
     'help' => null,
