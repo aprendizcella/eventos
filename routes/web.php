@@ -3,11 +3,13 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Account\AccountController;
+use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\RequestPasswordResetController;
 use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\Organizers\OrganizerController;
 use App\Http\Controllers\Organizers\TeamController;
 use Illuminate\Support\Facades\Route;
@@ -40,29 +42,39 @@ Route::post('/reset-password', ResetPasswordController::class)
     ->name('password.reset.post');
 
 Route::middleware(['auth'])->group(function () {
-    Volt::route('/dashboard', 'dashboard')->name('dashboard');
+    Volt::route('/email/verify', 'auth.verify')->name('verification.notice');
+    Route::get('/email/verify/{id}/{hash}', VerifyEmailController::class)
+        ->middleware('signed')
+        ->name('verification.verify');
+    Route::post('/email/verification-notification', EmailVerificationNotificationController::class)
+        ->middleware('throttle:6,1')
+        ->name('verification.send');
 
-    Route::prefix('account')->name('account.')->group(function () {
-        Route::get('/profile', [AccountController::class, 'editProfile'])->name('profile.edit');
-        Route::put('/profile', [AccountController::class, 'updateProfile'])->name('profile.update');
-        Route::get('/password', [AccountController::class, 'editPassword'])->name('password.edit');
-        Route::put('/password', [AccountController::class, 'updatePassword'])->name('password.update');
-    });
+    Route::middleware(['verified'])->group(function () {
+        Volt::route('/dashboard', 'dashboard')->name('dashboard');
 
-    Route::prefix('organizers')->name('organizers.')->group(function () {
-        Route::get('/', [OrganizerController::class, 'index'])->name('index');
-        Route::get('/create', [OrganizerController::class, 'create'])->name('create');
-        Route::post('/', [OrganizerController::class, 'store'])->name('store');
-        Route::get('/{organizer}', [OrganizerController::class, 'show'])->name('show');
-        Route::get('/{organizer}/edit', [OrganizerController::class, 'edit'])->name('edit');
-        Route::put('/{organizer}', [OrganizerController::class, 'update'])->name('update');
-        Route::delete('/{organizer}', [OrganizerController::class, 'destroy'])->name('destroy');
+        Route::prefix('account')->name('account.')->group(function () {
+            Route::get('/profile', [AccountController::class, 'editProfile'])->name('profile.edit');
+            Route::put('/profile', [AccountController::class, 'updateProfile'])->name('profile.update');
+            Route::get('/password', [AccountController::class, 'editPassword'])->name('password.edit');
+            Route::put('/password', [AccountController::class, 'updatePassword'])->name('password.update');
+        });
 
-        Route::prefix('{organizer}/team')->name('team.')->middleware('organizer.detect')->group(function () {
-            Route::get('/', [TeamController::class, 'index'])->name('index');
-            Route::post('/', [TeamController::class, 'store'])->name('store');
-            Route::put('/{user}', [TeamController::class, 'update'])->name('update');
-            Route::delete('/{user}', [TeamController::class, 'destroy'])->name('destroy');
+        Route::prefix('organizers')->name('organizers.')->group(function () {
+            Route::get('/', [OrganizerController::class, 'index'])->name('index');
+            Route::get('/create', [OrganizerController::class, 'create'])->name('create');
+            Route::post('/', [OrganizerController::class, 'store'])->name('store');
+            Route::get('/{organizer}', [OrganizerController::class, 'show'])->name('show');
+            Route::get('/{organizer}/edit', [OrganizerController::class, 'edit'])->name('edit');
+            Route::put('/{organizer}', [OrganizerController::class, 'update'])->name('update');
+            Route::delete('/{organizer}', [OrganizerController::class, 'destroy'])->name('destroy');
+
+            Route::prefix('{organizer}/team')->name('team.')->middleware('organizer.detect')->group(function () {
+                Route::get('/', [TeamController::class, 'index'])->name('index');
+                Route::post('/', [TeamController::class, 'store'])->name('store');
+                Route::put('/{user}', [TeamController::class, 'update'])->name('update');
+                Route::delete('/{user}', [TeamController::class, 'destroy'])->name('destroy');
+            });
         });
     });
 });

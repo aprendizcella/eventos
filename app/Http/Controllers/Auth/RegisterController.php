@@ -17,6 +17,6 @@ final class RegisterController extends Controller
     {
         ($this->registerUser)($request->toDto());
 
-        return redirect('/');
+        return redirect()->route('verification.notice');
     }
 }
