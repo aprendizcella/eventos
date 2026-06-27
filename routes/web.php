@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Account\AccountController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -40,6 +41,13 @@ Route::post('/reset-password', ResetPasswordController::class)
 
 Route::middleware(['auth'])->group(function () {
     Volt::route('/dashboard', 'dashboard')->name('dashboard');
+
+    Route::prefix('account')->name('account.')->group(function () {
+        Route::get('/profile', [AccountController::class, 'editProfile'])->name('profile.edit');
+        Route::put('/profile', [AccountController::class, 'updateProfile'])->name('profile.update');
+        Route::get('/password', [AccountController::class, 'editPassword'])->name('password.edit');
+        Route::put('/password', [AccountController::class, 'updatePassword'])->name('password.update');
+    });
 
     Route::prefix('organizers')->name('organizers.')->group(function () {
         Route::get('/', [OrganizerController::class, 'index'])->name('index');

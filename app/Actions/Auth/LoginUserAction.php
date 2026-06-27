@@ -20,7 +20,7 @@ final readonly class LoginUserAction
         $succeeded = $this->guard->attempt([
             'email' => $dto->email,
             'password' => $dto->password,
-        ]);
+        ], $dto->remember);
 
         if (!$succeeded) {
             return false;

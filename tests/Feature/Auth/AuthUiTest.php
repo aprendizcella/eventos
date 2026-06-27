@@ -36,6 +36,31 @@ it('renders the login page with a form posting to the backend', function (): voi
         ->assertSee('action="'.route('login.post').'"', false);
 });
 
+it('renders a remember me checkbox that is unchecked by default on the login page', function (): void {
+    $this->get('/login')
+        ->assertOk()
+        ->assertSee('Remember me')
+        ->assertSee('name="remember"', false)
+        ->assertSee('type="checkbox"', false);
+});
+
+it('preserves remember me checkbox state after validation failure', function (): void {
+    User::factory()->create([
+        'email' => 'ui-remember@example.com',
+        'password' => 'Sup3rSecret!',
+    ]);
+
+    $this->post('/login', [
+        'email' => 'ui-remember@example.com',
+        'password' => 'wrong-password',
+        'remember' => '1',
+    ])->assertSessionHasErrors(['email']);
+
+    $this->get('/login')
+        ->assertOk()
+        ->assertSee('checked', false);
+});
+
 it('renders the registration page with a form posting to the backend', function (): void {
     $this->get('/register')
         ->assertOk()
