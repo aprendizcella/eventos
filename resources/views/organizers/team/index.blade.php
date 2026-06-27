@@ -154,28 +154,24 @@
                         </div>
                         <div class="space-y-4 px-6 py-4">
                             <div>
-                                <label for="user_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">User</label>
-                                <select id="user_id" name="user_id" required class="mt-1 w-full rounded border border-gray-400 bg-white px-3 py-2 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
-                                    <option value="">Select a user...</option>
-                                    @foreach (\App\Models\User::query()->whereNotIn('id', $members->pluck('id'))->get() as $user)
-                                        <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
-                                    @endforeach
-                                </select>
-                                @error('user_id')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
+                                <x-form.select
+                                    name="user_id"
+                                    label="User"
+                                    :options="\App\Models\User::query()->whereNotIn('id', $members->pluck('id'))->get()->pluck('name', 'id')->map(fn ($name, $id) => $name)->prepend('Select a user...', '')->toArray()"
+                                    :selected="old('user_id')"
+                                    placeholder="Select a user..."
+                                    required
+                                />
                             </div>
 
                             <div>
-                                <label for="role_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Role</label>
-                                <select id="role_id" name="role_id" required class="mt-1 w-full rounded border border-gray-400 bg-white px-3 py-2 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
-                                    @foreach ($roles as $role)
-                                        <option value="{{ $role->id }}">{{ ucfirst($role->name) }}</option>
-                                    @endforeach
-                                </select>
-                                @error('role_id')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
+                                <x-form.select
+                                    name="role_id"
+                                    label="Role"
+                                    :options="$roles->pluck('name', 'id')->map(fn ($name) => ucfirst($name))->toArray()"
+                                    :selected="old('role_id')"
+                                    required
+                                />
                             </div>
                         </div>
                         <div class="flex items-center justify-end gap-3 border-t border-gray-200 px-6 py-4 dark:border-gray-700">
@@ -203,15 +199,13 @@
                             </div>
                             <div class="space-y-4 px-6 py-4">
                                 <div>
-                                    <label for="role_id_change" class="block text-sm font-medium text-gray-700 dark:text-gray-300">New Role</label>
-                                    <select id="role_id_change" name="role_id" required class="mt-1 w-full rounded border border-gray-400 bg-white px-3 py-2 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
-                                        @foreach ($roles as $role)
-                                            <option value="{{ $role->id }}" :selected="selectedRoleId == {{ $role->id }}">{{ ucfirst($role->name) }}</option>
-                                        @endforeach
-                                    </select>
-                                    @error('role_id')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
+                                    <x-form.select
+                                        name="role_id"
+                                        label="New Role"
+                                        :options="$roles->pluck('name', 'id')->map(fn ($name) => ucfirst($name))->toArray()"
+                                        x-model="selectedRoleId"
+                                        required
+                                    />
                                 </div>
                             </div>
                             <div class="flex items-center justify-end gap-3 border-t border-gray-200 px-6 py-4 dark:border-gray-700">
