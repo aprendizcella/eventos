@@ -1,0 +1,31 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "laravel-boost": {
+      "type": "local",
+      "enabled": true,
+      "command": [
+        "vendor/bin/sail",
+        "artisan",
+        "boost:mcp"
+      ]
+    },
+    "sonarqube": {
+      "type": "local",
+      "enabled": true,
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "-i",
+        "--init",
+        "--pull=always",
+        "-e",
+        "SONARQUBE_TOKEN",
+        "-e",
+        "SONARQUBE_URL=http://host.docker.internal:9001",
+        "mcp/sonarqube"
+      ]
+    }
+  }
+}

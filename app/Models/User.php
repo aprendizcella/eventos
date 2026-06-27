@@ -7,7 +7,9 @@ namespace App\Models;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Http\Request;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Override;
@@ -51,6 +53,40 @@ class User extends Authenticatable implements MustVerifyEmail
             ->logOnly(['name', 'email'])
             ->logOnlyDirty()
             ->useLogName('user');
+    }
+
+    public function organizers(): BelongsToMany
+    {
+        return $this->belongsToMany(Organizer::class, 'organizer_user')
+            ->withPivot('role_id')
+            ->withTimestamps();
+    }
+
+    public function currentOrganizer(): ?Organizer
+    {
+        /** @var Request $request */
+        $request = resolve('request');
+
+        // Try request attribute first
+        $organizer = $request->attributes->get('current_organizer');
+
+        if ($organizer instanceof Organizer) {
+            return $organizer;
+        }
+
+        // Try session (if available)
+        if ($request->hasSession()) {
+            $organizerId = $request->session()->get('current_organizer_id');
+
+            if ($organizerId) {
+                /** @var Organizer|null $organizer */
+                $organizer = $this->organizers()->where('organizers.id', $organizerId)->first();
+
+                return $organizer;
+            }
+        }
+
+        return null;
     }
 
     /**

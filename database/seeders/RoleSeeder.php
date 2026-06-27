@@ -8,24 +8,24 @@ use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 
 /**
- * Idempotently seeds the six initial Sprint 1.1 roles under the web guard.
+ * Idempotently seeds the three global Sprint 1.2 roles under the web guard.
+ *
+ * Organizer-scoped roles (admin, editor, viewer) are managed via the
+ * organizer_user pivot table, not as global Spatie roles.
  *
  * Uses `firstOrCreate` so repeated seeding never duplicates roles and never
- * mutulates existing role assignments or permissions.
+ * mutates existing role assignments or permissions.
  */
 final class RoleSeeder extends Seeder
 {
     /**
-     * Initial roles in canonical declaration order.
+     * Global roles in canonical declaration order.
      *
      * @var list<string>
      */
     public const array ROLES = [
         'super_admin',
         'platform_admin',
-        'organizer_admin',
-        'organizer_editor',
-        'organizer_viewer',
         'attendee',
     ];
 

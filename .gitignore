@@ -1,4 +1,6 @@
 *.log
+testing
+/build/logs/
 .DS_Store
 .env
 .env.backup
@@ -20,6 +22,8 @@
 /storage/pail
 /vendor
 /laravel-ai-boilerplate
+.codex/config.toml
+/.atl
 Homestead.json
 Homestead.yaml
 Thumbs.db
