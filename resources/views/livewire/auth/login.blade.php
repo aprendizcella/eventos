@@ -13,6 +13,8 @@ layout('layouts.auth');
     <x-form.field name="email" label="Email" type="email" :value="old('email')" required autofocus />
     <x-form.password-input name="password" label="Password" required autocomplete="current-password" />
 
+    <x-form.checkbox name="remember" label="Remember me" />
+
     <x-ui.button>Sign In</x-ui.button>
 
     <p class="text-sm flex items-center justify-between gap-4 mt-4 px-4">

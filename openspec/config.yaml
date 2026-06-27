@@ -1,5 +1,5 @@
 # openspec/config.yaml — SDD configuration for eventos
-# Refreshed by sdd-init on 2026-06-23
+# Refreshed by sdd-init on 2026-06-27
 schema: spec-driven
 
 context: |
@@ -7,7 +7,7 @@ context: |
   Stack: Laravel 12.60.2, PHP 8.4+, SQLite testing database
   Architecture: Fresh Laravel 12 default structure with laravel-ai-boilerplate conventions
     (Action pattern, DTOs, ViewModels, Resources, FormRequests). No custom domain yet.
-  Testing: Pest 4.7 with Laravel and Browser plugins, PHPUnit 12.5 fallback. Tests in tests/Unit and tests/Feature currently use PHPUnit-style classes.
+  Testing: Pest 4.7 with Laravel and Browser plugins (primary), PHPUnit 12.5 fallback. Tests in tests/Unit and tests/Feature use pure Pest syntax (uses/it/expect).
   Style: Laravel Pint 1.29, PHPStan/Larastan 3.9 level 8, Rector 2.4 with Laravel sets
   Frontend: Tailwind CSS 4, Vite 7 via laravel-vite-plugin 2
   Queue/Cache/Session: testing config uses sync queue, array cache, array session
@@ -48,11 +48,11 @@ testing:
     unit:
       available: true
       path: tests/Unit
-      tool: Pest runner with PHPUnit-style tests currently present
+      tool: Pest 4 (uses/it/expect syntax, Browser plugin available)
     feature:
       available: true
       path: tests/Feature
-      tool: Pest runner with Laravel plugin; PHPUnit-style feature test currently present
+      tool: Pest 4 with Laravel plugin, LazilyRefreshDatabase trait
     e2e:
       available: true
       path: tests/Browser (not created yet)

@@ -17,6 +17,7 @@ final class LoginUserRequest extends FormRequest
         return [
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
+            'remember' => ['nullable', 'boolean'],
         ];
     }
 
@@ -27,6 +28,7 @@ final class LoginUserRequest extends FormRequest
         return new LoginUserDto(
             email: (string) $data['email'],
             password: (string) $data['password'],
+            remember: (bool) ($data['remember'] ?? false),
         );
     }
 }
