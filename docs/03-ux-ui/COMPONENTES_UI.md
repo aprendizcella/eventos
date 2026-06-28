@@ -1,8 +1,8 @@
 # Componentes UI
 
-Estado actual de la carpeta de componentes Blade y objetivo de reorganización.
+Estado actual de la carpeta de componentes Blade, Livewire Volt y criterio de reutilización.
 
-> **En una línea:** los componentes reutilizables viven en `components/form/` (primitivas de formulario) y `components/ui/` (primitivas visuales genéricas). La antigua carpeta `components/auth/` se eliminó tras la migración.
+> **En una línea:** las primitivas reutilizables viven en `components/form/` y `components/ui/`; las tablas interactivas de dominio viven como componentes Livewire Volt en `resources/views/livewire/organizers/`.
 
 ---
 
@@ -12,11 +12,15 @@ Estado actual de la carpeta de componentes Blade y objetivo de reorganización.
 resources/views/
 ├── components/
 │   ├── form/
+│   │   ├── date.blade.php
 │   │   ├── field.blade.php
+│   │   ├── input.blade.php
 │   │   └── password-input.blade.php
+│   │   └── select.blade.php
 │   ├── ui/
 │   │   ├── button.blade.php
 │   │   ├── link.blade.php
+│   │   ├── modal.blade.php
 │   │   ├── theme-init.blade.php
 │   │   └── theme-toggle.blade.php
 │   ├── layout/
@@ -31,6 +35,11 @@ resources/views/
 │   │   ├── register.blade.php
 │   │   └── reset-password.blade.php
 │   └── dashboard.blade.php
+│   └── organizers/
+│       ├── events-table.blade.php
+│       ├── organizers-table.blade.php
+│       ├── team-table.blade.php
+│       └── venues-table.blade.php
 └── layouts/
     ├── app.blade.php
     └── auth.blade.php
@@ -41,6 +50,10 @@ resources/views/
 | Componente | Responsabilidad real |
 |---|---|
 | `ui/button.blade.php` | Botón con estilo primario para formularios. |
+| `ui/modal.blade.php` | Modal reutilizable con overlay, cierre por Escape/click exterior y scroll interno. |
+| `form/input.blade.php` | Input de texto alineado con TailAdmin. |
+| `form/select.blade.php` | Select reutilizable con label, error y soporte dark mode. |
+| `form/date.blade.php` | Datepicker propio con Alpine y valor enviado en formato `Y-m-d`. |
 | `form/field.blade.php` | Label + input + mensajes de error. |
 | `ui/link.blade.php` | Enlace con estilo de texto secundario. |
 | `form/password-input.blade.php` | Input de contraseña con toggle de visibilidad. |
@@ -49,6 +62,7 @@ resources/views/
 | `layout/app-shell.blade.php` | Estructura base del panel admin (sidebar + topbar + main). |
 | `navigation/sidebar.blade.php` | Sidebar con navegación principal. |
 | `navigation/topbar.blade.php` | Topbar con theme toggle y menú de usuario. |
+| `livewire/organizers/*-table.blade.php` | Tablas reactivas de dominio con búsqueda, ordenación, paginación, columnas visibles y acciones autorizadas. |
 
 ---
 
@@ -57,11 +71,15 @@ resources/views/
 ```text
 resources/views/components/
 ├── form/
+│   ├── date.blade.php
 │   ├── field.blade.php
+│   ├── input.blade.php
 │   └── password-input.blade.php
+│   └── select.blade.php
 ├── ui/
 │   ├── button.blade.php
 │   ├── link.blade.php
+│   ├── modal.blade.php
 │   ├── theme-init.blade.php
 │   └── theme-toggle.blade.php
 ├── layout/
@@ -77,6 +95,7 @@ resources/views/components/
 - **`ui/`** → primitivas visuales que no pertenecen a un formulario: botones, links, badges, iconos, modales, tooltips, theme toggle.
 - **`layout/`** → estructuras de layout reutilizables: app-shell, page-header, content-card.
 - **`navigation/`** → componentes de navegación: sidebar, topbar, breadcrumbs.
+- **`livewire/organizers/`** → componentes de dominio con estado servidor; no son primitivas genéricas.
 
 ---
 
@@ -99,10 +118,10 @@ Los componentes se movieron de `components/auth/` a `components/form/` y `compon
 
 ## 4. JavaScript interactivo — Alpine.js
 
-El proyecto usa **Alpine.js** como librería reactiva para interacciones de UI (dropdowns, toggles, estado de componentes).
+El proyecto usa **Alpine.js** para interacciones locales de UI (dropdowns, toggles, estado visual de componentes). Desde la adopción de Livewire 4, Alpine se carga mediante `@livewireScripts`.
 
 - **Instalación:** `npm install alpinejs` (en `dependencies`).
-- **Inicialización:** `resources/js/app.js` importa Alpine, lo expone en `window.Alpine` y llama `Alpine.start()`.
+- **Inicialización:** `resources/js/app.js` no debe importar ni arrancar Alpine manualmente; Livewire 4 lo carga automáticamente.
 - **Uso en Blade:** directivas `x-data`, `x-show`, `@click`, `:class`, etc. directamente en el HTML.
 - **FOUC de tema:** el script inline `theme-init.blade.php` corre antes de Alpine para aplicar la clase `dark` antes del primer paint.
 
@@ -114,16 +133,40 @@ El proyecto usa **Alpine.js** como librería reactiva para interacciones de UI (
 | `layout/app-shell.blade.php` | `x-data="{ sidebarOpen: false }"` — estado compartido entre topbar y sidebar. |
 | `navigation/sidebar.blade.php` | `:class` reactivo para `-translate-x-full`, overlay con `x-show="sidebarOpen"`. |
 | `navigation/topbar.blade.php` | Botón toggle con `@click="sidebarOpen = !sidebarOpen"`. |
+| `form/date.blade.php` | Estado del datepicker, mes visible, día seleccionado y auto-posicionamiento. |
+| `ui/modal.blade.php` | Visibilidad, cierre por Escape/click exterior y transiciones. |
+| `livewire/organizers/*-table.blade.php` | Dropdowns de columnas/filtros dentro de componentes Livewire. |
 
 ### Convenciones
 
 - Estado reactivo cerca de donde se usa (componente-scoped), no stores globales salvo necesidad real.
 - `theme-init.blade.php` sigue siendo inline para prevenir FOUC — Alpine corre después.
 - No duplicar listeners vanilla si Alpine maneja el estado.
+- No arrancar Alpine manualmente si Livewire ya está presente; duplicarlo puede romper componentes interactivos.
 
 ---
 
-## 5. Convenciones de autoría
+## 5. Tablas Livewire Volt
+
+La estrategia vigente para tablas administrativas es **componente Volt por dominio**, no una primitiva `<x-ui.table>` genérica.
+
+| Componente | Uso |
+|---|---|
+| `organizers.organizers-table` | Índice global de organizers. |
+| `organizers.team-table` | Gestión de miembros del organizer. |
+| `organizers.events-table` | Listado de eventos con filtros por status, visibility y fechas. |
+| `organizers.venues-table` | Listado de venues del organizer. |
+
+Reglas:
+
+- Toda acción pública de escritura debe autorizar en servidor con policy/gate.
+- Los registros nested se resuelven desde el organizer montado antes de operar sobre ellos.
+- La visibilidad con `@can` mejora la UX, pero nunca reemplaza la autorización del método Livewire.
+- Reutilizar estilos TailAdmin, pero mantener la lógica de dominio explícita dentro de cada tabla.
+
+---
+
+## 6. Convenciones de autoría
 
 - Props tipadas cuando sea posible (`@props(['variant' => 'primary'])`).
 - Slots con nombre solo cuando haya más de uno.

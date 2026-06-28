@@ -105,6 +105,8 @@ No se crearán carpetas vacías “por si acaso”. Las carpetas se crean cuando
 | UX-005 | Dark/light mode será decisión explícita, no solo clases `dark:*`. | ✅ Implementado: `light`, `dark`, `system` con persistencia en `localStorage`. Toggle reutilizable en auth y admin layouts. |
 | UX-006 | `AGENTS.md` será liviano; `docs/README.md` será el mapa documental. | La IA y humanos tienen entrada rápida sin inflar instrucciones. |
 | UX-007 | Alpine.js para interactividad de UI (dropdowns, toggles, estado de componentes). | ✅ Implementado: theme toggle y mobile sidebar migrados de vanilla JS a Alpine.js. `resources/js/theme.js` eliminado. FOUC prevention sigue vía `theme-init.blade.php` inline. |
+| UX-008 | Tablas administrativas interactivas como componentes Livewire Volt por dominio. | ✅ Implementado para organizers, team, events y venues. Se descarta `<x-ui.table>` genérico por ahora porque cada tabla tiene permisos, filtros y acciones distintas. |
+| UX-009 | Alpine.js lo carga Livewire 4 cuando hay componentes Livewire en layout. | ✅ Implementado: `resources/js/app.js` no arranca Alpine manualmente; `resources/views/layouts/app.blade.php` incluye `@livewireStyles` y `@livewireScripts`. |
 
 ---
 
@@ -134,8 +136,8 @@ No se crearán carpetas vacías “por si acaso”. Las carpetas se crean cuando
 | ~~Layout admin~~ | ✅ Resuelto: sidebar fijo en desktop, oculto en mobile con toggle. Topbar con theme toggle. |
 | ~~Interactividad JS~~ | ✅ Resuelto: Alpine.js para estado reactivo en theme toggle y mobile sidebar. Vanilla JS reemplazado. |
 | Navegación | ¿Topbar con usuario/tema/notificaciones desde el inicio? (theme ya incluido, usuario/notificaciones pendientes) |
-| Tablas | ¿Componente propio simple o patrón inspirado en TailAdmin? |
-| Feedback UI | ¿Alertas/toasts/modales propios desde `ui/`? |
+| ~~Tablas~~ | ✅ Resuelto: patrón TailAdmin implementado con componentes Livewire Volt por dominio. |
+| ~~Feedback UI~~ | ✅ Parcialmente resuelto: `x-ui.modal` existe; alertas/toasts siguen pendientes. |
 | Iconos | ¿SVG inline, Heroicons, Lucide u otra fuente? |
 
 ---

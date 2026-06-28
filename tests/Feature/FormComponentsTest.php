@@ -70,9 +70,13 @@ it('renders form date component', function (): void {
     $html = Blade::render('<x-form.date name="start_date" label="Start Date" :value="\'2024-01-15\'" />');
 
     expect($html)
-        ->toContain('type="date"')
+        ->toContain('x-data')
+        ->toContain('type="hidden"')
         ->toContain('name="start_date"')
-        ->toContain('value="2024-01-15"');
+        ->toContain('2024-01-15')
+        ->toContain('x-bind:value="value"')
+        ->toContain('Previous month')
+        ->toContain('Next month');
 });
 
 it('renders form time component', function (): void {

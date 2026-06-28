@@ -19,6 +19,7 @@
 | Qué hacer antes de iniciar nuevas pantallas de dominio | [`03-ux-ui/PLAN_UX_FOUNDATION.md`](./03-ux-ui/PLAN_UX_FOUNDATION.md) |
 | Estructura actual de componentes y objetivo (`form/` + `ui/`) | [`03-ux-ui/COMPONENTES_UI.md`](./03-ux-ui/COMPONENTES_UI.md) |
 | Observaciones del árbol de componentes de TailAdmin y por qué no copiarlo entero | [`03-ux-ui/REFERENCIAS_UX.md`](./03-ux-ui/REFERENCIAS_UX.md) |
+| Plan de mejora responsive y UX para alinear con TailAdmin | [`03-ux-ui/PLAN_MEJORA_RESPONSIVE.md`](./03-ux-ui/PLAN_MEJORA_RESPONSIVE.md) |
 | Librerías evaluadas, compatibilidad y estrategia de integración | [`04-librerias/VALORACION_LIBRERIAS_INTEGRACION.md`](./04-librerias/VALORACION_LIBRERIAS_INTEGRACION.md) |
 
 ---
@@ -40,7 +41,8 @@ docs/
 │   ├── DECISIONES_UX.md
 │   ├── PLAN_UX_FOUNDATION.md
 │   ├── COMPONENTES_UI.md
-│   └── REFERENCIAS_UX.md
+│   ├── REFERENCIAS_UX.md
+│   └── PLAN_MEJORA_RESPONSIVE.md
 └── 04-librerias/              ← valoración de dependencias
     └── VALORACION_LIBRERIAS_INTEGRACION.md
 ```

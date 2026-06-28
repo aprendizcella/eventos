@@ -14,6 +14,7 @@
         @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
             @vite(['resources/css/app.css', 'resources/js/app.js'])
         @endif
+        @livewireStyles
     </head>
     <body class="bg-gray-50 text-gray-900 antialiased dark:bg-gray-950 dark:text-gray-100">
         <x-layout.app-shell>
@@ -21,5 +22,6 @@
                 @yield('content', $slot ?? '')
             </main>
         </x-layout.app-shell>
+        @livewireScripts
     </body>
 </html>
