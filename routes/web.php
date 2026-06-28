@@ -10,8 +10,10 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\RequestPasswordResetController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\Organizers\EventController;
 use App\Http\Controllers\Organizers\OrganizerController;
 use App\Http\Controllers\Organizers\TeamController;
+use App\Http\Controllers\Organizers\VenueController;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
@@ -74,6 +76,26 @@ Route::middleware(['auth'])->group(function () {
                 Route::post('/', [TeamController::class, 'store'])->name('store');
                 Route::put('/{user}', [TeamController::class, 'update'])->name('update');
                 Route::delete('/{user}', [TeamController::class, 'destroy'])->name('destroy');
+            });
+
+            Route::prefix('{organizer}/events')->name('events.')->middleware('organizer.detect')->group(function () {
+                Route::get('/', [EventController::class, 'index'])->name('index');
+                Route::get('/create', [EventController::class, 'create'])->name('create');
+                Route::post('/', [EventController::class, 'store'])->name('store');
+                Route::get('/{event}', [EventController::class, 'show'])->name('show');
+                Route::get('/{event}/edit', [EventController::class, 'edit'])->name('edit');
+                Route::put('/{event}', [EventController::class, 'update'])->name('update');
+                Route::post('/{event}/publish', [EventController::class, 'publish'])->name('publish');
+                Route::post('/{event}/pause', [EventController::class, 'pause'])->name('pause');
+                Route::post('/{event}/cancel', [EventController::class, 'cancel'])->name('cancel');
+            });
+
+            Route::prefix('{organizer}/venues')->name('venues.')->middleware('organizer.detect')->group(function () {
+                Route::get('/', [VenueController::class, 'index'])->name('index');
+                Route::get('/create', [VenueController::class, 'create'])->name('create');
+                Route::post('/', [VenueController::class, 'store'])->name('store');
+                Route::get('/{venue}/edit', [VenueController::class, 'edit'])->name('edit');
+                Route::put('/{venue}', [VenueController::class, 'update'])->name('update');
             });
         });
     });

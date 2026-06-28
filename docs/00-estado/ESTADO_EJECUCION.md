@@ -1,6 +1,6 @@
 # Estado de ejecución
 
-> **Resumen en una línea:** Sprint 1.1 (Setup y Auth), Sprint 1.2 (Organizadores y Equipos), Account UX y Email Verification Gate están **implementados, verificados y cerrados**. La base UX Foundation (dark/light mode, layout admin) está **implementada**. El siguiente bloque recomendado es Sprint 1.3 (primeros flujos de evento) o el plan de implementación pendiente.
+> **Resumen en una línea:** Sprint 1.1 (Setup y Auth), Sprint 1.2 (Organizadores y Equipos), Sprint 1.3 (Eventos Básicos), Account UX y Email Verification Gate están **implementados y verificados localmente**. La base UX Foundation está implementada. El siguiente bloque recomendado es Sprint 1.4 (Panel de Organizador) o verificación Sonar/archivo SDD de Sprint 1.3.
 
 ---
 
@@ -66,6 +66,17 @@
 - Roles del organizer modelados como catálogo propio (`admin`, `editor`, `viewer`) separado de Spatie.
 - Policies y test coverage para global admins y organizer admins en verde.
 
+### Sprint 1.3 — Eventos Básicos ✅
+
+- Taxonomía global de categorías implementada con `CategorySeeder` idempotente.
+- Venues y events modelados con tablas singulares, PK `{model}_id`, SoftDeletes, factories y relaciones con organizer.
+- CRUD interno de eventos implementado con DTOs, FormRequests, Actions y controller fino.
+- Ciclo de vida cubierto: draft/configured/published/paused/completed/cancelled, con publish/pause/cancel actions.
+- Descripciones HTML se sanitizan con Purifier antes de persistir.
+- Policies de events/venues cubren admin/editor/viewer, global admins y acceso cruzado entre organizers.
+- UI interna Blade para listado, filtros, creación, edición, detalle y acciones publish/pause/cancel.
+- `composer qa` pasa limpio: 415 tests, 1059 assertions.
+
 ### Account UX ✅
 
 - Menú de usuario en topbar con nombre, rol, organizer, Profile y Sign out.
@@ -84,7 +95,6 @@
 
 ## Qué NO está hecho
 
-- Sprint 1.3 — Primeros flujos de dominio de Event.
 - Sprint 1.4 — Cierre de Fase 1 (integración end-to-end de Fundacion).
 - Fases 2–6: ticketing, operación, monetización, discovery, administración.
 
@@ -100,5 +110,5 @@ Ninguno conocido a cierre de UX Foundation.
 
 ## Próximo paso
 
-- El siguiente bloque recomendado es continuar con **Sprint 1.3** (eventos) o, si se prefiere cerrar primero la línea de producto, abordar el sprint posterior de **onboarding de usuarios e invitaciones**.
+- El siguiente bloque recomendado es ejecutar **verificación Sonar + sdd-verify/archive** de Sprint 1.3, y después continuar con **Sprint 1.4** (Panel de Organizador).
 - La creación asistida de usuarios asociados a organizer queda documentada para un sprint posterior.

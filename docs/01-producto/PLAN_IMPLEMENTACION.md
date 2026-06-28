@@ -6,7 +6,7 @@
 **Metodologia:** Sprints de 1 semana con entregables verificables por fase
 **Referencia:** Hi.Events (funcional), Attendize (ticketing), Eventbrite (benchmark)
 
-> **Estado de ejecucion (actualizacion post Sprint 1.1):** Sprint 1.1 (Setup y Auth) esta **IMPLEMENTADO y verificado**. El stack base de Fase 1 (Laravel 12 / PHP 8.4 / Sail, Sanctum, Spatie Permission, Spatie Activitylog, Livewire + Volt, Mews/Purifier) esta instalado y operativo. Auth flows (registro, login, logout, reset de password), roles/permisos, audit logging, migraciones/seeders y tests en verde. Sprints 1.2-1.4 y Fases 2-6 siguen en planificacion. Vease el detalle en [Sprint 1.1](#sprint-11-setup-y-auth-semana-1--implementado).
+> **Estado de ejecucion (actualizacion post Sprint 1.3):** Sprint 1.1 (Setup y Auth), Sprint 1.2 (Organizadores y Equipos) y Sprint 1.3 (Eventos Basicos) estan **implementados y verificados localmente**. El stack base, auth flows, roles globales, audit logging, UX Foundation, CRUD de organizers, team management y primeros flujos de eventos estan operativos. El siguiente bloque planificado es Sprint 1.4 (Panel de Organizador).
 
 ---
 
@@ -213,32 +213,118 @@ Stack y artefactos entregados en el repositorio:
 
 ---
 
-### Sprint 1.3: Eventos Basicos (Semana 3) — PENDIENTE
+### Sprint 1.3: Eventos Basicos (Semana 3) — IMPLEMENTADO
 
 **Spec:** CRUD de eventos con configuracion basica.
+
+**Estado:** Implementado con SDD en `openspec/changes/sprint-1-3-eventos-basicos`; `composer qa` pasa limpio localmente.
+
+**Checks realizados:**
+- [x] Migraciones, modelos, enums, factories y relaciones verificados
+- [x] Actions/FormRequests/DTOs de eventos verificados
+- [x] Policies y acceso cruzado entre organizers verificados
+- [x] UI interna con filtros y acciones publish/pause/cancel verificada
+- [x] `CategorySeeder` idempotente verificado
+- [x] QA local (`composer qa`) limpio
+
+**Objetivo operativo:** introducir el primer agregado de negocio (`Event`) sin mezclar todavia ticketing, checkout ni catalogo publico. El sprint debe dejar a un organizer creando, editando, publicando y cancelando eventos propios desde el panel interno.
+
+**Estado recomendado antes de implementar:** abrir cambio SDD `sprint-1-3-eventos-basicos` con `proposal`, `spec`, `design`, `tasks`, implementacion y `verify/archive`.
+
+**Alcance incluido:**
+- Taxonomia basica de categorias.
+- Venues reutilizables por organizer.
+- Eventos con estado, visibilidad, fechas, descripcion sanitizada y relacion con organizer.
+- Policies basadas en rol dentro del organizer (`admin`, `editor`, `viewer`) y acceso global admin.
+- UI interna para listar, crear, editar, ver detalle, publicar y cancelar eventos.
+
+**Fuera de alcance para este sprint:**
+- Tipos de entrada, precios, cuotas, stock y checkout.
+- Pagos, tickets, QR, asistentes y check-in.
+- Catalogo publico SEO completo.
+- Recurrencia avanzada de eventos.
+- Integracion con mapas externos para venues.
+
+**Decisiones de dominio para Sprint 1.3:**
+
+| Tema | Decision |
+|---|---|
+| `category` | Taxonomia global simple con `parent_id` nullable. No pertenece a organizer en la primera version. |
+| `venue` | Pertenece a un organizer. Un organizer puede reutilizar venues entre eventos. |
+| `event` | Pertenece siempre a un organizer y puede tener categoria y venue opcionales durante borrador. |
+| Publicacion | `PublishEventAction` solo permite publicar si el evento tiene datos minimos: titulo, slug, fechas validas, venue, categoria y visibilidad. |
+| Visibilidad | `public`, `private`, `password_protected`. La visibilidad define descubrimiento futuro, no permisos internos del panel. |
+| Sanitizacion | Descripciones HTML pasan por Purifier antes de persistirse. |
+| UI | Usar el layout admin existente. No crear un segundo layout de organizer hasta Sprint 1.4. |
 
 | Tarea | Detalle | Entregable |
 |---|---|---|
 | 1.3.1 | Migracion `category` | Tabla con nombre, slug, padre |
-| 1.3.2 | Migracion `venue` | Tabla con direccion, ciudad, pais, coordenadas, capacidad |
-| 1.3.3 | Migracion `event` | Tabla con todos los campos basicos |
+| 1.3.2 | Migracion `venue` | Tabla con direccion, ciudad, capacidad |
+| 1.3.3 | Migracion `event` | Tabla con campos basicos, estado, visibilidad y relaciones |
 | 1.3.4 | Enum `EventStatus` | draft, configured, published, paused, completed, cancelled |
 | 1.3.5 | Enum `EventVisibility` | public, private, password_protected |
-| 1.3.6 | Modelos Category, Venue, Event | Con LogsActivity, relaciones, casts |
-| 1.3.7 | Acciones de evento | `CreateEvent`, `UpdateEvent`, `PublishEvent`, `CancelEvent` |
+| 1.3.6 | Modelos Category, Venue, Event | Con relaciones, casts, factories y activity logging en Event |
+| 1.3.7 | Acciones de evento | `CreateEventAction`, `UpdateEventAction`, `PublishEventAction`, `PauseEventAction`, `CancelEventAction` |
 | 1.3.8 | DTOs de evento | `CreateEventDto`, `UpdateEventDto` |
-| 1.3.9 | FormRequests | `StoreEventRequest`, `UpdateEventRequest` |
-| 1.3.10 | Componentes Volt de evento | `event-form`, `event-list`, `event-detail` |
-| 1.3.11 | Policy `EventPolicy` | Permisos por rol de organizador |
-| 1.3.12 | Tests de evento | CRUD, publish, cancel, policies |
+| 1.3.9 | FormRequests | `CreateEventRequest`, `UpdateEventRequest` |
+| 1.3.10 | UI Blade de evento | Listado, formulario, detalle, filtros y acciones internas |
+| 1.3.11 | Policies | `EventPolicy`, `VenuePolicy` |
+| 1.3.12 | Tests de evento | Migraciones, modelos, actions, requests, policies, UI |
+
+#### Plan de implementacion TDD por PRs
+
+| PR | Corte | Incluye | Pruebas minimas |
+|---|---|---|---|
+| PR 1 | Modelo de datos | Migraciones `category`, `venue`, `event`; enums; modelos; factories; relaciones; casts; activity logging | Tests de migraciones, relaciones, casts, factories y constraints basicas |
+| PR 2 | Casos de uso | DTOs, FormRequests, Actions `CreateEventAction`, `UpdateEventAction`, `PublishEventAction`, `CancelEventAction` | Tests de actions, validacion, transiciones de estado y sanitizacion |
+| PR 3 | HTTP y autorizacion | `EventController`, rutas nombradas, `EventPolicy`, Resources/ViewModels si hay multiples datos de lectura | Feature tests de permisos por rol, acceso cruzado entre organizers y respuestas HTTP |
+| PR 4 | UI interna | Listado, formulario, detalle, filtros basicos y acciones publish/cancel con Volt/Blade reutilizando componentes existentes | Tests de render, navegacion, formularios y estados visibles |
+| PR 5 | Integracion y cierre | Ajustes de navegacion, docs, QA completo, Sonar, SDD verify/archive | `composer qa`, `./sonar.sh`, checklist de aceptacion completo |
+
+#### Detalle esperado por capa
+
+| Capa | Implementacion esperada |
+|---|---|
+| Migrations | Tablas singulares, PK `{model}_id`, FKs explicitas, soft deletes e indices por `organizer_id`, `slug`, `status`, `starts_at`. |
+| Models | `Category`, `Venue`, `Event` finales, con `fillable`, relaciones, `casts()` y `LogsActivity` donde aporte trazabilidad. |
+| Enums | `EventStatus` y `EventVisibility` en `app/Enums/`, con valores string estables. |
+| DTOs | `CreateEventDto` y `UpdateEventDto` sin logica; transporte desde FormRequest hacia Action. |
+| FormRequests | `StoreEventRequest` y `UpdateEventRequest` con `toDto()`. El controller no usa `validated()` directo. |
+| Actions | Una accion por caso de uso. No devuelven Response; retornan modelo o valor de dominio. |
+| Controllers | Finos, sin logica de negocio. Usan Actions, Policies y Resources/ViewModels. |
+| UI | Volt/Blade solo coordina presentacion; no contiene reglas de publicacion ni mutaciones directas. |
+| Tests | Primero contratos de dominio y permisos; despues UI/HTTP. Cada bug o regla nueva requiere test. |
+
+#### Reglas de estado
+
+| Transicion | Permitida si |
+|---|---|
+| `draft` -> `configured` | El evento tiene campos minimos internos, pero aun no se publica. |
+| `draft/configured` -> `published` | Pasa `PublishEventAction` y el usuario tiene permiso de gestion del evento. |
+| `published` -> `paused` | Se permite para detener venta/visibilidad futura sin cancelar el evento. Puede quedar preparado aunque la UI lo active mas adelante. |
+| `draft/configured/published/paused` -> `cancelled` | Se permite con permiso de gestion. Debe registrar actividad. |
+| `published/paused` -> `completed` | No se automatiza en Sprint 1.3; queda para operacion/event lifecycle posterior. |
+
+#### Checklist previo a implementacion
+
+- [x] Crear proposal/spec/design/tasks SDD para `sprint-1-3-eventos-basicos`.
+- [x] Confirmar si las categorias iniciales se cargan por seeder o se gestionan manualmente por admin global: se cargan por `CategorySeeder`.
+- [x] Confirmar copy y campos minimos del formulario de evento.
+- [x] Revisar componentes UI existentes antes de crear nuevos.
+- [x] Definir filtros iniciales de listado: status, visibility, date range y text search simple.
 
 **Criterios de aceptacion:**
-- [ ] Organizador puede crear evento borrador
-- [ ] Organizador puede editar evento (detalles, venue, categoria)
-- [ ] Organizador puede publicar evento (solo si esta configurado)
-- [ ] Organizador puede cancelar evento
-- [ ] Lista de eventos del organizador con filtros
-- [ ] QA pipeline pasa limpio
+- [x] Organizador puede crear evento borrador
+- [x] Organizador puede editar evento (detalles, venue, categoria)
+- [x] Organizador puede publicar evento (solo si esta configurado)
+- [x] Organizador puede cancelar evento
+- [x] Lista de eventos del organizador con filtros
+- [x] Usuario con rol `viewer` puede ver eventos pero no mutarlos
+- [x] Usuario de otro organizer no puede acceder al evento
+- [x] Global admin puede auditar/gestionar eventos segun policy
+- [x] Descripciones HTML se sanitizan antes de persistirse
+- [x] QA pipeline pasa limpio
 
 **Dependencias:** Sprint 1.2 (Organizer).
 
