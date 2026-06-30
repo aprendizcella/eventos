@@ -16,6 +16,8 @@ use Spatie\Activitylog\Support\LogOptions;
 
 /**
  * @phpstan-use \Illuminate\Database\Eloquent\Factories\HasFactory<\Database\Factories\OrganizerFactory>
+ *
+ * @property array<string, mixed>|null $settings
  */
 class Organizer extends Model
 {

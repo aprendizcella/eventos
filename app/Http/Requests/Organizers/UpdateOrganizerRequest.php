@@ -33,7 +33,7 @@ final class UpdateOrganizerRequest extends FormRequest
         return new UpdateOrganizerDto(
             name: (string) $data['name'],
             slug: (string) $data['slug'],
-            domain: isset($data['domain']) ? (string) $data['domain'] : null,
+            domain: array_key_exists('domain', $data) ? ($data['domain'] !== null ? (string) $data['domain'] : '') : null,
             settings: isset($data['settings']) ? (array) $data['settings'] : null,
             status: isset($data['status']) ? (string) $data['status'] : null,
         );

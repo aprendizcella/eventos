@@ -1,6 +1,6 @@
 # Estado de ejecución
 
-> **Resumen en una línea:** Sprint 1.1 (Setup y Auth), Sprint 1.2 (Organizadores y Equipos), Sprint 1.3 (Eventos Básicos), Account UX y Email Verification Gate están **implementados y verificados localmente**. La base UX Foundation está implementada. El siguiente bloque recomendado es Sprint 1.4 (Panel de Organizador) o verificación Sonar/archivo SDD de Sprint 1.3.
+> **Resumen en una línea:** Sprint 1.1 (Setup y Auth), Sprint 1.2 (Organizadores y Equipos), Sprint 1.3 (Eventos Básicos), Sprint 1.4 (Panel de Organizador), Account UX, Email Verification Gate y la base UX Foundation están **implementados y verificados localmente**. El próximo paso es iniciar la Fase 2 con el Sprint 2.1 (Productos y Tipos de Entrada).
 
 ---
 
@@ -91,11 +91,19 @@
 - Registro redirige a verificación.
 - Seed/admin users pueden quedar pre-verificados.
 
+### Sprint 1.4 — Panel de Organizador ✅
+
+- **Estructura de Navegación Contextual:** Sidebar y switcher de tenant actualizados con ordenación determinista.
+- **Dashboard Global del Organizador:** Métricas de negocio unificadas (Ventas y Registros como placeholders de diseño, Eventos Activos y Miembros del equipo reales), acompañado de un feed visual de **Pedidos Recientes**.
+- **Panel de Ajustes Multitab (Alpine.js):** Pestañas independientes para Información Básica, Dirección, Redes Sociales, Valores Predeterminados y Zona de Peligro, con reautorización robusta en la mutación Livewire.
+- **Sub-navegación del Evento:** Detalle de evento rediseñado con navegación interna por pestañas (Vista general, Entradas, Asistentes y Acciones de Ciclo de Vida) para consolidar los KPIs de forma limpia.
+- **API REST básica:** Endpoints anidados `/api/v1/organizers/{organizer}` y `/api/v1/organizers/{organizer}/events` asegurados por Sanctum con contrato explícito (settings filtrado sin datos privados) y aislados por el middleware `organizer.detect`.
+- **Paso limpio del pipeline de QA completo:** Suite de tests ejecutada en Pest de manera íntegra y sin filtros.
+
 ---
 
 ## Qué NO está hecho
 
-- Sprint 1.4 — Cierre de Fase 1 (integración end-to-end de Fundacion).
 - Fases 2–6: ticketing, operación, monetización, discovery, administración.
 
 El roadmap completo está en [`01-producto/PLAN_IMPLEMENTACION.md`](../01-producto/PLAN_IMPLEMENTACION.md).
@@ -104,11 +112,11 @@ El roadmap completo está en [`01-producto/PLAN_IMPLEMENTACION.md`](../01-produc
 
 ## Bloqueos actuales
 
-Ninguno conocido a cierre de UX Foundation.
+Ninguno conocido a cierre de Sprint 1.4.
 
 ---
 
 ## Próximo paso
 
-- El siguiente bloque recomendado es ejecutar **verificación Sonar + sdd-verify/archive** de Sprint 1.3, y después continuar con **Sprint 1.4** (Panel de Organizador).
+- El siguiente bloque recomendado es iniciar la **Fase 2: Ticketing y Compra**, comenzando por el **Sprint 2.1: Productos y Tipos de Entrada** (Semana 5).
 - La creación asistida de usuarios asociados a organizer queda documentada para un sprint posterior.

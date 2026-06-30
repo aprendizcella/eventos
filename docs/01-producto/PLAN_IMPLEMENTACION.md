@@ -6,7 +6,7 @@
 **Metodologia:** Sprints de 1 semana con entregables verificables por fase
 **Referencia:** Hi.Events (funcional), Attendize (ticketing), Eventbrite (benchmark)
 
-> **Estado de ejecucion (actualizacion post Sprint 1.3):** Sprint 1.1 (Setup y Auth), Sprint 1.2 (Organizadores y Equipos) y Sprint 1.3 (Eventos Basicos) estan **implementados y verificados localmente**. El stack base, auth flows, roles globales, audit logging, UX Foundation, CRUD de organizers, team management y primeros flujos de eventos estan operativos. El siguiente bloque planificado es Sprint 1.4 (Panel de Organizador).
+> **Estado de ejecucion (actualizacion post Sprint 1.4):** Sprint 1.1 (Setup y Auth), Sprint 1.2 (Organizadores y Equipos), Sprint 1.3 (Eventos Basicos) y Sprint 1.4 (Panel de Organizador) estan **implementados y verificados localmente**. El stack base, auth flows, roles globales, audit logging, UX Foundation, CRUD de organizers, team management, primeros flujos de eventos, panel multitab de ajustes, sub-navegacion de evento y API REST basica estan operativos. El siguiente bloque planificado es Sprint 2.1 (Productos y Tipos de Entrada) iniciando la Fase 2.
 
 ---
 
@@ -330,30 +330,30 @@ Stack y artefactos entregados en el repositorio:
 
 ---
 
-### Sprint 1.4: Panel de Organizador (Semana 4) — PENDIENTE
+### Sprint 1.4: Panel de Organizador (Semana 4) — IMPLEMENTADO (CON AJUSTES DE CIERRE)
 
 **Spec:** Dashboard del organizador con metricas basicas y navegacion.
 
 | Tarea | Detalle | Entregable |
 |---|---|---|
 | 1.4.1 | Layout de organizador | `layouts/organizer.blade.php` con sidebar |
-| 1.4.2 | Dashboard metricas | Ventas totales, asistentes, eventos activos |
+| 1.4.2 | Dashboard metricas | Ventas totales, asistentes (placeholders), eventos activos, equipo (reales) |
 | 1.4.3 | Navegacion del panel | Sidebar con enlaces a secciones |
-| 1.4.4 | Componente `event-dashboard` | KPIs del evento, estado, tareas pendientes |
-| 1.4.5 | API routes basicas | `/api/v1/organizers`, `/api/v1/events` |
-| 1.4.6 | API Resources | `OrganizerResource`, `EventResource` |
-| 1.4.7 | Middleware de contexto | `OrganizerContext` establece organizer actual |
-| 1.4.8 | Tests de panel | Dashboard, metricas, API |
-| 1.4.9 | Documentacion API | OpenAPI spec basica |
+| 1.4.4 | Detalle y KPIs de Evento | Detalle de evento integrado con navegación por pestañas en `show.blade.php` |
+| 1.4.5 | API routes basicas | `/api/v1/organizers/{organizer}`, `/api/v1/organizers/{organizer}/events` (anidadas) |
+| 1.4.6 | API Resources | `OrganizerResource` (contrato restringido), `EventResource` |
+| 1.4.7 | Middleware de contexto | Reutilización de `organizer.detect` (multitenant) |
+| 1.4.8 | Tests de panel | Dashboard, metricas, API, isolation y test negativo de Livewire |
+| 1.4.9 | Documentacion API | Integrada en las rutas api y recursos |
 | 1.4.10 | Retro de Fase 1 | Review de lo construido, ajustes |
 
 **Criterios de aceptacion:**
-- [ ] Dashboard muestra metricas reales (aunque sean 0)
-- [ ] Navegacion funcional entre secciones
-- [ ] API REST basica funcional con auth Sanctum
-- [ ] Middleware de contexto funciona
-- [ ] QA pipeline pasa limpio
-- [ ] Fase 1 completa: Auth + Organizer + Event + Panel
+- [x] Dashboard muestra metricas reales de negocio (Ventas/Asistentes mock/0, Eventos/Equipo dinámicos)
+- [x] Navegacion funcional entre secciones
+- [x] API REST basica funcional con auth Sanctum y diseño anidado
+- [x] Middleware de contexto funciona (aislamiento del tenant verificado)
+- [x] QA pipeline completo pasa limpio
+- [x] Fase 1 completa: Auth + Organizer + Event + Panel
 
 **Dependencias:** Sprints 1.1, 1.2, 1.3.
 

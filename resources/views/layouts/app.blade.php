@@ -18,9 +18,7 @@
     </head>
     <body class="bg-gray-50 text-gray-900 antialiased dark:bg-gray-950 dark:text-gray-100">
         <x-layout.app-shell>
-            <main class="flex-1 p-6">
-                @yield('content', $slot ?? '')
-            </main>
+            @yield('content', $slot ?? '')
         </x-layout.app-shell>
         @livewireScripts
     </body>

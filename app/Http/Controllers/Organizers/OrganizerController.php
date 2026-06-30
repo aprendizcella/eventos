@@ -29,7 +29,7 @@ final class OrganizerController extends Controller
 
     public function index(): View
     {
-        $organizers = Organizer::query()->paginate(15);
+        $organizers = Organizer::query()->orderBy('name')->paginate(15);
 
         return view('organizers.index', ['organizers' => $organizers]);
     }
@@ -101,5 +101,19 @@ final class OrganizerController extends Controller
 
         return to_route('organizers.index')
             ->with('success', 'Organizer deleted successfully.');
+    }
+
+    public function dashboard(Organizer $organizer): View
+    {
+        $this->authorize('view', $organizer);
+
+        return view('organizers.dashboard', ['organizer' => $organizer]);
+    }
+
+    public function settings(Organizer $organizer): View
+    {
+        $this->authorize('update', $organizer);
+
+        return view('organizers.settings', ['organizer' => $organizer]);
     }
 }

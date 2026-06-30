@@ -67,6 +67,8 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/create', [OrganizerController::class, 'create'])->name('create');
             Route::post('/', [OrganizerController::class, 'store'])->name('store');
             Route::get('/{organizer}', [OrganizerController::class, 'show'])->name('show');
+            Route::get('/{organizer}/dashboard', [OrganizerController::class, 'dashboard'])->name('dashboard')->middleware('organizer.detect');
+            Route::get('/{organizer}/settings', [OrganizerController::class, 'settings'])->name('settings')->middleware('organizer.detect');
             Route::get('/{organizer}/edit', [OrganizerController::class, 'edit'])->name('edit');
             Route::put('/{organizer}', [OrganizerController::class, 'update'])->name('update');
             Route::delete('/{organizer}', [OrganizerController::class, 'destroy'])->name('destroy');

@@ -19,7 +19,9 @@ final readonly class UpdateOrganizerAction
                 'slug' => $dto->slug,
             ];
 
-            if ($dto->domain !== null) {
+            if ($dto->domain === '') {
+                $data['domain'] = null;
+            } elseif ($dto->domain !== null) {
                 $data['domain'] = $dto->domain;
             }
 

@@ -107,6 +107,7 @@ No se crearán carpetas vacías “por si acaso”. Las carpetas se crean cuando
 | UX-007 | Alpine.js para interactividad de UI (dropdowns, toggles, estado de componentes). | ✅ Implementado: theme toggle y mobile sidebar migrados de vanilla JS a Alpine.js. `resources/js/theme.js` eliminado. FOUC prevention sigue vía `theme-init.blade.php` inline. |
 | UX-008 | Tablas administrativas interactivas como componentes Livewire Volt por dominio. | ✅ Implementado para organizers, team, events y venues. Se descarta `<x-ui.table>` genérico por ahora porque cada tabla tiene permisos, filtros y acciones distintas. |
 | UX-009 | Alpine.js lo carga Livewire 4 cuando hay componentes Livewire en layout. | ✅ Implementado: `resources/js/app.js` no arranca Alpine manualmente; `resources/views/layouts/app.blade.php` incluye `@livewireStyles` y `@livewireScripts`. |
+| UX-010 | Selector de Contexto (Tenant Switcher) con búsqueda asíncrona y Migas de Pan. | ✅ Implementado: Componente `tenant-switcher` (Livewire Volt) y `breadcrumbs.blade.php` (Blade). Resuelve la navegación del Superadmin ocultando menús locales en modo Global y agilizando accesos con acciones directas en la tabla. |
 
 ---
 

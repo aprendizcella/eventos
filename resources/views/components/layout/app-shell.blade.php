@@ -5,6 +5,7 @@
         <x-navigation.topbar />
 
         <main class="flex-1 p-4 sm:p-6 lg:p-8">
+            <x-ui.breadcrumbs />
             {{ $slot }}
         </main>
     </div>

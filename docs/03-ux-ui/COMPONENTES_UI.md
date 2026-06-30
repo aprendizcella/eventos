@@ -18,6 +18,7 @@ resources/views/
 │   │   └── password-input.blade.php
 │   │   └── select.blade.php
 │   ├── ui/
+│   │   ├── breadcrumbs.blade.php
 │   │   ├── button.blade.php
 │   │   ├── link.blade.php
 │   │   ├── modal.blade.php
@@ -39,6 +40,7 @@ resources/views/
 │       ├── events-table.blade.php
 │       ├── organizers-table.blade.php
 │       ├── team-table.blade.php
+│       ├── tenant-switcher.blade.php
 │       └── venues-table.blade.php
 └── layouts/
     ├── app.blade.php
@@ -49,6 +51,7 @@ resources/views/
 
 | Componente | Responsabilidad real |
 |---|---|
+| `ui/breadcrumbs.blade.php` | Miga de pan dinámica basada en la ruta activa y el contexto del organizador. |
 | `ui/button.blade.php` | Botón con estilo primario para formularios. |
 | `ui/modal.blade.php` | Modal reutilizable con overlay, cierre por Escape/click exterior y scroll interno. |
 | `form/input.blade.php` | Input de texto alineado con TailAdmin. |
@@ -59,9 +62,10 @@ resources/views/
 | `form/password-input.blade.php` | Input de contraseña con toggle de visibilidad. |
 | `ui/theme-init.blade.php` | Script inline para prevenir FOUC de tema (ejecuta antes de Alpine). |
 | `ui/theme-toggle.blade.php` | Dropdown accesible para cambiar tema (light/dark/system) con Alpine.js. |
-| `layout/app-shell.blade.php` | Estructura base del panel admin (sidebar + topbar + main). |
-| `navigation/sidebar.blade.php` | Sidebar con navegación principal. |
+| `layout/app-shell.blade.php` | Estructura base del panel admin (sidebar + topbar + main + breadcrumbs). |
+| `navigation/sidebar.blade.php` | Sidebar con navegación principal y selector de contexto. |
 | `navigation/topbar.blade.php` | Topbar con theme toggle y menú de usuario. |
+| `livewire/organizers/tenant-switcher.blade.php` | Selector de contexto e inquilino (Tenant Switcher) con buscador reactivo integrado. |
 | `livewire/organizers/*-table.blade.php` | Tablas reactivas de dominio con búsqueda, ordenación, paginación, columnas visibles y acciones autorizadas. |
 
 ---
@@ -77,6 +81,7 @@ resources/views/components/
 │   └── password-input.blade.php
 │   └── select.blade.php
 ├── ui/
+│   ├── breadcrumbs.blade.php
 │   ├── button.blade.php
 │   ├── link.blade.php
 │   ├── modal.blade.php
@@ -135,6 +140,7 @@ El proyecto usa **Alpine.js** para interacciones locales de UI (dropdowns, toggl
 | `navigation/topbar.blade.php` | Botón toggle con `@click="sidebarOpen = !sidebarOpen"`. |
 | `form/date.blade.php` | Estado del datepicker, mes visible, día seleccionado y auto-posicionamiento. |
 | `ui/modal.blade.php` | Visibilidad, cierre por Escape/click exterior y transiciones. |
+| `livewire/organizers/tenant-switcher.blade.php` | Estado del selector desplegable de inquilinos con Alpine.js, búsqueda y transiciones de carga. |
 | `livewire/organizers/*-table.blade.php` | Dropdowns de columnas/filtros dentro de componentes Livewire. |
 
 ### Convenciones
@@ -152,7 +158,8 @@ La estrategia vigente para tablas administrativas es **componente Volt por domin
 
 | Componente | Uso |
 |---|---|
-| `organizers.organizers-table` | Índice global de organizers. |
+| `organizers.tenant-switcher` | Selector de contexto con búsqueda reactiva de base de datos. |
+| `organizers.organizers-table` | Índice global de organizers con accesos directos por iconos a events, venues y team. |
 | `organizers.team-table` | Gestión de miembros del organizer. |
 | `organizers.events-table` | Listado de eventos con filtros por status, visibility y fechas. |
 | `organizers.venues-table` | Listado de venues del organizer. |
