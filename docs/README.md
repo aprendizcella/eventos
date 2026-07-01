@@ -21,6 +21,7 @@
 | Observaciones del árbol de componentes de TailAdmin y por qué no copiarlo entero | [`03-ux-ui/REFERENCIAS_UX.md`](./03-ux-ui/REFERENCIAS_UX.md) |
 | Plan de mejora responsive y UX para alinear con TailAdmin | [`03-ux-ui/PLAN_MEJORA_RESPONSIVE.md`](./03-ux-ui/PLAN_MEJORA_RESPONSIVE.md) |
 | Librerías evaluadas, compatibilidad y estrategia de integración | [`04-librerias/VALORACION_LIBRERIAS_INTEGRACION.md`](./04-librerias/VALORACION_LIBRERIAS_INTEGRACION.md) |
+| Cómo configurar y probar Stripe localmente en modo pruebas | [`05-guias/stripe_local_setup.md`](./05-guias/stripe_local_setup.md) |
 
 ---
 
@@ -43,8 +44,10 @@ docs/
 │   ├── COMPONENTES_UI.md
 │   ├── REFERENCIAS_UX.md
 │   └── PLAN_MEJORA_RESPONSIVE.md
-└── 04-librerias/              ← valoración de dependencias
-    └── VALORACION_LIBRERIAS_INTEGRACION.md
+├── 04-librerias/              ← valoración de dependencias
+│   └── VALORACION_LIBRERIAS_INTEGRACION.md
+└── 05-guias/                  ← guías de desarrollo y procedimientos
+    └── stripe_local_setup.md
 ```
 
 ---

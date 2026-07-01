@@ -25,7 +25,7 @@ class OrganizerFactory extends Factory
         return [
             'name' => $name,
             'slug' => Str::slug($name.'-'.fake()->unique()->randomNumber(4)),
-            'domain' => fake()->optional()->domainName(),
+            'domain' => fake()->unique()->domainName(),
             'settings' => null,
             'status' => 'active',
         ];

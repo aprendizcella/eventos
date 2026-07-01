@@ -6,7 +6,7 @@
 **Metodologia:** Sprints de 1 semana con entregables verificables por fase
 **Referencia:** Hi.Events (funcional), Attendize (ticketing), Eventbrite (benchmark)
 
-> **Estado de ejecucion (actualizacion post Sprint 2.2):** Sprint 1.1 al 1.4, Sprint 2.1 (Productos y Tipos de Entrada) y Sprint 2.2 (Órdenes y Checkout) están **implementados y verificados localmente**. Se cuenta con tickets configurables, control de visibilidad por contraseña, lógica transaccional de stock con prevención de sobreventa, cupones de descuento y el flujo de compra público con confirmaciones protegidas mediante URLs firmadas temporales. El siguiente bloque planificado es el Sprint 2.3 (Pagos con Stripe).
+> **Estado de ejecucion (actualizacion post Sprint 2.3):** Sprints 1.1 al 1.4, Sprints 2.1 (Entradas), 2.2 (Checkout) y 2.3 (Pagos con Stripe) están **implementados y 100% verificados localmente**. Se cuenta con pasarela de cobros segura, control de firmas digitales HMAC en webhooks locales, registro inmutable de transacciones e inventario liberado automáticamente tras reembolsos totales. El siguiente bloque planificado es el Sprint 2.4 (Generación de PDF/QR).
 
 ---
 
@@ -459,12 +459,12 @@ Stack y artefactos entregados en el repositorio:
 | 2.3.13 | Tests de pago | PaymentIntent, webhook, refund |
 
 **Criterios de aceptacion:**
-- [ ] Checkout redirige a Stripe Checkout o usa Elements
-- [ ] Webhook de Stripe confirma pago y actualiza orden
-- [ ] Orden pasa a `confirmed` tras pago exitoso
-- [ ] Reembolso funciona (total y parcial)
-- [ ] Webhook verificado con firma HMAC
-- [ ] QA pipeline pasa limpio
+- [x] Checkout redirige a Stripe Checkout o usa Elements
+- [x] Webhook de Stripe confirma pago y actualiza orden
+- [x] Orden pasa a `confirmed` tras pago exitoso
+- [x] Reembolso funciona (total y parcial)
+- [x] Webhook verificado con firma HMAC
+- [x] QA pipeline pasa limpio
 
 **Dependencias:** Sprint 2.2 (Order, Checkout).
 

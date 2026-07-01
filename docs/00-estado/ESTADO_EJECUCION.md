@@ -1,6 +1,6 @@
 # Estado de ejecución
 
-> **Resumen en una línea:** Sprint 1.1 al 1.4 (Fase 1), Sprint 2.1 (Productos y Tipos de Entrada) y Sprint 2.2 (Órdenes y Checkout) están **implementados y verificados localmente**. El próximo paso es iniciar el Sprint 2.3 (Pagos con Stripe).
+> **Resumen en una línea:** Sprints 1.1 al 1.4 (Fase 1), y Sprints 2.1 (Entradas), 2.2 (Checkout) y 2.3 (Pagos con Stripe) están **implementados, auditados estáticamente y 100% verificados localmente**. El próximo paso es iniciar el Sprint 2.4 (Generación de PDF/QR).
 
 ---
 
@@ -115,11 +115,20 @@
 - **Checkout Público y Confirmación:** Ruta pública de checkout y vista de confirmación protegida por middleware `signed` con expiración a los 30 minutos mediante `URL::temporarySignedRoute()`.
 - **QA y Refactor SonarQube:** 489 tests integrados pasando en Pest. Complejidad cognitiva y excepciones customizadas en las acciones de dominio resueltas.
 
+### Sprint 2.3 — Pagos con Stripe ✅
+
+- **Estructura de Base de Datos Inmutable:** Creadas las tablas inmutables `payment` y `refund`, más la tabla `processed_webhook_event` para control de idempotencia de webhooks.
+- **Abstracción del Gateway de Stripe:** Creado `StripeGateway` y `PaymentGatewayInterface` desacoplados de Eloquent mediante DTOs.
+- **Idempotencia de Pagos y Reembolsos:** `InitiatePaymentAction` y `ProcessRefundAction` garantizan la prevención de cobros y reembolsos duplicados.
+- **Manejo Seguro de Webhooks:** Endpoint público seguro exento de CSRF y multi-tenancy. El webhook verifica firmas digitales sobre el body crudo antes de procesar el cambio de estado.
+- **Liberación de Stock automática:** Registrado el listener `ReleaseStockOnRefund` para liberar automáticamente el inventario de entradas al realizarse reembolsos totales.
+- **QA Pipeline Completo:** 497 tests totales en Pest en verde con análisis estático impecable por PHPStan y formateo automático de Pint.
+
 ---
 
 ## Qué NO está hecho
 
-- Sprints restantes de la Fase 2 (Stripe, Generación de PDF/QR) y Fases 3–6.
+- Sprints restantes de la Fase 2 (Generación de PDF/QR) y Fases 3–6.
 
 El roadmap completo está en [`01-producto/PLAN_IMPLEMENTACION.md`](../01-producto/PLAN_IMPLEMENTACION.md).
 
@@ -127,10 +136,10 @@ El roadmap completo está en [`01-producto/PLAN_IMPLEMENTACION.md`](../01-produc
 
 ## Bloqueos actuales
 
-Ninguno conocido a cierre de Sprint 2.2.
+Ninguno conocido a cierre de Sprint 2.3.
 
 ---
 
 ## Próximo paso
 
-- Iniciar el **Sprint 2.3: Pagos con Stripe** (Semana 7) para procesar cobros y transaccionar órdenes pendientes a estado completado/pagado a través del webhook de Stripe.
+- Iniciar el **Sprint 2.4: Generación de PDF/QR** (Semana 8) para generar las entradas físicas con código QR único para los asistentes.

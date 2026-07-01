@@ -187,6 +187,73 @@ new #[Layout('layouts.public')] class extends Component {
         $this->redirectConfirmation($order);
     }
 
+    public function simulateStripeWebhookPayment(
+        \App\Actions\Payments\InitiatePaymentAction $initiateAction,
+        \App\Actions\Payments\HandleStripeWebhookAction $webhookAction
+    ): void {
+        // Solo permitido en local o testing
+        if (!app()->environment('local', 'testing')) {
+            abort(403, 'Simulation is only allowed in local/testing environment.');
+        }
+
+        if ($this->orderId === null) {
+            return;
+        }
+
+        /** @var TicketOrder $order */
+        $order = TicketOrder::query()->findOrFail($this->orderId);
+
+        $providerId = 'pi_mock_web_' . \Illuminate\Support\Str::random(12);
+
+        try {
+            $initiateAction($order);
+        } catch (\Exception $e) {
+            // Si falla por falta de credenciales de Stripe (AuthenticationException / ApiConnectionException),
+            // creamos un Payment pendiente simulado directamente para continuar la prueba de webhooks.
+            \App\Models\Payment::query()->updateOrCreate(
+                ['ticket_order_id' => $order->ticket_order_id, 'status' => \App\Enums\PaymentStatus::Pending],
+                [
+                    'provider_id' => $providerId,
+                    'payment_method' => \App\Enums\PaymentMethod::Stripe,
+                    'amount' => $order->total,
+                    'currency' => $order->currency ?? 'USD',
+                ]
+            );
+        }
+
+        // Buscar el pago recién creado para obtener su provider_id real o simulado
+        $payment = \App\Models\Payment::query()
+            ->where('ticket_order_id', $order->ticket_order_id)
+            ->where('status', \App\Enums\PaymentStatus::Pending)
+            ->first();
+
+        if ($payment !== null && $payment->provider_id !== null) {
+            $providerId = $payment->provider_id;
+        }
+
+        // 2. Simular el Webhook de Stripe firmándolo
+        $payload = json_encode([
+            'id' => 'evt_mock_web_' . \Illuminate\Support\Str::random(12),
+            'type' => 'payment_intent.succeeded',
+            'data' => [
+                'object' => [
+                    'id' => $providerId,
+                    'status' => 'succeeded',
+                ],
+            ],
+        ]);
+
+        $secret = config('services.stripe.webhook.secret', 'whsec_mock');
+        $timestamp = time();
+        $signature = hash_hmac('sha256', $timestamp . '.' . $payload, $secret);
+        $sigHeader = "t={$timestamp},v1={$signature}";
+
+        // 3. Procesar el webhook usando la acción HandleStripeWebhookAction directamente
+        $webhookAction($payload, $sigHeader);
+
+        $this->redirectConfirmation($order);
+    }
+
     private function redirectConfirmation(TicketOrder $order): void
     {
         $url = URL::temporarySignedRoute(
@@ -393,14 +460,19 @@ new #[Layout('layouts.public')] class extends Component {
                     </div>
 
                     @if(app()->environment('local', 'testing'))
-                        <div class="p-4 rounded-lg bg-yellow-50 border border-yellow-200 dark:bg-yellow-950/20 dark:border-yellow-900/30 max-w-md mx-auto">
-                            <h4 class="text-sm font-bold text-yellow-800 dark:text-yellow-400">{{ __('Offline Payment Simulation') }}</h4>
+                        <div class="p-4 rounded-lg bg-yellow-50 border border-yellow-200 dark:bg-yellow-950/20 dark:border-yellow-900/30 max-w-md mx-auto space-y-4">
+                            <h4 class="text-sm font-bold text-yellow-800 dark:text-yellow-400">{{ __('Offline & Payment Simulation') }}</h4>
                             <p class="text-xs text-yellow-700 dark:text-yellow-500 mt-1">
-                                {{ __('Local/Testing Mode: You can simulate a successful offline checkout using the button below.') }}
+                                {{ __('Local/Testing Mode: You can simulate checkout flows using the buttons below.') }}
                             </p>
-                            <button type="button" wire:click="simulatePayment" class="mt-4 rounded-lg bg-yellow-600 px-4 py-2 text-xs font-bold text-white hover:bg-yellow-500">
-                                {{ __('Simulate Payment / Complete Purchase') }}
-                            </button>
+                            <div class="flex flex-col gap-2">
+                                <button type="button" wire:click="simulatePayment" class="rounded-lg bg-yellow-600 px-4 py-2 text-xs font-bold text-white hover:bg-yellow-500">
+                                    {{ __('Simulate Simple Payment') }}
+                                </button>
+                                <button type="button" wire:click="simulateStripeWebhookPayment" class="rounded-lg bg-blue-600 px-4 py-2 text-xs font-bold text-white hover:bg-blue-500">
+                                    {{ __('Simulate Stripe Webhook Payment') }}
+                                </button>
+                            </div>
                         </div>
                     @else
                         <div class="p-4 rounded-lg bg-blue-50 border border-blue-200 dark:bg-blue-950/20 dark:border-blue-900/30 max-w-md mx-auto">

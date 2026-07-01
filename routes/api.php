@@ -10,3 +10,5 @@ Route::middleware(['auth:sanctum', 'organizer.detect'])->prefix('v1')->group(fun
     Route::get('/organizers/{organizer}', [OrganizerApiController::class, 'show'])->name('api.organizers.show');
     Route::get('/organizers/{organizer}/events', [EventApiController::class, 'index'])->name('api.events.index');
 });
+
+Route::post('/v1/webhooks/stripe', App\Http\Controllers\Payments\StripeWebhookController::class)->name('webhooks.stripe');

@@ -33,6 +33,11 @@ class AppServiceProvider extends ServiceProvider
 
             return $guard;
         });
+
+        $this->app->singleton(
+            \App\Services\Payments\Contracts\PaymentGatewayInterface::class,
+            \App\Services\Payments\StripeGateway::class,
+        );
     }
 
     /**

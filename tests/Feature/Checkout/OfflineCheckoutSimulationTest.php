@@ -34,6 +34,17 @@ it('allows offline payment simulation in testing environment', function (): void
 
     $order->refresh();
     expect($order->status)->toBe(TicketOrderStatus::Completed);
+
+    // Reset status for second simulation
+    $order->update(['status' => TicketOrderStatus::Reserved]);
+
+    Livewire::test('public.events.checkout', ['event' => $event])
+        ->set('orderId', $order->ticket_order_id)
+        ->call('simulateStripeWebhookPayment')
+        ->assertRedirect();
+
+    $order->refresh();
+    expect($order->status)->toBe(TicketOrderStatus::Completed);
 });
 
 it('denies offline payment simulation in production environment', function (): void {
@@ -54,6 +65,11 @@ it('denies offline payment simulation in production environment', function (): v
     Livewire::test('public.events.checkout', ['event' => $event])
         ->set('orderId', $order->ticket_order_id)
         ->call('simulatePayment')
+        ->assertForbidden();
+
+    Livewire::test('public.events.checkout', ['event' => $event])
+        ->set('orderId', $order->ticket_order_id)
+        ->call('simulateStripeWebhookPayment')
         ->assertForbidden();
 
     $order->refresh();
