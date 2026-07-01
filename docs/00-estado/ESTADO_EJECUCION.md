@@ -1,6 +1,6 @@
 # Estado de ejecución
 
-> **Resumen en una línea:** Sprint 1.1 (Setup y Auth), Sprint 1.2 (Organizadores y Equipos), Sprint 1.3 (Eventos Básicos), Sprint 1.4 (Panel de Organizador), Account UX, Email Verification Gate y la base UX Foundation están **implementados y verificados localmente**. El próximo paso es iniciar la Fase 2 con el Sprint 2.1 (Productos y Tipos de Entrada).
+> **Resumen en una línea:** Sprint 1.1 al 1.4 (Fase 1), Sprint 2.1 (Productos y Tipos de Entrada) y Sprint 2.2 (Órdenes y Checkout) están **implementados y verificados localmente**. El próximo paso es iniciar el Sprint 2.3 (Pagos con Stripe).
 
 ---
 
@@ -100,11 +100,26 @@
 - **API REST básica:** Endpoints anidados `/api/v1/organizers/{organizer}` y `/api/v1/organizers/{organizer}/events` asegurados por Sanctum con contrato explícito (settings filtrado sin datos privados) y aislados por el middleware `organizer.detect`.
 - **Paso limpio del pipeline de QA completo:** Suite de tests ejecutada en Pest de manera íntegra y sin filtros.
 
+### Sprint 2.1 — Productos y Tipos de Entrada ✅
+
+- **Modelos y Estructura:** Modelado de `Product`, `ProductPrice` y `PromoCode` con claves e índices adecuados y SoftDeletes.
+- **Acciones y Lógica:** Acciones `CreateProductAction` y `UpdateProductAction` para encapsular la lógica de negocio; `PriceCalculator` y `PromoCodeValidator` para el cálculo dinámico y validación de precios y cupones.
+- **Seguridad:** Encriptación/hash de contraseña para tickets protegidos por contraseña.
+- **UI de Tickets:** Componentes Blade reutilizables bajo la filosofía de la UX Foundation.
+
+### Sprint 2.2 — Órdenes y Checkout ✅
+
+- **Estructura Transaccional:** Tablas `ticket_order` y `ticket_order_item`. Enum `TicketOrderStatus`.
+- **Preferencia de Sobreventa:** Servicio `StockManager` con bloqueo atómico de filas (`lockForUpdate()`) para evitar condiciones de carrera.
+- **Agendador de Expiración (Laravel 12):** Comando de consola `ReleaseExpiredReservations` agendado cada minuto en `routes/console.php` para liberar stock de reservas expiradas tras 10 minutos.
+- **Checkout Público y Confirmación:** Ruta pública de checkout y vista de confirmación protegida por middleware `signed` con expiración a los 30 minutos mediante `URL::temporarySignedRoute()`.
+- **QA y Refactor SonarQube:** 489 tests integrados pasando en Pest. Complejidad cognitiva y excepciones customizadas en las acciones de dominio resueltas.
+
 ---
 
 ## Qué NO está hecho
 
-- Fases 2–6: ticketing, operación, monetización, discovery, administración.
+- Sprints restantes de la Fase 2 (Stripe, Generación de PDF/QR) y Fases 3–6.
 
 El roadmap completo está en [`01-producto/PLAN_IMPLEMENTACION.md`](../01-producto/PLAN_IMPLEMENTACION.md).
 
@@ -112,11 +127,10 @@ El roadmap completo está en [`01-producto/PLAN_IMPLEMENTACION.md`](../01-produc
 
 ## Bloqueos actuales
 
-Ninguno conocido a cierre de Sprint 1.4.
+Ninguno conocido a cierre de Sprint 2.2.
 
 ---
 
 ## Próximo paso
 
-- El siguiente bloque recomendado es iniciar la **Fase 2: Ticketing y Compra**, comenzando por el **Sprint 2.1: Productos y Tipos de Entrada** (Semana 5).
-- La creación asistida de usuarios asociados a organizer queda documentada para un sprint posterior.
+- Iniciar el **Sprint 2.3: Pagos con Stripe** (Semana 7) para procesar cobros y transaccionar órdenes pendientes a estado completado/pagado a través del webhook de Stripe.

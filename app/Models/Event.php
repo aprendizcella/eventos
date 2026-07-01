@@ -80,6 +80,14 @@ final class Event extends Model
     }
 
     /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<Product, $this>
+     */
+    public function products(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Product::class, 'event_id', 'event_id');
+    }
+
+    /**
      * @param  Builder<$this>  $query
      * @return Builder<$this>
      */

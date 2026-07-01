@@ -26,6 +26,13 @@ Volt::route('/register', 'auth.register')->name('register');
 Volt::route('/forgot-password', 'auth.forgot-password')->name('forgot-password');
 Volt::route('/reset-password/{token}', 'auth.reset-password')->name('password.reset');
 
+Volt::route('/checkout/{event}', 'public.events.checkout')
+    ->name('checkout');
+
+Volt::route('/checkout/{event}/order/{ticketOrder}/confirmation', 'public.events.order-confirmation')
+    ->middleware('signed')
+    ->name('checkout.confirmation');
+
 Route::post('/login', LoginController::class)
     ->middleware('throttle:login')
     ->name('login.post');

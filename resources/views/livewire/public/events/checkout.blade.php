@@ -1,0 +1,494 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Livewire\Public\Events;
+
+use App\Actions\Orders\ConfirmTicketOrderAction;
+use App\DataTransferObjects\Orders\ReserveStockDto;
+use App\DataTransferObjects\Orders\ReserveStockItemDto;
+use App\Enums\PricingMode;
+use App\Models\Event;
+use App\Models\Product;
+use App\Models\ProductPrice;
+use App\Models\PromoCode;
+use App\Models\TicketOrder;
+use App\Services\PriceCalculator;
+use App\Services\PromoCodeValidator;
+use App\Services\StockManager;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\URL;
+use Livewire\Attributes\Layout;
+use Livewire\Volt\Component;
+
+new #[Layout('layouts.public')] class extends Component {
+    public Event $event;
+
+    // Selection properties
+    /** @var array<int, int> */
+    public array $quantities = []; // product_price_id => quantity
+    /** @var array<int, string> */
+    public array $passwords = []; // product_id => password entered
+    /** @var array<int, bool> */
+    public array $unlockedProducts = []; // product_id => true/false
+    /** @var array<int, string> */
+    public array $passwordErrors = [];
+
+    // Promo code properties
+    public string $promoCodeText = '';
+    public ?PromoCode $appliedPromoCode = null;
+    public string $promoCodeError = '';
+
+    // Buyer properties
+    public string $firstName = '';
+    public string $lastName = '';
+    public string $email = '';
+
+    // Flow properties
+    public int $step = 1; // 1: Ticket Selection, 2: Buyer Info, 3: Reserve & Checkout Simulation
+    public ?int $orderId = null;
+    public ?string $reservedUntil = null;
+
+    public function mount(Event $event): void
+    {
+        $this->event = $event;
+
+        // Initialize quantities to 0
+        foreach ($this->event->products as $product) {
+            foreach ($product->prices as $price) {
+                $this->quantities[$price->product_price_id] = 0;
+            }
+        }
+    }
+
+    public function getAvailableCapacity(ProductPrice $price): int
+    {
+        return resolve(StockManager::class)->getAvailableCapacity($price);
+    }
+
+    public function applyPromoCode(PromoCodeValidator $validator): void
+    {
+        $this->resetErrorBag('promoCodeText');
+        $this->promoCodeError = '';
+        $this->appliedPromoCode = null;
+
+        if (empty($this->promoCodeText)) {
+            return;
+        }
+
+        /** @var PromoCode|null $promoCode */
+        $promoCode = PromoCode::query()
+            ->where('event_id', $this->event->event_id)
+            ->where('code', strtoupper($this->promoCodeText))
+            ->first();
+
+        if ($promoCode === null || !$validator->isValid($promoCode, $this->event->event_id)) {
+            $this->promoCodeError = __('Invalid or expired promo code.');
+            return;
+        }
+
+        $this->appliedPromoCode = $promoCode;
+    }
+
+    public function unlockProduct(int $productId): void
+    {
+        $this->passwordErrors[$productId] = '';
+        /** @var Product $product */
+        $product = Product::query()->findOrFail($productId);
+
+        $entered = $this->passwords[$productId] ?? '';
+        if ($product->password !== null && Hash::check($entered, $product->password)) {
+            $this->unlockedProducts[$productId] = true;
+        } else {
+            $this->passwordErrors[$productId] = __('Incorrect password.');
+        }
+    }
+
+    public function nextStep(): void
+    {
+        if ($this->step === 1) {
+            // Validate at least 1 ticket selected
+            $totalQty = array_sum($this->quantities);
+            if ($totalQty <= 0) {
+                $this->addError('tickets', __('Please select at least one ticket.'));
+                return;
+            }
+
+            $this->step = 2;
+        }
+    }
+
+    public function previousStep(): void
+    {
+        if ($this->step === 2) {
+            $this->step = 1;
+        }
+    }
+
+    public function reserveAndCheckout(StockManager $stockManager, ConfirmTicketOrderAction $confirmAction): void
+    {
+        $this->validate([
+            'firstName' => ['required', 'string', 'max:255'],
+            'lastName' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255'],
+        ]);
+
+        // Map quantities to DTOs
+        $items = [];
+        foreach ($this->quantities as $priceId => $qty) {
+            $qty = (int) $qty;
+            if ($qty > 0) {
+                $items[] = new ReserveStockItemDto((int) $priceId, $qty);
+            }
+        }
+
+        $dto = new ReserveStockDto(
+            firstName: $this->firstName,
+            lastName: $this->lastName,
+            email: $this->email,
+            promoCodeId: $this->appliedPromoCode?->promo_code_id,
+            items: $items
+        );
+
+        try {
+            /** @var TicketOrder $order */
+            $order = $stockManager->reserve($this->event, $dto);
+            $this->orderId = $order->ticket_order_id;
+            $this->reservedUntil = $order->reserved_until?->toIso8601String();
+
+            // Si es gratis ($0.00), confirmamos automáticamente de inmediato
+            if ($order->total <= 0.00) {
+                $confirmAction($order);
+                $this->redirectConfirmation($order);
+                return;
+            }
+
+            $this->step = 3;
+        } catch (\Exception $e) {
+            $this->addError('reservation', $e->getMessage());
+        }
+    }
+
+    public function simulatePayment(ConfirmTicketOrderAction $confirmAction): void
+    {
+        // Solo permitido en local o testing
+        if (!app()->environment('local', 'testing')) {
+            abort(403, 'Offline payment is only allowed in local/testing environment.');
+        }
+
+        if ($this->orderId === null) {
+            return;
+        }
+
+        /** @var TicketOrder $order */
+        $order = TicketOrder::query()->findOrFail($this->orderId);
+
+        $confirmAction($order);
+        $this->redirectConfirmation($order);
+    }
+
+    private function redirectConfirmation(TicketOrder $order): void
+    {
+        $url = URL::temporarySignedRoute(
+            'checkout.confirmation',
+            now()->addMinutes(30),
+            [
+                'event' => $this->event->event_id,
+                'ticketOrder' => $order->ticket_order_id,
+            ]
+        );
+
+        $this->redirect($url);
+    }
+
+    public function with(PriceCalculator $calculator): array
+    {
+        // Get active public or unlocked tickets
+        $products = Product::query()
+            ->where('event_id', $this->event->event_id)
+            ->where('status', \App\Enums\ProductStatus::Active)
+            ->where(function ($query) {
+                $query->where('visibility', \App\Enums\ProductVisibility::Public)
+                    ->orWhere('visibility', \App\Enums\ProductVisibility::Password);
+            })
+            ->with('prices')
+            ->orderBy('sort_order')
+            ->get();
+
+        // Calculate dynamic live totals
+        $subtotal = 0.0;
+        $discount = 0.0;
+        $total = 0.0;
+
+        foreach ($products as $product) {
+            foreach ($product->prices as $price) {
+                $qty = (int) ($this->quantities[$price->product_price_id] ?? 0);
+                if ($qty > 0) {
+                    $calc = $calculator->calculate((float) $price->price, $qty, $this->appliedPromoCode);
+                    $subtotal += $calc['subtotal'];
+                    $discount += $calc['discount'];
+                    $total += $calc['total'];
+                }
+            }
+        }
+
+        return [
+            'products' => $products,
+            'subtotal' => $subtotal,
+            'discount' => $discount,
+            'total' => $total,
+        ];
+    }
+};
+?>
+
+<div class="max-w-4xl mx-auto">
+    {{-- Header --}}
+    <div class="mb-8 text-center sm:text-left">
+        <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white">{{ $event->title }}</h2>
+        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+            📅 {{ $event->starts_at?->format('F d, Y - H:i') ?? __('Date not set') }}
+        </p>
+    </div>
+
+    {{-- Error de reservación --}}
+    @error('reservation')
+        <div class="mb-6 rounded-lg bg-red-50 p-4 text-sm text-red-800 dark:bg-red-950/30 dark:text-red-400">
+            {{ $message }}
+        </div>
+    @enderror
+
+    <div class="grid gap-8 lg:grid-cols-12 items-start">
+        {{-- Main Area --}}
+        <div class="lg:col-span-8 space-y-6">
+            {{-- STEP 1: Ticket Selection --}}
+            @if($step === 1)
+                <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">{{ __('Step 1: Select Tickets') }}</h3>
+                    
+                    @error('tickets') 
+                        <div class="mb-4 text-sm text-red-600 font-semibold">{{ $message }}</div> 
+                    @enderror
+
+                    <div class="divide-y divide-gray-100 dark:divide-gray-800">
+                        @foreach($products as $product)
+                            @php
+                                $isPasswordProtected = $product->visibility->value === 'password';
+                                $isUnlocked = isset($unlockedProducts[$product->product_id]) && $unlockedProducts[$product->product_id] === true;
+                            @endphp
+
+                            <div class="py-6 first:pt-0 last:pb-0">
+                                <div class="flex justify-between items-start gap-4">
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900 dark:text-white">{{ $product->title }}</h4>
+                                        <p class="text-xs text-gray-400 mt-1">{{ $product->description }}</p>
+                                    </div>
+
+                                    @if($isPasswordProtected && !$isUnlocked)
+                                        {{-- Password Lock Form --}}
+                                        <div class="flex flex-col items-end gap-1.5">
+                                            <div class="flex gap-2">
+                                                <input type="password" wire:model="passwords.{{ $product->product_id }}" placeholder="{{ __('Access Password') }}" class="rounded-lg border border-gray-300 px-3 py-1.5 text-xs dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+                                                <button type="button" wire:click="unlockProduct({{ $product->product_id }})" class="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-500">
+                                                    {{ __('Unlock') }}
+                                                </button>
+                                            </div>
+                                            @if(!empty($passwordErrors[$product->product_id]))
+                                                <span class="text-xxs text-red-600 font-medium">{{ $passwordErrors[$product->product_id] }}</span>
+                                            @endif
+                                        </div>
+                                    @else
+                                        {{-- Standard Ticket Tiers list --}}
+                                        <div class="space-y-4 w-48 text-right">
+                                            @foreach($product->prices as $price)
+                                                @php
+                                                    $availableQty = $this->getAvailableCapacity($price);
+                                                    $isSoldOut = $price->capacity !== null && $price->quantity_sold >= $price->capacity;
+                                                @endphp
+                                                <div class="flex items-center justify-between gap-3">
+                                                    <div class="text-xs text-right">
+                                                        <span class="font-medium text-gray-700 dark:text-gray-300 block">{{ $price->name }}</span>
+                                                        <span class="text-gray-500">
+                                                            @if($product->pricing_mode->value === 'free')
+                                                                {{ __('Free') }}
+                                                            @elseif($product->pricing_mode->value === 'donation')
+                                                                {{ __('Donation') }}
+                                                            @else
+                                                                ${{ number_format($price->price, 2) }}
+                                                            @endif
+                                                        </span>
+                                                    </div>
+                                                    
+                                                    @if($isSoldOut || $availableQty <= 0)
+                                                        <span class="text-xs font-semibold text-red-600 uppercase">{{ __('Sold Out') }}</span>
+                                                    @else
+                                                        <select wire:model.live="quantities.{{ $price->product_price_id }}" class="rounded-lg border border-gray-300 px-2 py-1 text-xs dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+                                                            @for($i = 0; $i <= min($availableQty, $product->max_qty); $i++)
+                                                                <option value="{{ $i }}">{{ $i }}</option>
+                                                            @endfor
+                                                        </select>
+                                                    @endif
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                {{-- Action buttons --}}
+                <div class="flex justify-end">
+                    <button type="button" wire:click="nextStep" class="rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500">
+                        {{ __('Next Step') }}
+                    </button>
+                </div>
+            @endif
+
+            {{-- STEP 2: Buyer Info --}}
+            @if($step === 2)
+                <form wire:submit.prevent="reserveAndCheckout" class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900 space-y-6">
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ __('Step 2: Buyer Information') }}</h3>
+
+                    <div class="grid gap-6 sm:grid-cols-2">
+                        <div>
+                            <label for="firstName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('First Name') }}</label>
+                            <input type="text" wire:model="firstName" id="firstName" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+                            @error('firstName') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
+                        </div>
+                        <div>
+                            <label for="lastName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Last Name') }}</label>
+                            <input type="text" wire:model="lastName" id="lastName" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+                            @error('lastName') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Email Address') }}</label>
+                        <input type="email" wire:model="email" id="email" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white" placeholder="you@example.com">
+                        @error('email') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div class="flex justify-between border-t border-gray-100 pt-4 dark:border-gray-800">
+                        <button type="button" wire:click="previousStep" class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">
+                            {{ __('Back') }}
+                        </button>
+                        <button type="submit" class="rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500">
+                            {{ __('Reserve Tickets & Continue') }}
+                        </button>
+                    </div>
+                </form>
+            @endif
+
+            {{-- STEP 3: Reserve & Checkout Simulation --}}
+            @if($step === 3)
+                <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900 text-center space-y-6">
+                    <span class="text-5xl">⏳</span>
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ __('Tickets Reserved!') }}</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                            {{ __('Your tickets are reserved for 10 minutes. Please complete payment to confirm your order.') }}
+                        </p>
+                    </div>
+
+                    @if(app()->environment('local', 'testing'))
+                        <div class="p-4 rounded-lg bg-yellow-50 border border-yellow-200 dark:bg-yellow-950/20 dark:border-yellow-900/30 max-w-md mx-auto">
+                            <h4 class="text-sm font-bold text-yellow-800 dark:text-yellow-400">{{ __('Offline Payment Simulation') }}</h4>
+                            <p class="text-xs text-yellow-700 dark:text-yellow-500 mt-1">
+                                {{ __('Local/Testing Mode: You can simulate a successful offline checkout using the button below.') }}
+                            </p>
+                            <button type="button" wire:click="simulatePayment" class="mt-4 rounded-lg bg-yellow-600 px-4 py-2 text-xs font-bold text-white hover:bg-yellow-500">
+                                {{ __('Simulate Payment / Complete Purchase') }}
+                            </button>
+                        </div>
+                    @else
+                        <div class="p-4 rounded-lg bg-blue-50 border border-blue-200 dark:bg-blue-950/20 dark:border-blue-900/30 max-w-md mx-auto">
+                            <p class="text-xs text-blue-700 dark:text-blue-500 font-semibold">
+                                {{ __('Payments are currently offline. Real payments will be enabled in Sprint 2.3 with Stripe.') }}
+                            </p>
+                        </div>
+                    @endif
+                </div>
+            @endif
+        </div>
+
+        {{-- Order Summary Sidebar (always visible except in step 3 maybe) --}}
+        @if($step < 3)
+            <div class="lg:col-span-4 space-y-6">
+                <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+                    <h3 class="text-md font-bold text-gray-900 dark:text-white mb-4">{{ __('Order Summary') }}</h3>
+
+                    <div class="space-y-4">
+                        @php $hasSelection = false; @endphp
+                        @foreach($products as $product)
+                            @foreach($product->prices as $price)
+                                @php $qty = $quantities[$price->product_price_id] ?? 0; @endphp
+                                @if($qty > 0)
+                                    @php $hasSelection = true; @endphp
+                                    <div class="flex justify-between text-sm">
+                                        <div class="text-gray-700 dark:text-gray-300">
+                                            <span class="font-semibold">{{ $qty }}x</span> {{ $product->title }} ({{ $price->name }})
+                                        </div>
+                                        <span class="font-medium text-gray-900 dark:text-white">
+                                            @if($product->pricing_mode->value === 'free')
+                                                $0.00
+                                            @else
+                                                ${{ number_format($price->price * $qty, 2) }}
+                                            @endif
+                                        </span>
+                                    </div>
+                                @endif
+                            @endforeach
+                        @endforeach
+
+                        @if(!$hasSelection)
+                            <p class="text-xs text-gray-400 italic text-center py-4">{{ __('No tickets selected.') }}</p>
+                        @endif
+
+                        {{-- Promo Code --}}
+                        @if($step === 1 && $hasSelection)
+                            <div class="border-t border-gray-100 pt-4 dark:border-gray-800">
+                                <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">{{ __('Promo Code') }}</label>
+                                <div class="flex gap-2">
+                                    <input type="text" wire:model="promoCodeText" placeholder="CODE" class="block w-full rounded-lg border border-gray-300 px-3 py-1.5 text-xs focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white uppercase">
+                                    <button type="button" wire:click="applyPromoCode" class="rounded-lg bg-gray-100 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-750">
+                                        {{ __('Apply') }}
+                                    </button>
+                                </div>
+                                @if($appliedPromoCode)
+                                    <div class="text-xs text-green-600 font-semibold mt-1">
+                                        ✓ {{ __('Code applied: :code', ['code' => $appliedPromoCode->code]) }}
+                                    </div>
+                                @endif
+                                @if($promoCodeError)
+                                    <div class="text-xs text-red-600 font-semibold mt-1">{{ $promoCodeError }}</div>
+                                @endif
+                            </div>
+                        @endif
+
+                        {{-- Price breakdown --}}
+                        @if($hasSelection)
+                            <div class="border-t border-gray-100 pt-4 dark:border-gray-800 space-y-2">
+                                <div class="flex justify-between text-xs text-gray-500">
+                                    <span>{{ __('Subtotal') }}</span>
+                                    <span>${{ number_format($subtotal, 2) }}</span>
+                                </div>
+                                @if($discount > 0)
+                                    <div class="flex justify-between text-xs text-green-600 font-semibold">
+                                        <span>{{ __('Discount') }}</span>
+                                        <span>-${{ number_format($discount, 2) }}</span>
+                                    </div>
+                                @endif
+                                <div class="flex justify-between text-sm font-bold text-gray-900 dark:text-white pt-2 border-t border-gray-100 dark:border-gray-800">
+                                    <span>{{ __('Total') }}</span>
+                                    <span>${{ number_format($total, 2) }}</span>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        @endif
+    </div>
+</div>

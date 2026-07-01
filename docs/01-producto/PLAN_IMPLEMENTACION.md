@@ -6,7 +6,7 @@
 **Metodologia:** Sprints de 1 semana con entregables verificables por fase
 **Referencia:** Hi.Events (funcional), Attendize (ticketing), Eventbrite (benchmark)
 
-> **Estado de ejecucion (actualizacion post Sprint 1.4):** Sprint 1.1 (Setup y Auth), Sprint 1.2 (Organizadores y Equipos), Sprint 1.3 (Eventos Basicos) y Sprint 1.4 (Panel de Organizador) estan **implementados y verificados localmente**. El stack base, auth flows, roles globales, audit logging, UX Foundation, CRUD de organizers, team management, primeros flujos de eventos, panel multitab de ajustes, sub-navegacion de evento y API REST basica estan operativos. El siguiente bloque planificado es Sprint 2.1 (Productos y Tipos de Entrada) iniciando la Fase 2.
+> **Estado de ejecucion (actualizacion post Sprint 2.2):** Sprint 1.1 al 1.4, Sprint 2.1 (Productos y Tipos de Entrada) y Sprint 2.2 (Órdenes y Checkout) están **implementados y verificados localmente**. Se cuenta con tickets configurables, control de visibilidad por contraseña, lógica transaccional de stock con prevención de sobreventa, cupones de descuento y el flujo de compra público con confirmaciones protegidas mediante URLs firmadas temporales. El siguiente bloque planificado es el Sprint 2.3 (Pagos con Stripe).
 
 ---
 
@@ -401,11 +401,11 @@ Stack y artefactos entregados en el repositorio:
 | 2.1.11 | Tests de producto | CRUD, pricing, promo codes |
 
 **Criterios de aceptacion:**
-- [ ] Organizador puede crear tipos de entrada con precios y quotas
-- [ ] Organizador puede configurar multiples tiers por producto
-- [ ] Organizador puede crear promo codes con reglas
-- [ ] PriceCalculator calcula correctamente subtotal, taxes, descuentos
-- [ ] QA pipeline pasa limpio
+- [x] Organizador puede crear tipos de entrada con precios y quotas
+- [x] Organizador puede configurar multiples tiers por producto
+- [x] Organizador puede crear promo codes con reglas
+- [x] PriceCalculator calcula correctamente subtotal, taxes, descuentos
+- [x] QA pipeline pasa limpio
 
 **Dependencias:** Sprint 1.3 (Event).
 
@@ -429,12 +429,12 @@ Stack y artefactos entregados en el repositorio:
 | 2.2.12 | Tests de concurrencia | Overselling prevention |
 
 **Criterios de aceptacion:**
-- [ ] Asistente puede seleccionar entradas y crear pedido
-- [ ] Stock se reserva con TTL de 10 minutos
-- [ ] Si expira, se libera automaticamente
-- [ ] Promo code se aplica correctamente
-- [ ] Tests de concurrencia pasan (no overselling)
-- [ ] QA pipeline pasa limpio
+- [x] Asistente puede seleccionar entradas y crear pedido
+- [x] Stock se reserva con TTL de 10 minutos
+- [x] Si expira, se libera automaticamente
+- [x] Promo code se aplica correctamente
+- [x] Tests de concurrencia pasan (no overselling)
+- [x] QA pipeline pasa limpio
 
 **Dependencias:** Sprint 2.1 (Product, Pricing).
 

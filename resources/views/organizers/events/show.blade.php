@@ -125,20 +125,9 @@
             </div>
         </div>
 
-        {{-- Tab Content: Tickets (Phase 2 Placeholder) --}}
+        {{-- Tab Content: Tickets --}}
         <div x-show="activeTab === 'tickets'" class="space-y-4" x-cloak>
-            <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900 text-center py-12">
-                <span class="text-4xl">🎟️</span>
-                <h3 class="mt-4 text-lg font-semibold text-gray-900 dark:text-white">{{ __('Ticket Types & Pricing') }}</h3>
-                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400 max-w-md mx-auto">
-                    {{ __('Configuring ticket classes, free/paid structures, coupons, and quotas is part of Phase 2 (Ticketing & Checkout).') }}
-                </p>
-                <div class="mt-6">
-                    <button type="button" disabled class="inline-flex items-center justify-center rounded-lg bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-400 dark:bg-gray-800 dark:text-gray-500 cursor-not-allowed">
-                        {{ __('Add Ticket Class (Phase 2)') }}
-                    </button>
-                </div>
-            </div>
+            <livewire:organizers.events.product-list :event="$event" />
         </div>
 
         {{-- Tab Content: Attendees (Phase 3 Placeholder) --}}

@@ -30,10 +30,16 @@ final class UpdateOrganizerRequest extends FormRequest
     {
         $data = $this->validated();
 
+        $domain = null;
+
+        if (array_key_exists('domain', $data)) {
+            $domain = $data['domain'] !== null ? (string) $data['domain'] : '';
+        }
+
         return new UpdateOrganizerDto(
             name: (string) $data['name'],
             slug: (string) $data['slug'],
-            domain: array_key_exists('domain', $data) ? ($data['domain'] !== null ? (string) $data['domain'] : '') : null,
+            domain: $domain,
             settings: isset($data['settings']) ? (array) $data['settings'] : null,
             status: isset($data['status']) ? (string) $data['status'] : null,
         );
