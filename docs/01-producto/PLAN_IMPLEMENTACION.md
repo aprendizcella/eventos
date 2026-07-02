@@ -6,7 +6,7 @@
 **Metodologia:** Sprints de 1 semana con entregables verificables por fase
 **Referencia:** Hi.Events (funcional), Attendize (ticketing), Eventbrite (benchmark)
 
-> **Estado de ejecucion (actualizacion post Sprint 2.4):** Sprints 1.1 al 1.4, Sprints 2.1 (Entradas), 2.2 (Checkout), 2.3 (Pagos con Stripe) y 2.4 (Tickets PDF/QR) están **implementados y 100% verificados localmente**. Se cuenta con pasarela de cobros segura, generación de entradas con PDF y código QR únicos, control de reenvíos/concurrencia asíncrona, y Magic Links seguros de un solo uso para asistentes. El siguiente bloque planificado es el Sprint 3.1 (Check-in y Validación), que da inicio a la Fase 3.
+> **Estado de ejecucion (actualizacion post Sprint 3.1):** Sprints 1.1 al 1.4, Sprints 2.1 (Entradas), 2.2 (Checkout), 2.3 (Pagos con Stripe), 2.4 (Tickets PDF/QR) y 3.1 (Check-in y Validación) están **implementados y 100% verificados localmente**. Se cuenta con pasarela de cobros segura, generación de entradas con PDF y código QR únicos, control de reenvíos/concurrencia asíncrona, Magic Links seguros de un solo uso para asistentes, y check-in operativo por cámara y lista manual con control de roles y transacciones concurrentes seguras. El siguiente bloque planificado es el Sprint 3.2 (Waitlist y Preguntas).
 
 ---
 
@@ -504,25 +504,25 @@ Stack y artefactos entregados en el repositorio:
 
 **Objetivo:** Check-in, gestion de asistentes, herramientas operativas para el dia del evento.
 
-### Sprint 3.1: Check-in y Validacion (Semana 9)
+### Sprint 3.1: Check-in y Validacion (Semana 9) — IMPLEMENTADO
 
 | Tarea | Detalle | Entregable |
 |---|---|---|
 | 3.1.1 | Migracion `check_in_list` | Listas de check-in por evento |
-| 3.1.2 | Acciones de check-in | `CheckInAttendee`, `UndoCheckIn` |
+| 3.1.2 | Acciones de check-in | `CheckInAttendeeAction`, `UndoCheckInAction` |
 | 3.1.3 | Servicio de validacion QR | Verifica unique_code, status, evento |
 | 3.1.4 | Componente Volt `check-in` | Escaneo QR con camara (JS) |
 | 3.1.5 | Componente Volt `attendee-list` | Lista de asistentes con busqueda |
-| 3.1.6 | Domain events | `AttendeeCheckedIn`, `CheckInRejected` |
-| 3.1.7 | Tests de check-in | Validacion QR, undo, lista |
+| 3.1.6 | Domain events | `AttendeeCheckedIn`, `CheckInUndone` |
+| 3.1.7 | Tests de check-in | Validacion QR, undo, lista, policy |
 
 **Criterios de aceptacion:**
-- [ ] Escaner lee QR y valida entrada
-- [ ] QR usado se marca como checked_in
-- [ ] QR ya usado rechaza entrada
-- [ ] Undo check-in funciona
-- [ ] Lista de asistentes con busqueda por nombre/email
-- [ ] QA pipeline pasa limpio
+- [x] Escaner lee QR y valida entrada
+- [x] QR usado se marca como checked_in
+- [x] QR ya usado rechaza entrada
+- [x] Undo check-in funciona
+- [x] Lista de asistentes con busqueda por nombre/email
+- [x] QA pipeline pasa limpio
 
 **Dependencias:** Sprint 2.4 (Attendee).
 

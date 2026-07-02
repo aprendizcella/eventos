@@ -70,6 +70,21 @@ class EventPolicy
         return $this->canManageEvent($user, $event);
     }
 
+    public function viewCheckIn(User $user, Event $event): bool
+    {
+        return $this->view($user, $event);
+    }
+
+    public function checkIn(User $user, Event $event): bool
+    {
+        return $this->canManageEvent($user, $event);
+    }
+
+    public function undoCheckIn(User $user, Event $event): bool
+    {
+        return $this->canManageEvent($user, $event);
+    }
+
     private function canManageEvent(User $user, Event $event): bool
     {
         if ($user->hasRole(['super_admin', 'platform_admin'])) {
