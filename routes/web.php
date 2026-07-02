@@ -33,6 +33,12 @@ Volt::route('/checkout/{event}/order/{ticketOrder}/confirmation', 'public.events
     ->middleware('signed')
     ->name('checkout.confirmation');
 
+Volt::route('/my-orders', 'public.orders.my-orders')
+    ->name('public.orders.my-orders');
+
+Volt::route('/my-orders/view', 'public.orders.view-orders')
+    ->name('public.orders.view');
+
 Route::post('/login', LoginController::class)
     ->middleware('throttle:login')
     ->name('login.post');

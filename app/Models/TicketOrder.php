@@ -29,6 +29,8 @@ use Spatie\Activitylog\Support\LogOptions;
  * @property float $discount
  * @property float $total
  * @property \Carbon\Carbon|null $reserved_until
+ * @property \Carbon\Carbon|null $tickets_sent_at
+ * @property \Carbon\Carbon|null $tickets_processing_at
  * @property \Carbon\Carbon|null $created_at
  * @property \Carbon\Carbon|null $updated_at
  */
@@ -88,6 +90,14 @@ final class TicketOrder extends Model
     }
 
     /**
+     * @return HasMany<Attendee, $this>
+     */
+    public function attendees(): HasMany
+    {
+        return $this->hasMany(Attendee::class, 'ticket_order_id', 'ticket_order_id');
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
@@ -101,6 +111,8 @@ final class TicketOrder extends Model
             'discount' => 'float',
             'total' => 'float',
             'reserved_until' => 'datetime',
+            'tickets_sent_at' => 'datetime',
+            'tickets_processing_at' => 'datetime',
         ];
     }
 }
