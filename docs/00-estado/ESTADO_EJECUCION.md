@@ -1,6 +1,6 @@
 # Estado de ejecución
 
-> **Resumen en una línea:** Sprints 1.1 al 1.4 (Fase 1), y Sprints 2.1 (Entradas), 2.2 (Checkout) y 2.3 (Pagos con Stripe) están **implementados, auditados estáticamente y 100% verificados localmente**. El próximo paso es iniciar el Sprint 2.4 (Generación de PDF/QR).
+> **Resumen en una línea:** Sprints 1.1 al 1.4 (Fase 1) y Sprints 2.1 al 2.4 (Fase 2) están **implementados, auditados estáticamente y 100% verificados localmente**. El próximo paso es iniciar la Fase 3 con el Sprint 3.1 (Check-in y Validación).
 
 ---
 
@@ -62,7 +62,7 @@
 ### Sprint 1.2 — Organizadores y Equipos ✅
 
 - CRUD de organizers implementado y verificado.
-- Team management implementado y verificado.
+- Team management implementado and verificado.
 - Roles del organizer modelados como catálogo propio (`admin`, `editor`, `viewer`) separado de Spatie.
 - Policies y test coverage para global admins y organizer admins en verde.
 
@@ -124,11 +124,20 @@
 - **Liberación de Stock automática:** Registrado el listener `ReleaseStockOnRefund` para liberar automáticamente el inventario de entradas al realizarse reembolsos totales.
 - **QA Pipeline Completo:** 497 tests totales en Pest en verde con análisis estático impecable por PHPStan y formateo automático de Pint.
 
+### Sprint 2.4 — Tickets PDF y QR ✅
+
+- **Instalación de Bacon QR + DomPDF**: Bacon QR para la generación de códigos vectoriales y DomPDF para compilar PDFs de tickets.
+- **Modelado e Idempotencia Fuerte**: Creación de la tabla `attendee` con claves únicas compuestas `(ticket_order_item_id, sequence)` para evitar asistentes duplicados.
+- **Acciones y Tareas en Cola**: `GenerateAttendeesAction` ligera con estrategia de colisión finita de códigos. Despacho asíncrono asilado mediante `afterCommit()` en el listener.
+- **Control de Concurrencia**: `SendTicketEmailJob` con claim atómico (`tickets_processing_at` con TTL de 15 minutos) que actualiza atómicamente a éxito `tickets_sent_at` y libera el semáforo.
+- **Búsqueda e Invalidación de Enlaces (Magic Links)**: Búsqueda segura en `/my-orders` que envía un enlace temporal firmado (15 minutos) con token de un solo uso en caché. Consumo atómico mediante `Cache::pull()` e inicio de sesión de navegador.
+- **QA y SonarQube**: Cobertura al 100% en verde (509 tests) con resolución de complejidad y excepciones de SonarQube.
+
 ---
 
 ## Qué NO está hecho
 
-- Sprints restantes de la Fase 2 (Generación de PDF/QR) y Fases 3–6.
+- Fases 3–6 (Sprints 3.1 al 6.4).
 
 El roadmap completo está en [`01-producto/PLAN_IMPLEMENTACION.md`](../01-producto/PLAN_IMPLEMENTACION.md).
 
@@ -136,10 +145,10 @@ El roadmap completo está en [`01-producto/PLAN_IMPLEMENTACION.md`](../01-produc
 
 ## Bloqueos actuales
 
-Ninguno conocido a cierre de Sprint 2.3.
+Ninguno conocido a cierre de Sprint 2.4.
 
 ---
 
 ## Próximo paso
 
-- Iniciar el **Sprint 2.4: Generación de PDF/QR** (Semana 8) para generar las entradas físicas con código QR único para los asistentes.
+- Iniciar la **Fase 3: Operación del Evento** con el **Sprint 3.1: Check-in y Validación** (Semana 9) para escanear y validar códigos QR en la entrada de los eventos.

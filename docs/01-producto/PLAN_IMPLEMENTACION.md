@@ -6,7 +6,7 @@
 **Metodologia:** Sprints de 1 semana con entregables verificables por fase
 **Referencia:** Hi.Events (funcional), Attendize (ticketing), Eventbrite (benchmark)
 
-> **Estado de ejecucion (actualizacion post Sprint 2.3):** Sprints 1.1 al 1.4, Sprints 2.1 (Entradas), 2.2 (Checkout) y 2.3 (Pagos con Stripe) están **implementados y 100% verificados localmente**. Se cuenta con pasarela de cobros segura, control de firmas digitales HMAC en webhooks locales, registro inmutable de transacciones e inventario liberado automáticamente tras reembolsos totales. El siguiente bloque planificado es el Sprint 2.4 (Generación de PDF/QR).
+> **Estado de ejecucion (actualizacion post Sprint 2.4):** Sprints 1.1 al 1.4, Sprints 2.1 (Entradas), 2.2 (Checkout), 2.3 (Pagos con Stripe) y 2.4 (Tickets PDF/QR) están **implementados y 100% verificados localmente**. Se cuenta con pasarela de cobros segura, generación de entradas con PDF y código QR únicos, control de reenvíos/concurrencia asíncrona, y Magic Links seguros de un solo uso para asistentes. El siguiente bloque planificado es el Sprint 3.1 (Check-in y Validación), que da inicio a la Fase 3.
 
 ---
 
@@ -470,7 +470,7 @@ Stack y artefactos entregados en el repositorio:
 
 ---
 
-### Sprint 2.4: Tickets PDF y QR (Semana 8)
+### Sprint 2.4: Tickets PDF y QR (Semana 8) — IMPLEMENTADO
 
 | Tarea | Detalle | Entregable |
 |---|---|---|
@@ -488,13 +488,13 @@ Stack y artefactos entregados en el repositorio:
 | 2.4.12 | Retro de Fase 2 | Review de lo construido, ajustes |
 
 **Criterios de aceptacion:**
-- [ ] Tras pago confirmado, se generan attendees
-- [ ] Cada attendee tiene unique_code y QR
-- [ ] PDF de ticket se genera con branding del organizador
-- [ ] Email de confirmacion llega con PDF adjunto
-- [ ] Asistente ve sus pedidos y descarga tickets
-- [ ] QA pipeline pasa limpio
-- [ ] Fase 2 completa: Productos + Checkout + Stripe + Tickets
+- [x] Tras pago confirmado, se generan attendees
+- [x] Cada attendee tiene unique_code y QR
+- [x] PDF de ticket se genera con branding del organizador
+- [x] Email de confirmacion llega con PDF adjunto
+- [x] Asistente ve sus pedidos y descarga tickets
+- [x] QA pipeline pasa limpio
+- [x] Fase 2 completa: Productos + Checkout + Stripe + Tickets
 
 **Dependencias:** Sprints 2.1, 2.2, 2.3.
 
