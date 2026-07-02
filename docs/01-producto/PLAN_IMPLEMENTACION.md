@@ -524,6 +524,13 @@ Stack y artefactos entregados en el repositorio:
 - [x] Lista de asistentes con busqueda por nombre/email
 - [x] QA pipeline pasa limpio
 
+**Notas de implementacion:**
+- **Modelo de Datos de Acceso**: Desacoplamiento de tablas. Se creó `active_check_in` para llevar el control instantáneo del check-in y `check_in_log` para mantener un historial de auditoría inmutable (incluso al revertir entradas).
+- **Control de Concurrencia**: `CheckInAttendeeAction` y `UndoCheckInAction` usan transacciones con bloqueos de base de datos (`lockForUpdate()`) para prevenir race conditions.
+- **Autorización por Rol**: Implementadas habilidades explícitas (`viewCheckIn`, `checkIn`, `undoCheckIn`) en `EventPolicy` mapeando las capacidades de `admin`, `editor` y `viewer`.
+- **UX Lector QR**: Lector basado en la cámara web ajustado para evitar distorsión de proporción y configurado con apagado de stream inmediato tras el escaneo para evitar bucles repetidos de lectura.
+- **Sincronización Reactiva**: El escáner y la lista de asistentes se comunican asíncronamente mediante el evento global `check-in-updated` de Livewire.
+
 **Dependencias:** Sprint 2.4 (Attendee).
 
 ---

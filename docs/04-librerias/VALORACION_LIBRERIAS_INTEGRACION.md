@@ -8,9 +8,9 @@
 
 ## Resumen ejecutivo
 
-Se han evaluado 7 librerias para integrar en el proyecto. De las 7, **6 son aprobadas sin reservas** y **1 requiere decision informada** (HTMLPurifier). A continuacion, la valoracion individual y la estrategia de integracion.
+Se han evaluado 10 librerias para integrar en el proyecto. De las 10, **9 son aprobadas sin reservas** y **1 requiere decision informada** (HTMLPurifier). A continuacion, la valoracion individual y la estrategia de integracion.
 
-> **Estado de integracion (post Sprint 1.1):** Las 6 librerias de Fase 1 estan **instaladas y operativas** en el repositorio (`composer.json`): `laravel/sanctum ^4.3`, `spatie/laravel-permission ^8.0`, `spatie/laravel-activitylog ^5.0`, `mews/purifier ^3.4`, `livewire/livewire ^4.3`, `livewire/volt ^1.10`. Config publicada (`config/sanctum.php`, `config/permission.php`, `config/activitylog.php`, `config/purifier.php`) y migraciones desplegadas (`personal_access_tokens`, `activity_log`, `permission_tables`). `spatie/laravel-multitenancy` sigue fuera de Fase 1 (planificado para Fase 4), como se recomienda.
+> **Estado de integracion (post Sprint 3.1):** Las 6 librerias de Fase 1 estan **instaladas y operativas** en el repositorio (`composer.json`): `laravel/sanctum ^4.3`, `spatie/laravel-permission ^8.0`, `spatie/laravel-activitylog ^5.0`, `mews/purifier ^3.4`, `livewire/livewire ^4.3`, `livewire/volt ^1.10`. Adicionalmente, para la generación y validación de entradas (Sprint 2.4 y 3.1), se han integrado `bacon/bacon-qr-code ^2.0`, `barryvdh/laravel-dompdf ^3.0` y `html5-qrcode` (JS CDN). `spatie/laravel-multitenancy` sigue fuera de Fase 1-3.
 
 ---
 
@@ -25,6 +25,9 @@ Se han evaluado 7 librerias para integrar en el proyecto. De las 7, **6 son apro
 | `spatie/laravel-activitylog` | v5.0.0 | ^8.4 | ^12\|^13 | Compatible | 52M | 3 | APROBADO |
 | `spatie/laravel-multitenancy` | v4.1.3 | ^8.2 | ^11\|^12\|^13 | Compatible | 3.3M | 0 | APROBADO |
 | `spatie/laravel-permission` | v8.0.0 | ^8.3 | ^12\|^13 | Compatible | 101M | 2 | APROBADO |
+| `bacon/bacon-qr-code` | v2.0 | ^7.1\|^8.0 | N/A | Compatible | 20M | 5 | APROBADO |
+| `barryvdh/laravel-dompdf` | v3.0 | ^8.0 | ^10\|^11\|^12 | Compatible | 38M | 15 | APROBADO |
+| `html5-qrcode` (JS) | v2.3.8 | N/A | N/A | Compatible | N/A | N/A | APROBADO |
 
 ---
 
@@ -556,6 +559,48 @@ Flow:
 
 ---
 
+### 2.7 bacon/bacon-qr-code v2.0
+
+**Veredicto: APROBADO sin reservas.**
+
+| Aspecto | Detalle |
+|---|---|
+| Que hace | Genera códigos QR vectoriales (SVG) de alta precisión. |
+| Por que encaja | Requisito para generar códigos QR únicos para las entradas de los asistentes, los cuales se renderizan en formato PDF y se escanean en el acceso. |
+| Alternativas | Librerías JavaScript en frontend (menos seguras/idempotentes). |
+
+**Fase de instalacion:** Fase 2 (Sprint 2.4).
+
+---
+
+### 2.8 dompdf/dompdf (via barryvdh/laravel-dompdf v3.0)
+
+**Veredicto: APROBADO sin reservas.**
+
+| Aspecto | Detalle |
+|---|---|
+| Que hace | Compila y renderiza archivos PDF a partir de código HTML y CSS. |
+| Por que encaja | Para la exportación de entradas y facturas en formato PDF desde las plantillas Blade del servidor de forma automatizada. |
+| Alternativas | Snappy/WKHTMLTOPDF (requiere binarios en el sistema), Browsershot (requiere Node/Puppeteer, más pesado). |
+
+**Fase de instalacion:** Fase 2 (Sprint 2.4).
+
+---
+
+### 2.9 html5-qrcode v2.3.8 (JS)
+
+**Veredicto: APROBADO sin reservas.**
+
+| Aspecto | Detalle |
+|---|---|
+| Que hace | Lector de códigos de barras y QR en tiempo real para navegadores web utilizando la cámara del dispositivo de forma local. |
+| Por que encaja | Permite el escaneo rápido de entradas desde el panel de control del organizador sin necesidad de instalar apps nativas. |
+| Alternativas | Instascan (obsoleto), QuaggaJS (enfocado a código de barras). |
+
+**Fase de instalacion:** Fase 3 (Sprint 3.1).
+
+---
+
 ## 3. Orden de instalacion y dependencias
 
 > **Estado: Fase 1 completada (Sprint 1.1).** Las librerias 1–5 estan instaladas, configuradas y con migraciones desplegadas. El bloque de Fase 4 (multitenancy) permanece sin instalar, segun la recomendacion.
@@ -639,7 +684,7 @@ composer qa
 
 ## 6. Resumen de decisiones
 
-> **Estado de instalacion (post Sprint 1.1):** marcado en la columna "Instalado".
+> **Estado de instalacion (post Sprint 3.1):** marcado en la columna "Instalado".
 
 | Libreria | Decision | Instalado | Justificacion clave |
 |---|---|---|---|
@@ -650,6 +695,9 @@ composer qa
 | `spatie/laravel-activitylog` | Instalar en Fase 1 | Si (Sprint 1.1) | Trazabilidad automatica. Reemplaza audit log custom. |
 | `spatie/laravel-multitenancy` | **No instalar hasta Fase 4** | No | Complejidad innecesaria para MVP. Usar scopes de Eloquent primero. |
 | `spatie/laravel-permission` | Instalar en Fase 1 | Si (Sprint 1.1) | Estandar de la industria. 101M installs. Compatible con Sanctum. |
+| `bacon/bacon-qr-code` | Instalar en Fase 2 | Si (Sprint 2.4) | Indispensable para generación robusta de códigos QR vectoriales de entradas. |
+| `barryvdh/laravel-dompdf` | Instalar en Fase 2 | Si (Sprint 2.4) | Estandar de facto para compilación rápida de PDFs en Laravel. |
+| `html5-qrcode` | Instalar en Fase 3 | Si (Sprint 3.1) | Lector de cámara web ligero directo en frontend para validaciones de accesos. |
 
 ---
 

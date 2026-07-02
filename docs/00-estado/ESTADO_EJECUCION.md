@@ -1,6 +1,6 @@
 # Estado de ejecución
 
-> **Resumen en una línea:** Sprints 1.1 al 1.4 (Fase 1) y Sprints 2.1 al 2.4 (Fase 2) están **implementados, auditados estáticamente y 100% verificados localmente**. El próximo paso es iniciar la Fase 3 con el Sprint 3.1 (Check-in y Validación).
+> **Resumen en una línea:** Sprints 1.1 al 1.4 (Fase 1), Sprints 2.1 al 2.4 (Fase 2) y Sprint 3.1 (Fase 3) están **implementados, auditados estáticamente y 100% verificados localmente**. El próximo paso es iniciar el Sprint 3.2 (Waitlist y Preguntas).
 
 ---
 
@@ -133,11 +133,22 @@
 - **Búsqueda e Invalidación de Enlaces (Magic Links)**: Búsqueda segura en `/my-orders` que envía un enlace temporal firmado (15 minutos) con token de un solo uso en caché. Consumo atómico mediante `Cache::pull()` e inicio de sesión de navegador.
 - **QA y SonarQube**: Cobertura al 100% en verde (509 tests) con resolución de complejidad y excepciones de SonarQube.
 
+### Sprint 3.1 — Check-in y Validación ✅
+
+- **Modelos y Estructura**: Modelado e implementación de `CheckInList`, `CheckInLog` y `ActiveCheckIn` con SoftDeletes y claves únicas.
+- **Lógica Transaccional**: `CheckInAttendeeAction` y `UndoCheckInAction` con transacciones de base de datos y control de concurrencia mediante bloqueos atómicos (`lockForUpdate`).
+- **Validador Modular**: `ValidateQrCodeService` estructurado para baja complejidad cognitiva, sin code smells en SonarQube, controlando expiraciones, eventos correctos, duplicados y elegibilidad de producto.
+- **Componentes Volt**:
+  - `check-in.blade.php`: Lector QR basado en cámara web sin distorsión visual, detención automática al escanear y control de estados.
+  - `attendee-list.blade.php`: Lista de invitados reactiva que se actualiza en segundo plano mediante eventos globales de Livewire (`check-in-updated`).
+- **Políticas y Autorización**: `EventPolicy` configurada para controlar permisos de check-in y reversión según rol del organizador (`admin`, `editor`, `viewer`).
+- **QA y Cobertura**: 35 tests Pest dedicados en verde y pipeline de QA completo libre de errores.
+
 ---
 
 ## Qué NO está hecho
 
-- Fases 3–6 (Sprints 3.1 al 6.4).
+- Fases 3–6 (Sprints 3.2 al 6.4).
 
 El roadmap completo está en [`01-producto/PLAN_IMPLEMENTACION.md`](../01-producto/PLAN_IMPLEMENTACION.md).
 
@@ -145,10 +156,10 @@ El roadmap completo está en [`01-producto/PLAN_IMPLEMENTACION.md`](../01-produc
 
 ## Bloqueos actuales
 
-Ninguno conocido a cierre de Sprint 2.4.
+Ninguno conocido a cierre de Sprint 3.1.
 
 ---
 
 ## Próximo paso
 
-- Iniciar la **Fase 3: Operación del Evento** con el **Sprint 3.1: Check-in y Validación** (Semana 9) para escanear y validar códigos QR en la entrada de los eventos.
+- Iniciar la **Fase 3: Operación del Evento** con el **Sprint 3.2: Lista de Espera y Preguntas del Comprador** (Semana 10) para gestionar colas de espera automáticas y recolectar información adicional durante el checkout.
