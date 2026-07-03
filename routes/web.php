@@ -29,6 +29,9 @@ Volt::route('/reset-password/{token}', 'auth.reset-password')->name('password.re
 Volt::route('/checkout/{event}', 'public.events.checkout')
     ->name('checkout');
 
+Volt::route('/event/{event}/waitlist', 'public.events.join-waitlist')
+    ->name('public.events.join-waitlist');
+
 Volt::route('/checkout/{event}/order/{ticketOrder}/confirmation', 'public.events.order-confirmation')
     ->middleware('signed')
     ->name('checkout.confirmation');

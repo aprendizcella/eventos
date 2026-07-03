@@ -31,6 +31,7 @@ use Spatie\Activitylog\Support\LogOptions;
  * @property \Carbon\Carbon|null $reserved_until
  * @property \Carbon\Carbon|null $tickets_sent_at
  * @property \Carbon\Carbon|null $tickets_processing_at
+ * @property int|null $waitlist_entry_id
  * @property \Carbon\Carbon|null $created_at
  * @property \Carbon\Carbon|null $updated_at
  */
@@ -55,6 +56,7 @@ final class TicketOrder extends Model
         'discount',
         'total',
         'reserved_until',
+        'waitlist_entry_id',
     ];
 
     public function getActivitylogOptions(): LogOptions
@@ -79,6 +81,14 @@ final class TicketOrder extends Model
     public function promoCode(): BelongsTo
     {
         return $this->belongsTo(PromoCode::class, 'promo_code_id', 'promo_code_id');
+    }
+
+    /**
+     * @return BelongsTo<WaitlistEntry, $this>
+     */
+    public function waitlistEntry(): BelongsTo
+    {
+        return $this->belongsTo(WaitlistEntry::class, 'waitlist_entry_id', 'waitlist_entry_id');
     }
 
     /**
@@ -113,6 +123,7 @@ final class TicketOrder extends Model
             'reserved_until' => 'datetime',
             'tickets_sent_at' => 'datetime',
             'tickets_processing_at' => 'datetime',
+            'waitlist_entry_id' => 'integer',
         ];
     }
 }

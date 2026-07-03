@@ -24,6 +24,7 @@ use Spatie\Activitylog\Support\LogOptions;
  * @property float $subtotal
  * @property float $discount
  * @property float $total
+ * @property array<mixed>|null $custom_answers_staging
  * @property \Carbon\Carbon|null $created_at
  * @property \Carbon\Carbon|null $updated_at
  */
@@ -45,6 +46,7 @@ final class TicketOrderItem extends Model
         'subtotal',
         'discount',
         'total',
+        'custom_answers_staging',
     ];
 
     public function getActivitylogOptions(): LogOptions
@@ -92,6 +94,7 @@ final class TicketOrderItem extends Model
             'subtotal' => 'float',
             'discount' => 'float',
             'total' => 'float',
+            'custom_answers_staging' => 'array',
         ];
     }
 }

@@ -139,6 +139,11 @@ it('processes ticket reservation and redirects to temporary signed confirmation 
         ->set('firstName', 'John')
         ->set('lastName', 'Doe')
         ->set('email', 'john@example.com')
+        ->set('attendeeDetails.'.$price->product_price_id.'.1', [
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'email' => 'john@example.com',
+        ])
         ->call('reserveAndCheckout')
         ->assertHasNoErrors()
         ->assertSet('step', 3);

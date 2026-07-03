@@ -6,7 +6,7 @@
 **Metodologia:** Sprints de 1 semana con entregables verificables por fase
 **Referencia:** Hi.Events (funcional), Attendize (ticketing), Eventbrite (benchmark)
 
-> **Estado de ejecucion (actualizacion post Sprint 3.1):** Sprints 1.1 al 1.4, Sprints 2.1 (Entradas), 2.2 (Checkout), 2.3 (Pagos con Stripe), 2.4 (Tickets PDF/QR) y 3.1 (Check-in y Validación) están **implementados y 100% verificados localmente**. Se cuenta con pasarela de cobros segura, generación de entradas con PDF y código QR únicos, control de reenvíos/concurrencia asíncrona, Magic Links seguros de un solo uso para asistentes, y check-in operativo por cámara y lista manual con control de roles y transacciones concurrentes seguras. El siguiente bloque planificado es el Sprint 3.2 (Waitlist y Preguntas).
+> **Estado de ejecucion (actualizacion post Sprint 3.2):** Sprints 1.1 al 1.4, Sprints 2.1 (Entradas), 2.2 (Checkout), 2.3 (Pagos con Stripe), 2.4 (Tickets PDF/QR), 3.1 (Check-in y Validación) y 3.2 (Waitlist y Preguntas) están **implementados y 100% verificados localmente**. Se cuenta con pasarela de cobros segura, generación de entradas con PDF y código QR únicos, control de reenvíos/concurrencia asíncrona, Magic Links seguros de un solo uso para asistentes, check-in operativo por cámara y lista manual, colas de lista de espera automáticas con transaccionalidad e idempotencia y recolección de información adicional (preguntas personalizadas) durante el checkout con validación en servidor. El siguiente bloque planificado es el Sprint 3.3 (Mensajes Masivos y Export).
 
 ---
 
@@ -535,7 +535,7 @@ Stack y artefactos entregados en el repositorio:
 
 ---
 
-### Sprint 3.2: Waitlist y Preguntas (Semana 10)
+### Sprint 3.2: Waitlist y Preguntas (Semana 10) — IMPLEMENTADO
 
 | Tarea | Detalle | Entregable |
 |---|---|---|
@@ -550,11 +550,11 @@ Stack y artefactos entregados en el repositorio:
 | 3.2.9 | Tests de waitlist | Union, notificacion, conversion |
 
 **Criterios de aceptacion:**
-- [ ] Asistente puede unirse a waitlist si evento agotado
-- [ ] Cuando hay plaza, se notifica al siguiente
-- [ ] Preguntas personalizadas en checkout
-- [ ] Respuestas se almacenan en attendee
-- [ ] QA pipeline pasa limpio
+- [x] Asistente puede unirse a waitlist si evento agotado
+- [x] Cuando hay plaza, se notifica al siguiente
+- [x] Preguntas personalizadas en checkout
+- [x] Respuestas se almacenan en attendee
+- [x] QA pipeline pasa limpio
 
 **Dependencias:** Sprint 2.1 (Product), Sprint 2.4 (Attendee).
 

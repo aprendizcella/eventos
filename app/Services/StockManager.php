@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\DataTransferObjects\Orders\ReserveStockDto;
 use App\Enums\TicketOrderStatus;
+use App\Enums\WaitlistStatus;
 use App\Models\Event;
 use App\Models\ProductPrice;
 use App\Models\PromoCode;
@@ -23,7 +24,7 @@ final readonly class StockManager
     /**
      * Calcula la capacidad disponible para un tier de precio de entrada.
      */
-    public function getAvailableCapacity(ProductPrice $price): int
+    public function getAvailableCapacity(ProductPrice $price, ?string $excludeWaitlistToken = null): int
     {
         if ($price->capacity === null) {
             return 999999; // Capacidad ilimitada
@@ -37,7 +38,17 @@ final readonly class StockManager
             ->where('ticket_order.reserved_until', '>', now())
             ->sum('ticket_order_item.quantity');
 
-        $available = $price->capacity - ($price->quantity_sold + $activeReservations);
+        // Sumar reservas de la waitlist activas (Notified o Reserved) excluyendo la del usuario si posee token
+        $activeWaitlistReservations = (int) DB::table('waitlist_entry')
+            ->where('product_price_id', $price->product_price_id)
+            ->whereIn('status', [WaitlistStatus::Notified->value, WaitlistStatus::Reserved->value])
+            ->where('expires_at', '>', now())
+            ->when($excludeWaitlistToken !== null, function ($query) use ($excludeWaitlistToken) {
+                $query->where('token', '!=', $excludeWaitlistToken);
+            })
+            ->count();
+
+        $available = $price->capacity - ($price->quantity_sold + $activeReservations + $activeWaitlistReservations);
 
         return max(0, $available);
     }
@@ -48,6 +59,27 @@ final readonly class StockManager
     public function reserve(Event $event, ReserveStockDto $dto): TicketOrder
     {
         return DB::transaction(function () use ($event, $dto): TicketOrder {
+            $waitlistEntry = null;
+
+            if ($dto->waitlistToken !== null) {
+                /** @var \App\Models\WaitlistEntry|null $waitlistEntry */
+                $waitlistEntry = \App\Models\WaitlistEntry::query()
+                    ->where('token', $dto->waitlistToken)
+                    ->lockForUpdate()
+                    ->first();
+
+                if ($waitlistEntry === null ||
+                    $waitlistEntry->status !== WaitlistStatus::Notified ||
+                    ($waitlistEntry->expires_at !== null && $waitlistEntry->expires_at->isPast())) {
+                    throw \App\Exceptions\Orders\OrderException::invalidSelection(__('The waitlist token is invalid or has expired.'));
+                }
+
+                // Inhabilitar token poniéndolo en Reserved
+                $waitlistEntry->update([
+                    'status' => WaitlistStatus::Reserved,
+                ]);
+            }
+
             $promoCode = $this->resolvePromoCode($event, $dto->promoCodeId);
 
             [$orderItemsData, $subtotalSum, $discountSum, $totalSum] = $this->processItems($event, $dto, $promoCode);
@@ -71,6 +103,7 @@ final readonly class StockManager
                 'discount' => $discountSum,
                 'total' => $totalSum,
                 'reserved_until' => now()->addMinutes(10),
+                'waitlist_entry_id' => $waitlistEntry?->waitlist_entry_id,
             ]);
 
             // Crear los items
@@ -128,8 +161,8 @@ final readonly class StockManager
                 throw \App\Exceptions\Orders\OrderException::invalidSelection(__('Invalid ticket selection.'));
             }
 
-            // Verificar stock disponible
-            $available = $this->getAvailableCapacity($price);
+            // Verificar stock disponible excluyendo la reserva propia
+            $available = $this->getAvailableCapacity($price, $dto->waitlistToken);
 
             if ($itemDto->quantity > $available) {
                 throw \App\Exceptions\Orders\OrderException::stockDepleted(__('Not enough tickets available for: :name', ['name' => $price->name]));
@@ -150,6 +183,7 @@ final readonly class StockManager
                 'subtotal' => $calc['subtotal'],
                 'discount' => $calc['discount'],
                 'total' => $calc['total'],
+                'custom_answers_staging' => $itemDto->customAnswersStaging,
             ];
         }
 

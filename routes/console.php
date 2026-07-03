@@ -11,3 +11,4 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command(App\Console\Commands\ReleaseExpiredReservations::class)->everyMinute();
+Schedule::command(App\Console\Commands\ExpireWaitlistEntries::class)->everyMinute();

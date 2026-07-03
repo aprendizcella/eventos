@@ -85,6 +85,16 @@ class EventPolicy
         return $this->canManageEvent($user, $event);
     }
 
+    public function manageWaitlist(User $user, Event $event): bool
+    {
+        return $this->canManageEvent($user, $event);
+    }
+
+    public function manageCustomQuestions(User $user, Event $event): bool
+    {
+        return $this->canManageEvent($user, $event);
+    }
+
     private function canManageEvent(User $user, Event $event): bool
     {
         if ($user->hasRole(['super_admin', 'platform_admin'])) {

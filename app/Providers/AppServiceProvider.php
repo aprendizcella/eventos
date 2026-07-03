@@ -45,6 +45,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        \Illuminate\Support\Facades\Event::listen(
+            \App\Events\Waitlist\WaitlistEntryExpired::class,
+            \App\Listeners\Waitlist\NotifyWaitlistOnExpiredListener::class,
+        );
     }
 }

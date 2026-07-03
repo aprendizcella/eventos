@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Actions\Orders\ExpireTicketOrderAction;
+use App\Enums\TicketOrderStatus;
+use App\Models\TicketOrder;
 use Illuminate\Console\Command;
 
-class ReleaseExpiredReservations extends Command
+final class ReleaseExpiredReservations extends Command
 {
     /**
      * The name and signature of the console command.
@@ -25,27 +28,17 @@ class ReleaseExpiredReservations extends Command
     /**
      * Execute the console command.
      */
-    public function handle(): int
+    public function handle(ExpireTicketOrderAction $expireTicketOrderAction): int
     {
-        $expiredOrders = \App\Models\TicketOrder::query()
-            ->where('status', \App\Enums\TicketOrderStatus::Reserved)
+        $expiredOrders = TicketOrder::query()
+            ->where('status', TicketOrderStatus::Reserved)
             ->where('reserved_until', '<', now())
             ->get();
 
         $count = 0;
 
         foreach ($expiredOrders as $order) {
-            \Illuminate\Support\Facades\DB::transaction(function () use ($order) {
-                $order->update([
-                    'status' => \App\Enums\TicketOrderStatus::Expired,
-                    'reserved_until' => null,
-                ]);
-
-                activity()
-                    ->performedOn($order)
-                    ->useLog('ticket_order')
-                    ->log('expired');
-            });
+            $expireTicketOrderAction($order);
             $count++;
         }
 

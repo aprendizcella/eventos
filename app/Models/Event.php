@@ -24,6 +24,7 @@ use Spatie\Activitylog\Support\LogOptions;
  * @property CarbonInterface|null $ends_at
  * @property EventStatus $status
  * @property EventVisibility $visibility
+ * @property array<mixed>|null $custom_questions
  */
 final class Event extends Model
 {
@@ -45,6 +46,7 @@ final class Event extends Model
         'ends_at',
         'status',
         'visibility',
+        'custom_questions',
     ];
 
     public function getActivitylogOptions(): LogOptions
@@ -115,6 +117,7 @@ final class Event extends Model
             'ends_at' => 'datetime',
             'status' => EventStatus::class,
             'visibility' => EventVisibility::class,
+            'custom_questions' => 'array',
         ];
     }
 }

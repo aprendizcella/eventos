@@ -1,6 +1,6 @@
 # Estado de ejecución
 
-> **Resumen en una línea:** Sprints 1.1 al 1.4 (Fase 1), Sprints 2.1 al 2.4 (Fase 2) y Sprint 3.1 (Fase 3) están **implementados, auditados estáticamente y 100% verificados localmente**. El próximo paso es iniciar el Sprint 3.2 (Waitlist y Preguntas).
+> **Resumen en una línea:** Sprints 1.1 al 1.4 (Fase 1), Sprints 2.1 al 2.4 (Fase 2), y Sprints 3.1 al 3.2 (Fase 3) están **implementados, auditados estáticamente y 100% verificados localmente**. El próximo paso es iniciar el Sprint 3.3 (Exportación y Reportes).
 
 ---
 
@@ -144,11 +144,21 @@
 - **Políticas y Autorización**: `EventPolicy` configurada para controlar permisos de check-in y reversión según rol del organizador (`admin`, `editor`, `viewer`).
 - **QA y Cobertura**: 35 tests Pest dedicados en verde y pipeline de QA completo libre de errores.
 
+### Sprint 3.2 — Lista de Espera y Preguntas del Comprador ✅
+
+- **Base de Datos y Unicidad Virtual:** Modelado de `waitlist_entry` y campos JSON para respuestas personalizadas (`custom_questions` en `event`, `custom_answers_staging` en `ticket_order_item` y `custom_answers` en `attendee`). Restricción `active_email_unique` dinámica (MySQL/SQLite) para unicidad activa.
+- **Acciones Waitlist:** Actions transaccionales e idempotentes `JoinWaitlistAction`, `NotifyWaitlistAction`, `RollbackWaitlistReservationAction`, `ExpireWaitlistEntriesAction` y `ConvertWaitlistEntryAction`.
+- **Automatización de Cola:** Evento post-commit `WaitlistEntryExpired` y listener `NotifyWaitlistOnExpiredListener` para notificar automáticamente al siguiente en cola al expirar.
+- **StockManager:** Modificado para restar cupos de waitlist activos (`Notified`/`Reserved`) y soportar la exclusión del token en checkout.
+- **Formularios de Checkout y Waitlist:** Formulario público Livewire Volt `join-waitlist` con rate-limiting compuesto. Checkout adaptado para consumir el token y validar dinámicamente en servidor las preguntas personalizadas.
+- **Administración del Organizador:** Panel `custom-questions-management` para configurar preguntas con ordenamiento y IDs inmutables, y `waitlist-management` para gestionar colas manuales con bitácora de actividad (Activitylog).
+- **QA e Integración:** 531 tests Pest en verde, PHPStan OK y Pint formateado.
+
 ---
 
 ## Qué NO está hecho
 
-- Fases 3–6 (Sprints 3.2 al 6.4).
+- Fases 3–6 (Sprints 3.3 al 6.4).
 
 El roadmap completo está en [`01-producto/PLAN_IMPLEMENTACION.md`](../01-producto/PLAN_IMPLEMENTACION.md).
 
@@ -156,10 +166,10 @@ El roadmap completo está en [`01-producto/PLAN_IMPLEMENTACION.md`](../01-produc
 
 ## Bloqueos actuales
 
-Ninguno conocido a cierre de Sprint 3.1.
+Ninguno conocido a cierre de Sprint 3.2.
 
 ---
 
 ## Próximo paso
 
-- Iniciar la **Fase 3: Operación del Evento** con el **Sprint 3.2: Lista de Espera y Preguntas del Comprador** (Semana 10) para gestionar colas de espera automáticas y recolectar información adicional durante el checkout.
+- Iniciar el **Sprint 3.3: Exportación y Reportes** para permitir la descarga de datos de asistentes y estadísticas clave del evento.

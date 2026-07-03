@@ -71,16 +71,35 @@ final readonly class GenerateAttendeesAction
 
         $uniqueCode = $this->generateUniqueCode();
 
+        /** @var array<int, array<string, mixed>> $staging */
+        $staging = $item->custom_answers_staging ?? [];
+        $seqStaging = $staging[$seq] ?? [];
+
+        $firstName = $seqStaging['first_name'] ?? $order->first_name;
+        $lastName = $seqStaging['last_name'] ?? $order->last_name;
+        $email = $seqStaging['email'] ?? $order->email;
+        $customAnswers = $seqStaging['answers'] ?? [];
+
+        if (empty($seqStaging) && !empty($staging)) {
+            \Illuminate\Support\Facades\Log::error('Corrupted or missing custom answers staging sequence data', [
+                'order_id' => $order->ticket_order_id,
+                'item_id' => $item->ticket_order_item_id,
+                'seq' => $seq,
+                'email' => $order->email,
+            ]);
+        }
+
         /** @var Attendee */
         return Attendee::query()->create([
             'ticket_order_id' => $order->ticket_order_id,
             'ticket_order_item_id' => $item->ticket_order_item_id,
             'sequence' => $seq,
             'unique_code' => $uniqueCode,
-            'first_name' => $order->first_name,
-            'last_name' => $order->last_name,
-            'email' => $order->email,
+            'first_name' => $firstName,
+            'last_name' => $lastName,
+            'email' => $email,
             'status' => AttendeeStatus::Active,
+            'custom_answers' => $customAnswers,
         ]);
     }
 

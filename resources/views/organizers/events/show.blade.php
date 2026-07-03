@@ -66,6 +66,24 @@
                 >
                     👥 {{ __('Attendees') }}
                 </button>
+                @can('manageWaitlist', $event)
+                <button
+                    @click="activeTab = 'waitlist'"
+                    :class="activeTab === 'waitlist' ? 'border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-400' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'"
+                    class="whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium focus:outline-none cursor-pointer"
+                >
+                    ⏳ {{ __('Waitlist') }}
+                </button>
+                @endcan
+                @can('manageCustomQuestions', $event)
+                <button
+                    @click="activeTab = 'custom-questions'"
+                    :class="activeTab === 'custom-questions' ? 'border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-400' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'"
+                    class="whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium focus:outline-none cursor-pointer"
+                >
+                    ❓ {{ __('Custom Questions') }}
+                </button>
+                @endcan
                 <button
                     @click="activeTab = 'actions'"
                     :class="activeTab === 'actions' ? 'border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-400' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'"
@@ -193,5 +211,19 @@
                 </div>
             </div>
         </div>
+
+        @can('manageWaitlist', $event)
+        {{-- Tab Content: Waitlist --}}
+        <div x-show="activeTab === 'waitlist'" class="space-y-4" x-cloak>
+            <livewire:organizers.events.waitlist-management :event="$event" />
+        </div>
+        @endcan
+
+        @can('manageCustomQuestions', $event)
+        {{-- Tab Content: Custom Questions --}}
+        <div x-show="activeTab === 'custom-questions'" class="space-y-4" x-cloak>
+            <livewire:organizers.events.custom-questions-management :event="$event" />
+        </div>
+        @endcan
     </div>
 @endsection

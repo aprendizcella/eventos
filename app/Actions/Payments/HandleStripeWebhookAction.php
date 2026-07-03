@@ -18,6 +18,10 @@ use Stripe\Webhook;
 
 final readonly class HandleStripeWebhookAction
 {
+    public function __construct(
+        private ConfirmTicketOrderAction $confirmTicketOrderAction,
+    ) {}
+
     public function __invoke(string $payload, string $sigHeader): string
     {
         /** @var string $endpointSecret */
@@ -79,7 +83,7 @@ final readonly class HandleStripeWebhookAction
             $payment->update(['status' => PaymentStatus::Completed]);
 
             // Consolidar el stock y confirmar la orden (Frontera de estado)
-            resolve(ConfirmTicketOrderAction::class)->__invoke($payment->ticketOrder);
+            ($this->confirmTicketOrderAction)($payment->ticketOrder);
 
             // Disparar evento para efectos secundarios
             event(new PaymentCompleted($payment));

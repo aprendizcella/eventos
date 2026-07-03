@@ -15,5 +15,6 @@ final readonly class ReserveStockDto
         public string $email,
         public ?int $promoCodeId = null,
         public array $items = [],
+        public ?string $waitlistToken = null,
     ) {}
 }

@@ -235,7 +235,25 @@ new class extends Component {
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/30">
                                 <td class="px-6 py-4">
                                     <div class="font-medium text-gray-900 dark:text-white">{{ $attendee->first_name }} {{ $attendee->last_name }}</div>
-                                    <div class="text-xs text-gray-500 dark:text-gray-400">{{ $attendee->email }}</div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">{{ $attendee->email }}</div>
+                                    @if(!empty($attendee->custom_answers))
+                                        <div class="mt-2 space-y-1 rounded-lg border border-gray-100 bg-gray-50/50 p-2 text-xxs dark:border-gray-800 dark:bg-gray-900/50">
+                                            <span class="block text-xxx font-bold uppercase tracking-wider text-gray-400">{{ __('Answers') }}</span>
+                                            @foreach($attendee->custom_answers as $qId => $answer)
+                                                @php
+                                                    $questionLabel = collect($event->custom_questions)->firstWhere('id', $qId)['label'] ?? $qId;
+                                                @endphp
+                                                <div class="text-gray-600 dark:text-gray-400">
+                                                    <span class="font-semibold text-gray-700 dark:text-gray-300">{{ $questionLabel }}:</span>
+                                                    @if(is_array($answer))
+                                                        <span class="italic">{{ implode(', ', $answer) }}</span>
+                                                    @else
+                                                        <span class="italic">{{ $answer }}</span>
+                                                    @endif
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4 text-gray-700 dark:text-gray-300">
                                     {{ $attendee->ticketOrderItem->product->name ?? __('Ticket') }}

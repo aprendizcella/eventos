@@ -11,6 +11,10 @@ use Illuminate\Support\Facades\DB;
 
 final readonly class ConfirmTicketOrderAction
 {
+    public function __construct(
+        private \App\Actions\Waitlist\ConvertWaitlistEntryAction $convertWaitlistEntryAction,
+    ) {}
+
     public function __invoke(TicketOrder $order): TicketOrder
     {
         if ($order->status !== TicketOrderStatus::Reserved) {
@@ -27,6 +31,10 @@ final readonly class ConfirmTicketOrderAction
                 'status' => TicketOrderStatus::Completed,
                 'reserved_until' => null,
             ]);
+
+            if ($order->waitlist_entry_id !== null && $order->waitlistEntry !== null) {
+                ($this->convertWaitlistEntryAction)($order->waitlistEntry);
+            }
 
             // Consolidar el stock
             $this->consolidateStock($order);

@@ -48,6 +48,7 @@ final class Attendee extends Model
         'last_name',
         'email',
         'status',
+        'custom_answers',
     ];
 
     public function getActivitylogOptions(): LogOptions
@@ -83,6 +84,7 @@ final class Attendee extends Model
         return [
             'status' => AttendeeStatus::class,
             'sequence' => 'integer',
+            'custom_answers' => 'array',
         ];
     }
 }

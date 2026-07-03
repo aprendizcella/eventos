@@ -10,6 +10,10 @@ use Illuminate\Support\Facades\DB;
 
 final readonly class CancelTicketOrderAction
 {
+    public function __construct(
+        private \App\Actions\Waitlist\RollbackWaitlistReservationAction $rollbackAction,
+    ) {}
+
     public function __invoke(TicketOrder $order): TicketOrder
     {
         return DB::transaction(function () use ($order): TicketOrder {
@@ -19,6 +23,10 @@ final readonly class CancelTicketOrderAction
                 'status' => TicketOrderStatus::Cancelled,
                 'reserved_until' => null,
             ]);
+
+            if ($order->waitlist_entry_id !== null && $order->waitlistEntry !== null) {
+                ($this->rollbackAction)($order->waitlistEntry);
+            }
 
             // Si la orden ya estaba completada, liberamos el stock consolidado
             if ($oldStatus === TicketOrderStatus::Completed) {

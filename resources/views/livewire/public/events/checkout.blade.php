@@ -44,8 +44,15 @@ new #[Layout('layouts.public')] class extends Component {
     public string $lastName = '';
     public string $email = '';
 
+    // Waitlist token
+    public ?string $waitlistToken = null;
+
+    // Attendee fields and custom answers staging
+    public array $customAnswersStaging = [];
+    public array $attendeeDetails = [];
+
     // Flow properties
-    public int $step = 1; // 1: Ticket Selection, 2: Buyer Info, 3: Reserve & Checkout Simulation
+    public int $step = 1; // 1: Ticket Selection, 2: Buyer & Attendee Info, 3: Reserve & Checkout Simulation
     public ?int $orderId = null;
     public ?string $reservedUntil = null;
 
@@ -59,11 +66,43 @@ new #[Layout('layouts.public')] class extends Component {
                 $this->quantities[$price->product_price_id] = 0;
             }
         }
+
+        // Recuperar waitlist_token de la URL
+        $this->waitlistToken = request()->query('waitlist_token');
+
+        if ($this->waitlistToken !== null) {
+            /** @var \App\Models\WaitlistEntry|null $waitlistEntry */
+            $waitlistEntry = \App\Models\WaitlistEntry::query()
+                ->where('token', $this->waitlistToken)
+                ->where('event_id', $this->event->event_id)
+                ->first();
+
+            if ($waitlistEntry === null ||
+                $waitlistEntry->status !== \App\Enums\WaitlistStatus::Notified ||
+                ($waitlistEntry->expires_at !== null && $waitlistEntry->expires_at->isPast())) {
+                $this->addError('reservation', __('The waitlist link is invalid or has expired.'));
+                $this->waitlistToken = null;
+            } else {
+                // Prellenar datos del comprador
+                $this->firstName = $waitlistEntry->first_name ?? '';
+                $this->lastName = $waitlistEntry->last_name ?? '';
+                $this->email = $waitlistEntry->email;
+
+                // Preseleccionar y forzar cantidad = 1 para el product_price_id del waitlist
+                $this->quantities[$waitlistEntry->product_price_id] = 1;
+                // Forzar 0 en los demás tiers
+                foreach ($this->quantities as $id => $qty) {
+                    if ($id != $waitlistEntry->product_price_id) {
+                        $this->quantities[$id] = 0;
+                    }
+                }
+            }
+        }
     }
 
     public function getAvailableCapacity(ProductPrice $price): int
     {
-        return resolve(StockManager::class)->getAvailableCapacity($price);
+        return resolve(StockManager::class)->getAvailableCapacity($price, $this->waitlistToken);
     }
 
     public function applyPromoCode(PromoCodeValidator $validator): void
@@ -114,6 +153,27 @@ new #[Layout('layouts.public')] class extends Component {
                 return;
             }
 
+            // Inicializar las estructuras de asistentes y respuestas para cada ticket seleccionado
+            $this->attendeeDetails = [];
+            $this->customAnswersStaging = [];
+            foreach ($this->quantities as $priceId => $qty) {
+                $qty = (int) $qty;
+                if ($qty > 0) {
+                    for ($seq = 1; $seq <= $qty; $seq++) {
+                        // Prellenar el primer ticket con Buyer info si hay token de waitlist
+                        $prefill = ($this->waitlistToken !== null && $seq === 1);
+                        $this->attendeeDetails[$priceId][$seq] = [
+                            'first_name' => $prefill ? $this->firstName : '',
+                            'last_name' => $prefill ? $this->lastName : '',
+                            'email' => $prefill ? $this->email : '',
+                        ];
+                        foreach ($this->event->custom_questions ?? [] as $question) {
+                            $this->customAnswersStaging[$priceId][$seq][$question['id']] = '';
+                        }
+                    }
+                }
+            }
+
             $this->step = 2;
         }
     }
@@ -127,18 +187,79 @@ new #[Layout('layouts.public')] class extends Component {
 
     public function reserveAndCheckout(StockManager $stockManager, ConfirmTicketOrderAction $confirmAction): void
     {
-        $this->validate([
+        $rules = [
             'firstName' => ['required', 'string', 'max:255'],
             'lastName' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255'],
-        ]);
+        ];
 
-        // Map quantities to DTOs
+        // Reglas de validación para detalles de cada asistente y preguntas personalizadas
+        foreach ($this->quantities as $priceId => $qty) {
+            $qty = (int) $qty;
+            if ($qty > 0) {
+                for ($seq = 1; $seq <= $qty; $seq++) {
+                    $rules["attendeeDetails.{$priceId}.{$seq}.first_name"] = ['required', 'string', 'max:255'];
+                    $rules["attendeeDetails.{$priceId}.{$seq}.last_name"] = ['required', 'string', 'max:255'];
+                    $rules["attendeeDetails.{$priceId}.{$seq}.email"] = ['required', 'email', 'max:255'];
+
+                    foreach ($this->event->custom_questions ?? [] as $question) {
+                        $qRules = [];
+                        if ($question['required'] ?? false) {
+                            $qRules[] = 'required';
+                        }
+                        if (($question['type'] ?? '') === 'select' || ($question['type'] ?? '') === 'radio') {
+                            $options = $question['options'] ?? [];
+                            $qRules[] = \Illuminate\Validation\Rule::in($options);
+                        }
+                        $rules["customAnswersStaging.{$priceId}.{$seq}.{$question['id']}"] = $qRules;
+                    }
+                }
+            }
+        }
+
+        $this->validate($rules);
+
+        // Map quantities and staging answers to DTOs
         $items = [];
         foreach ($this->quantities as $priceId => $qty) {
             $qty = (int) $qty;
             if ($qty > 0) {
-                $items[] = new ReserveStockItemDto((int) $priceId, $qty);
+                // Estructurar el JSON de staging por secuencia
+                $stagingData = [];
+                for ($seq = 1; $seq <= $qty; $seq++) {
+                    // Si la pregunta es checkbox, agrupamos las claves marcadas
+                    $rawAnswers = $this->customAnswersStaging[$priceId][$seq] ?? [];
+                    $processedAnswers = [];
+                    foreach ($this->event->custom_questions ?? [] as $question) {
+                        $qId = $question['id'];
+                        if (($question['type'] ?? '') === 'checkbox') {
+                            $selected = [];
+                            if (isset($rawAnswers[$qId]) && is_array($rawAnswers[$qId])) {
+                                foreach ($rawAnswers[$qId] as $opt => $val) {
+                                    if ($val) {
+                                        $selected[] = $opt;
+                                    }
+                                }
+                            }
+                            $processedAnswers[$qId] = $selected;
+                        } else {
+                            $processedAnswers[$qId] = $rawAnswers[$qId] ?? '';
+                        }
+                    }
+
+                    $stagingData[$seq] = [
+                        'first_name' => $this->attendeeDetails[$priceId][$seq]['first_name'],
+                        'last_name' => $this->attendeeDetails[$priceId][$seq]['last_name'],
+                        'email' => $this->attendeeDetails[$priceId][$seq]['email'],
+                        'answers' => $processedAnswers,
+                    ];
+                }
+
+                $items[] = new ReserveStockItemDto(
+                    productPriceId: (int) $priceId,
+                    quantity: $qty,
+                    customAnswersStaging: $stagingData
+                );
             }
         }
 
@@ -147,7 +268,8 @@ new #[Layout('layouts.public')] class extends Component {
             lastName: $this->lastName,
             email: $this->email,
             promoCodeId: $this->appliedPromoCode?->promo_code_id,
-            items: $items
+            items: $items,
+            waitlistToken: $this->waitlistToken
         );
 
         try {
@@ -320,7 +442,7 @@ new #[Layout('layouts.public')] class extends Component {
 
     {{-- Error de reservación --}}
     @error('reservation')
-        <div class="mb-6 rounded-lg bg-red-50 p-4 text-sm text-red-800 dark:bg-red-950/30 dark:text-red-400">
+        <div class="mb-6 rounded-lg bg-red-50 p-4 text-sm text-red-800 dark:bg-red-950/30 dark:text-red-400 font-semibold">
             {{ $message }}
         </div>
     @enderror
@@ -387,12 +509,21 @@ new #[Layout('layouts.public')] class extends Component {
                                                     </div>
                                                     
                                                     @if($isSoldOut || $availableQty <= 0)
-                                                        <span class="text-xs font-semibold text-red-600 uppercase">{{ __('Sold Out') }}</span>
+                                                        <div class="flex flex-col items-end gap-1">
+                                                            <span class="text-xs font-semibold text-red-600 uppercase">{{ __('Sold Out') }}</span>
+                                                            <a href="{{ route('public.events.join-waitlist', ['event' => $event->event_id, 'price' => $price->product_price_id]) }}" class="text-xxs text-blue-600 hover:underline font-semibold">
+                                                                {{ __('Join Waitlist') }}
+                                                            </a>
+                                                        </div>
                                                     @else
-                                                        <select wire:model.live="quantities.{{ $price->product_price_id }}" class="rounded-lg border border-gray-300 px-2 py-1 text-xs dark:border-gray-700 dark:bg-gray-800 dark:text-white">
-                                                            @for($i = 0; $i <= min($availableQty, $product->max_qty); $i++)
-                                                                <option value="{{ $i }}">{{ $i }}</option>
-                                                            @endfor
+                                                        <select wire:model.live="quantities.{{ $price->product_price_id }}" @disabled($waitlistToken !== null) class="rounded-lg border border-gray-300 px-2 py-1 text-xs dark:border-gray-700 dark:bg-gray-800 dark:text-white disabled:opacity-50">
+                                                            @if($waitlistToken !== null && isset($quantities[$price->product_price_id]) && $quantities[$price->product_price_id] == 1)
+                                                                <option value="1">1</option>
+                                                            @else
+                                                                @for($i = 0; $i <= min($availableQty, $product->max_qty); $i++)
+                                                                    <option value="{{ $i }}">{{ $i }}</option>
+                                                                @endfor
+                                                            @endif
                                                         </select>
                                                     @endif
                                                 </div>
@@ -413,28 +544,125 @@ new #[Layout('layouts.public')] class extends Component {
                 </div>
             @endif
 
-            {{-- STEP 2: Buyer Info --}}
+            {{-- STEP 2: Buyer & Attendee Info --}}
             @if($step === 2)
-                <form wire:submit.prevent="reserveAndCheckout" class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900 space-y-6">
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ __('Step 2: Buyer Information') }}</h3>
+                <form wire:submit.prevent="reserveAndCheckout" class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900 space-y-8">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ __('Step 2: Buyer Information') }}</h3>
+                        <p class="text-xs text-gray-400 mt-1">{{ __('This is where we will send your order details and tickets.') }}</p>
+                    </div>
 
                     <div class="grid gap-6 sm:grid-cols-2">
                         <div>
                             <label for="firstName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('First Name') }}</label>
-                            <input type="text" wire:model="firstName" id="firstName" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+                            <input type="text" wire:model="firstName" id="firstName" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white" @disabled($waitlistToken !== null)>
                             @error('firstName') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
                         </div>
                         <div>
                             <label for="lastName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Last Name') }}</label>
-                            <input type="text" wire:model="lastName" id="lastName" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+                            <input type="text" wire:model="lastName" id="lastName" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white" @disabled($waitlistToken !== null)>
                             @error('lastName') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
                         </div>
                     </div>
 
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Email Address') }}</label>
-                        <input type="email" wire:model="email" id="email" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white" placeholder="you@example.com">
+                        <input type="email" wire:model="email" id="email" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white" placeholder="you@example.com" @disabled($waitlistToken !== null)>
                         @error('email') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
+                    </div>
+
+                    {{-- Attendees Section --}}
+                    <div class="border-t border-gray-100 pt-6 dark:border-gray-800 space-y-8">
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ __('Attendee Information') }}</h3>
+                            <p class="text-xs text-gray-400 mt-1">{{ __('Enter the name and email for each ticket holder.') }}</p>
+                        </div>
+
+                        @foreach($quantities as $priceId => $qty)
+                            @php
+                                $qty = (int) $qty;
+                                $priceObj = \App\Models\ProductPrice::query()->find($priceId);
+                            @endphp
+                            @if($qty > 0 && $priceObj !== null)
+                                @for($seq = 1; $seq <= $qty; $seq++)
+                                    <div class="p-6 rounded-xl border border-gray-100 bg-gray-50 dark:border-gray-800 dark:bg-gray-950/40 space-y-6">
+                                        <h4 class="font-bold text-gray-800 dark:text-gray-200">
+                                            Ticket #{{ $seq }} - {{ $priceObj->product->title }} ({{ $priceObj->name }})
+                                        </h4>
+
+                                        <div class="grid gap-6 sm:grid-cols-2">
+                                            <div>
+                                                <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400">{{ __('First Name') }} *</label>
+                                                <input type="text" wire:model="attendeeDetails.{{ $priceId }}.{{ $seq }}.first_name" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-xs focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+                                                @error("attendeeDetails.{$priceId}.{$seq}.first_name") <span class="text-xxs text-red-600">{{ $message }}</span> @enderror
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400">{{ __('Last Name') }} *</label>
+                                                <input type="text" wire:model="attendeeDetails.{{ $priceId }}.{{ $seq }}.last_name" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-xs focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+                                                @error("attendeeDetails.{$priceId}.{$seq}.last_name") <span class="text-xxs text-red-600">{{ $message }}</span> @enderror
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-400">{{ __('Email Address') }} *</label>
+                                            <input type="email" wire:model="attendeeDetails.{{ $priceId }}.{{ $seq }}.email" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-xs focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+                                            @error("attendeeDetails.{$priceId}.{$seq}.email") <span class="text-xxs text-red-600">{{ $message }}</span> @enderror
+                                        </div>
+
+                                        {{-- Custom Questions --}}
+                                        @if(!empty($event->custom_questions))
+                                            <div class="border-t border-gray-200/60 pt-4 dark:border-gray-800 space-y-4">
+                                                <h5 class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">{{ __('Custom Questions') }}</h5>
+
+                                                @foreach(collect($event->custom_questions)->sortBy('position') as $question)
+                                                    <div class="space-y-1.5">
+                                                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300">
+                                                            {{ $question['label'] }}
+                                                            @if($question['required'] ?? false) * @endif
+                                                        </label>
+
+                                                        @if(($question['type'] ?? 'text') === 'text')
+                                                            <input type="text" wire:model="customAnswersStaging.{{ $priceId }}.{{ $seq }}.{{ $question['id'] }}" class="block w-full rounded-lg border border-gray-300 px-3 py-2 text-xs focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+                                                        @elseif($question['type'] === 'textarea')
+                                                            <textarea wire:model="customAnswersStaging.{{ $priceId }}.{{ $seq }}.{{ $question['id'] }}" rows="3" class="block w-full rounded-lg border border-gray-300 px-3 py-2 text-xs focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"></textarea>
+                                                        @elseif($question['type'] === 'select')
+                                                            <select wire:model="customAnswersStaging.{{ $priceId }}.{{ $seq }}.{{ $question['id'] }}" class="block w-full rounded-lg border border-gray-300 px-3 py-2 text-xs focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+                                                                <option value="">{{ __('Select an option') }}</option>
+                                                                @foreach($question['options'] ?? [] as $option)
+                                                                    <option value="{{ $option }}">{{ $option }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        @elseif($question['type'] === 'radio')
+                                                            <div class="space-y-2">
+                                                                @foreach($question['options'] ?? [] as $option)
+                                                                    <label class="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300">
+                                                                        <input type="radio" wire:model="customAnswersStaging.{{ $priceId }}.{{ $seq }}.{{ $question['id'] }}" value="{{ $option }}" class="text-blue-600 focus:ring-blue-500">
+                                                                        {{ $option }}
+                                                                    </label>
+                                                                @endforeach
+                                                            </div>
+                                                        @elseif($question['type'] === 'checkbox')
+                                                            <div class="space-y-2">
+                                                                @foreach($question['options'] ?? [] as $option)
+                                                                    <label class="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300">
+                                                                        <input type="checkbox" wire:model="customAnswersStaging.{{ $priceId }}.{{ $seq }}.{{ $question['id'] }}.{{ $option }}" class="rounded text-blue-600 focus:ring-blue-500">
+                                                                        {{ $option }}
+                                                                    </label>
+                                                                @endforeach
+                                                            </div>
+                                                        @endif
+
+                                                        @error("customAnswersStaging.{$priceId}.{$seq}.{$question['id']}")
+                                                            <span class="text-xxs text-red-600 block mt-0.5">{{ $message }}</span>
+                                                        @enderror
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endfor
+                            @endif
+                        @endforeach
                     </div>
 
                     <div class="flex justify-between border-t border-gray-100 pt-4 dark:border-gray-800">
@@ -485,7 +713,7 @@ new #[Layout('layouts.public')] class extends Component {
             @endif
         </div>
 
-        {{-- Order Summary Sidebar (always visible except in step 3 maybe) --}}
+        {{-- Order Summary Sidebar (always visible except in step 3) --}}
         @if($step < 3)
             <div class="lg:col-span-4 space-y-6">
                 <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">

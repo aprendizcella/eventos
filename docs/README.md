@@ -10,7 +10,7 @@
 
 | Quiero saber… | Lee este documento |
 |---|---|
-| En qué punto está el proyecto (Sprint 1.1, próximos pasos) | [`00-estado/ESTADO_EJECUCION.md`](./00-estado/ESTADO_EJECUCION.md) |
+| En qué punto está el proyecto (Sprint 3.2, próximos pasos) | [`00-estado/ESTADO_EJECUCION.md`](./00-estado/ESTADO_EJECUCION.md) |
 | Qué se va a construir, fases y sprints | [`01-producto/PLAN_IMPLEMENTACION.md`](./01-producto/PLAN_IMPLEMENTACION.md) |
 | Cómo está montado el backend (capas, flujos, convenciones) | [`02-arquitectura/ESPECIFICACION_TECNICA_BOILERPLATE_EVENTOS.md`](./02-arquitectura/ESPECIFICACION_TECNICA_BOILERPLATE_EVENTOS.md) |
 | Cómo encaja la propuesta DDD en el boilerplate | [`02-arquitectura/MAPING_PROPUESTA_DDD_A_BOILERPLATE.md`](./02-arquitectura/MAPING_PROPUESTA_DDD_A_BOILERPLATE.md) |
@@ -22,6 +22,7 @@
 | Plan de mejora responsive y UX para alinear con TailAdmin | [`03-ux-ui/PLAN_MEJORA_RESPONSIVE.md`](./03-ux-ui/PLAN_MEJORA_RESPONSIVE.md) |
 | Librerías evaluadas, compatibilidad y estrategia de integración | [`04-librerias/VALORACION_LIBRERIAS_INTEGRACION.md`](./04-librerias/VALORACION_LIBRERIAS_INTEGRACION.md) |
 | Cómo configurar y probar Stripe localmente en modo pruebas | [`05-guias/stripe_local_setup.md`](./05-guias/stripe_local_setup.md) |
+| Análisis de deuda técnica post Sprint 3.2 (qué refactorizar y cuándo) | [`06-deuda-tecnica/ANALISIS_ARQUITECTONICO_FASE3.md`](./06-deuda-tecnica/ANALISIS_ARQUITECTONICO_FASE3.md) |
 
 ---
 
@@ -46,8 +47,10 @@ docs/
 │   └── PLAN_MEJORA_RESPONSIVE.md
 ├── 04-librerias/              ← valoración de dependencias
 │   └── VALORACION_LIBRERIAS_INTEGRACION.md
-└── 05-guias/                  ← guías de desarrollo y procedimientos
-    └── stripe_local_setup.md
+├── 05-guias/                  ← guías de desarrollo y procedimientos
+│   └── stripe_local_setup.md
+└── 06-deuda-tecnica/          ← análisis de deuda técnica y refactoring pendiente
+    └── ANALISIS_ARQUITECTONICO_FASE3.md
 ```
 
 ---
