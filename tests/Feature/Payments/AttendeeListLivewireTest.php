@@ -104,3 +104,17 @@ it('denies check-in actions to viewer role', function (): void {
         ->call('manualCheckIn', $attendee->unique_code)
         ->assertStatus(403);
 });
+
+it('exports attendees using the current filter mapping without errors', function (): void {
+    $this->actingAs($this->admin);
+
+    Attendee::factory()->create([
+        'ticket_order_id' => TicketOrder::factory()->create(['event_id' => $this->event->event_id])->ticket_order_id,
+        'status' => AttendeeStatus::Active,
+    ]);
+
+    Volt::test('organizers.events.attendee-list', ['event' => $this->event])
+        ->set('statusFilter', 'active')
+        ->call('exportCsv')
+        ->assertFileDownloaded('attendees-'.$this->event->slug.'.csv');
+});

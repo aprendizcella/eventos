@@ -90,6 +90,14 @@ final class Event extends Model
     }
 
     /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<NotificationLog, $this>
+     */
+    public function notificationLogs(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(NotificationLog::class, 'event_id', 'event_id');
+    }
+
+    /**
      * @param  Builder<$this>  $query
      * @return Builder<$this>
      */

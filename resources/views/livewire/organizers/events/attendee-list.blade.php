@@ -11,6 +11,7 @@ use App\Models\ActiveCheckIn;
 use App\Models\Attendee;
 use App\Models\CheckInList;
 use App\Models\Event;
+use App\Actions\Attendees\ExportAttendeesAction;
 use Livewire\Attributes\On;
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
@@ -89,6 +90,28 @@ new class extends Component {
         }
     }
 
+    public function exportCsv(ExportAttendeesAction $action)
+    {
+        $this->authorize('exportAttendees', $this->event);
+
+        // Mapear los filtros actuales del componente de forma consistente
+        $filters = [];
+        if ($this->statusFilter === 'active') {
+            $filters['attendee_status'] = 'active';
+            $filters['check_in_status'] = 'not_checked_in';
+        } elseif ($this->statusFilter === 'checked_in') {
+            $filters['check_in_status'] = 'checked_in';
+        } elseif ($this->statusFilter === 'cancelled') {
+            $filters['attendee_status'] = 'cancelled';
+        }
+
+        $callback = $action($this->event, $filters);
+
+        return response()->streamDownload($callback, 'attendees-' . $this->event->slug . '.csv', [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
+    }
+
     public function with(): array
     {
         // Obtener listas del evento para el selector
@@ -116,14 +139,20 @@ new class extends Component {
         if ($this->statusFilter !== '') {
             if ($this->statusFilter === 'checked_in') {
                 // Filtrar los que tienen check-in activo en la lista seleccionada
-                $query->whereHas('ticketOrder.event.activeCheckIns', function ($q) {
-                    $q->where('active_check_in.check_in_list_id', $this->selectedCheckInListId);
+                $query->whereExists(function ($q) {
+                    $q->selectRaw('1')
+                        ->from('active_check_in')
+                        ->whereColumn('active_check_in.attendee_id', 'attendee.attendee_id')
+                        ->where('active_check_in.check_in_list_id', $this->selectedCheckInListId);
                 });
             } elseif ($this->statusFilter === 'active') {
                 // Filtrar los que están activos pero no tienen check-in en la lista seleccionada
                 $query->where('attendee.status', AttendeeStatus::Active)
-                    ->whereDoesntHave('ticketOrder.event.activeCheckIns', function ($q) {
-                        $q->where('active_check_in.check_in_list_id', $this->selectedCheckInListId);
+                    ->whereNotExists(function ($q) {
+                        $q->selectRaw('1')
+                            ->from('active_check_in')
+                            ->whereColumn('active_check_in.attendee_id', 'attendee.attendee_id')
+                            ->where('active_check_in.check_in_list_id', $this->selectedCheckInListId);
                     });
             } else {
                 $query->where('attendee.status', $this->statusFilter);
@@ -194,7 +223,16 @@ new class extends Component {
             </div>
         </div>
 
-        <div class="flex justify-end">
+        <div class="flex justify-end items-center gap-2">
+            @can('exportAttendees', $event)
+                <button type="button" wire:click="exportCsv" class="inline-flex items-center rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-200 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800/80 focus:outline-none">
+                    <svg class="size-5 mr-2 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                    </svg>
+                    {{ __('Export CSV') }}
+                </button>
+            @endcan
+
             <button type="button" @click="$dispatch('open-qr-scanner')" class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus:outline-none">
                 <svg class="size-5 mr-2" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" />

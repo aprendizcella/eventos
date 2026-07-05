@@ -95,6 +95,16 @@ class EventPolicy
         return $this->canManageEvent($user, $event);
     }
 
+    public function sendMessages(User $user, Event $event): bool
+    {
+        return $this->canManageEvent($user, $event);
+    }
+
+    public function exportAttendees(User $user, Event $event): bool
+    {
+        return $this->view($user, $event);
+    }
+
     private function canManageEvent(User $user, Event $event): bool
     {
         if ($user->hasRole(['super_admin', 'platform_admin'])) {

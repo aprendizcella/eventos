@@ -84,6 +84,15 @@
                     ❓ {{ __('Custom Questions') }}
                 </button>
                 @endcan
+                @can('sendMessages', $event)
+                <button
+                    @click="activeTab = 'messages'"
+                    :class="activeTab === 'messages' ? 'border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-400' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'"
+                    class="whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium focus:outline-none cursor-pointer"
+                >
+                    ✉️ {{ __('Messages') }}
+                </button>
+                @endcan
                 <button
                     @click="activeTab = 'actions'"
                     :class="activeTab === 'actions' ? 'border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-400' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'"
@@ -223,6 +232,13 @@
         {{-- Tab Content: Custom Questions --}}
         <div x-show="activeTab === 'custom-questions'" class="space-y-4" x-cloak>
             <livewire:organizers.events.custom-questions-management :event="$event" />
+        </div>
+        @endcan
+
+        @can('sendMessages', $event)
+        {{-- Tab Content: Messages --}}
+        <div x-show="activeTab === 'messages'" class="space-y-4" x-cloak>
+            <livewire:organizers.events.bulk-message :event="$event" />
         </div>
         @endcan
     </div>
