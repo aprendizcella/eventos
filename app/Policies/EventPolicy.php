@@ -105,6 +105,11 @@ class EventPolicy
         return $this->view($user, $event);
     }
 
+    public function manageSettings(User $user, Event $event): bool
+    {
+        return $this->canManageEvent($user, $event);
+    }
+
     private function canManageEvent(User $user, Event $event): bool
     {
         if ($user->hasRole(['super_admin', 'platform_admin'])) {

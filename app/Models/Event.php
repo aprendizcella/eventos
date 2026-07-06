@@ -47,6 +47,7 @@ final class Event extends Model
         'status',
         'visibility',
         'custom_questions',
+        'settings',
     ];
 
     public function getActivitylogOptions(): LogOptions
@@ -98,6 +99,14 @@ final class Event extends Model
     }
 
     /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<NotificationTemplate, $this>
+     */
+    public function notificationTemplates(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(NotificationTemplate::class, 'event_id', 'event_id');
+    }
+
+    /**
      * @param  Builder<$this>  $query
      * @return Builder<$this>
      */
@@ -126,6 +135,7 @@ final class Event extends Model
             'status' => EventStatus::class,
             'visibility' => EventVisibility::class,
             'custom_questions' => 'array',
+            'settings' => 'array',
         ];
     }
 }

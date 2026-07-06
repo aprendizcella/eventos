@@ -93,6 +93,15 @@
                     ✉️ {{ __('Messages') }}
                 </button>
                 @endcan
+                @can('manageSettings', $event)
+                <button
+                    @click="activeTab = 'settings'"
+                    :class="activeTab === 'settings' ? 'border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-400' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'"
+                    class="whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium focus:outline-none cursor-pointer"
+                >
+                    ⚙️ {{ __('Settings') }}
+                </button>
+                @endcan
                 <button
                     @click="activeTab = 'actions'"
                     :class="activeTab === 'actions' ? 'border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-400' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'"
@@ -105,9 +114,11 @@
 
         {{-- Tab Content: Overview --}}
         <div x-show="activeTab === 'overview'" class="space-y-6">
+            <livewire:organizers.events.event-dashboard :event="$event" />
+
             <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
                 <div class="border-b border-gray-100 px-6 py-4 dark:border-gray-800">
-                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ __('Event Information') }}</h2>
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ __('Event Information Details') }}</h2>
                 </div>
                 <dl class="divide-y divide-gray-100 dark:divide-gray-800">
                     <div class="grid grid-cols-1 gap-2 px-6 py-4 sm:grid-cols-3">
@@ -239,6 +250,13 @@
         {{-- Tab Content: Messages --}}
         <div x-show="activeTab === 'messages'" class="space-y-4" x-cloak>
             <livewire:organizers.events.bulk-message :event="$event" />
+        </div>
+        @endcan
+
+        @can('manageSettings', $event)
+        {{-- Tab Content: Settings --}}
+        <div x-show="activeTab === 'settings'" class="space-y-4" x-cloak>
+            <livewire:organizers.events.event-settings :event="$event" />
         </div>
         @endcan
     </div>

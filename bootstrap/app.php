@@ -26,6 +26,10 @@ return Application::configure(basePath: dirname(__DIR__))
             RateLimiter::for('password-reset-request', function (Request $request): Limit {
                 return Limit::perMinute(5)->by($request->string('email')->lower()->toString().'|'.$request->ip());
             });
+
+            RateLimiter::for('api', function (Request $request): Limit {
+                return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
+            });
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
