@@ -6,7 +6,7 @@
 **Metodologia:** Sprints de 1 semana con entregables verificables por fase
 **Referencia:** Hi.Events (funcional), Attendize (ticketing), Eventbrite (benchmark)
 
-> **Estado de ejecucion (actualizacion post Sprint 3.3):** Sprints 1.1 al 1.4, Sprints 2.1 (Entradas), 2.2 (Checkout), 2.3 (Pagos con Stripe), 2.4 (Tickets PDF/QR), 3.1 (Check-in y Validación), 3.2 (Waitlist y Preguntas) y 3.3 (Mensajes Masivos y Export) están **implementados y 100% verificados localmente**. Se cuenta con pasarela de cobros segura, generación de entradas con PDF y código QR únicos, control de reenvíos/concurrencia asíncrona, Magic Links seguros de un solo uso para asistentes, check-in operativo por cámara y lista manual, colas de lista de espera automáticas con transaccionalidad e idempotencia, recolección de información adicional (preguntas personalizadas) durante el checkout con validación en servidor, envíos masivos ad-hoc asíncronos con estrategia Outbox tolerante a fallos y exportación de asistentes a CSV en streaming nativo. El siguiente bloque planificado es el Sprint 3.4 (Panel de Evento Completo).
+> **Estado de ejecucion (actualizacion post Sprint 3.4):** Sprints 1.1 al 1.4, Sprints 2.1 (Entradas), 2.2 (Checkout), 2.3 (Pagos con Stripe), 2.4 (Tickets PDF/QR), 3.1 (Check-in y Validación), 3.2 (Waitlist y Preguntas), 3.3 (Mensajes Masivos y Export) y 3.4 (Panel de Evento Completo) están **implementados, archivados y 100% verificados localmente**. Se cuenta con pasarela de cobros segura, generación de entradas con PDF y código QR únicos, control de reenvíos/concurrencia asíncrona, Magic Links seguros de un solo uso para asistentes, check-in operativo por cámara y lista manual, colas de lista de espera automáticas con transaccionalidad e idempotencia, recolección de información adicional (preguntas personalizadas) durante el checkout con validación en servidor, envíos masivos ad-hoc asíncronos con estrategia Outbox tolerante a fallos, exportación de asistentes a CSV en streaming nativo y un panel de evento completo con KPIs, settings y API operativa. El siguiente bloque planificado es el Sprint 4.1 (Facturación).
 
 ---
 
@@ -607,6 +607,8 @@ Stack y artefactos entregados en el repositorio:
 
 ### Sprint 3.4: Panel de Evento Completo (Semana 12)
 
+**Estado:** completado y verificado localmente.
+
 | Tarea | Detalle                               | Entregable                                                   |
 | ----- | ------------------------------------- | ------------------------------------------------------------ |
 | 3.4.1 | Componente `event-dashboard` completo | KPIs, ventas en tiempo real, tareas                          |
@@ -618,13 +620,15 @@ Stack y artefactos entregados en el repositorio:
 
 **Criterios de aceptacion:**
 
-- [ ] Dashboard muestra ventas en tiempo real
-- [ ] Settings de evento configurables
-- [ ] API de operacion completa
-- [ ] QA pipeline pasa limpio
-- [ ] Fase 3 completa: Check-in + Waitlist + Mensajes + Panel
+- [x] Dashboard muestra ventas en tiempo real
+- [x] Settings de evento configurables
+- [x] API de operacion completa
+- [x] QA pipeline pasa limpio
+- [x] Fase 3 completa: Check-in + Waitlist + Mensajes + Panel
 
 **Dependencias:** Sprints 3.1, 3.2, 3.3.
+
+**Cierre formal:** archivado en `openspec/changes/archive/2026-07-07-sprint-3-4-panel-evento-completo/` con verify report y specs delta.
 
 ---
 

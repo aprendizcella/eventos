@@ -1,6 +1,6 @@
 # Estado de ejecución
 
-> **Resumen en una línea:** Sprints 1.1 al 1.4 (Fase 1), Sprints 2.1 al 2.4 (Fase 2), y Sprints 3.1 al 3.2 (Fase 3) están **implementados, auditados estáticamente y 100% verificados localmente**. El próximo paso es iniciar el Sprint 3.3 (Exportación y Reportes).
+> **Resumen en una línea:** Sprints 1.1 al 1.4 (Fase 1), Sprints 2.1 al 2.4 (Fase 2), y Sprints 3.1 al 3.4 (Fase 3) están **implementados, auditados estáticamente, archivados y 100% verificados localmente**. El próximo paso es iniciar el Sprint 4.1 (Facturación).
 
 ---
 
@@ -154,11 +154,19 @@
 - **Administración del Organizador:** Panel `custom-questions-management` para configurar preguntas con ordenamiento y IDs inmutables, y `waitlist-management` para gestionar colas manuales con bitácora de actividad (Activitylog).
 - **QA e Integración:** 531 tests Pest en verde, PHPStan OK y Pint formateado.
 
+### Sprint 3.4 — Panel de Evento Completo ✅
+
+- **Dashboard de evento:** KPIs de ventas y operación, gráfico SVG de ventas diarias y refresco automático con `wire:poll.30s`.
+- **Settings de evento:** formulario de configuración avanzada con plantillas de notificación y preferencias operativas.
+- **API operativa:** `/api/v1/events/{event}/attendees`, `/check-in` y `/messages` con Sanctum, aislamiento de organizer y validación dedicada.
+- **Verificación:** QA completo en verde antes de archivar el sprint.
+- **Cierre formal:** Sprint archivado en `openspec/changes/archive/2026-07-07-sprint-3-4-panel-evento-completo/`.
+
 ---
 
 ## Qué NO está hecho
 
-- Fases 3–6 (Sprints 3.3 al 6.4).
+- Fases 4–6 (Sprints 4.1 al 6.4).
 
 El roadmap completo está en [`01-producto/PLAN_IMPLEMENTACION.md`](../01-producto/PLAN_IMPLEMENTACION.md).
 
@@ -166,10 +174,10 @@ El roadmap completo está en [`01-producto/PLAN_IMPLEMENTACION.md`](../01-produc
 
 ## Bloqueos actuales
 
-Ninguno conocido a cierre de Sprint 3.2.
+Ninguno conocido a cierre de Sprint 3.4.
 
 ---
 
 ## Próximo paso
 
-- Iniciar el **Sprint 3.3: Exportación y Reportes** para permitir la descarga de datos de asistentes y estadísticas clave del evento.
+- Iniciar el **Sprint 4.1: Facturación** para introducir facturas, notas de crédito y PDF de factura.
