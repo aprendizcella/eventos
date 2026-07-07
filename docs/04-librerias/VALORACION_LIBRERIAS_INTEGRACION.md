@@ -10,7 +10,7 @@
 
 Se han evaluado 10 librerias para integrar en el proyecto. De las 10, **9 son aprobadas sin reservas** y **1 requiere decision informada** (HTMLPurifier). A continuacion, la valoracion individual y la estrategia de integracion.
 
-> **Estado de integracion (post Sprint 3.1):** Las 6 librerias de Fase 1 estan **instaladas y operativas** en el repositorio (`composer.json`): `laravel/sanctum ^4.3`, `spatie/laravel-permission ^8.0`, `spatie/laravel-activitylog ^5.0`, `mews/purifier ^3.4`, `livewire/livewire ^4.3`, `livewire/volt ^1.10`. Adicionalmente, para la generación y validación de entradas (Sprint 2.4 y 3.1), se han integrado `bacon/bacon-qr-code ^2.0`, `barryvdh/laravel-dompdf ^3.0` y `html5-qrcode` (JS CDN). `spatie/laravel-multitenancy` sigue fuera de Fase 1-3.
+> **Estado de integracion (post Sprint 3.1):** Las 6 librerias de Fase 1 estan **instaladas y operativas** en el repositorio (`composer.json`): `laravel/sanctum ^4.3`, `spatie/laravel-permission ^8.0`, `spatie/laravel-activitylog ^5.0`, `mews/purifier ^3.4`, `livewire/livewire ^4.3`, `livewire/volt ^1.10`. Adicionalmente, para la generación y validación de entradas (Sprint 2.4 y 3.1), se han integrado `bacon/bacon-qr-code ^2.0`, `barryvdh/laravel-dompdf ^3.0` y `html5-qrcode` (JS CDN). `spatie/laravel-multitenancy` sigue fuera de Fase 1-3 y se activará en Sprint T0 con el host raíz del entorno definido por `APP_URL`.
 
 ---
 
@@ -420,15 +420,15 @@ Para una plataforma de eventos, hay tres modelos posibles:
 **Recomendacion para este proyecto:**
 
 ```
-Fase 1-3: Single DB + tenant_id (organizer_id como scope)
-  - No instalar multitenancy todavia
-  - Usar Global Scopes de Eloquent para filtrar por organizer
-  - Mas simple, suficiente para MVP
+Estado actual / decision vigente: Single DB + tenant_id (organizer_id como scope)
+  - El proyecto sigue siendo tenant-aware con una sola BBDD
+  - Usar Global Scopes de Eloquent y middleware organizer.detect para aislar por organizer
+  - Mantener Organizer.domain como branding/routing opcional, no como señal de DB separada
 
-Fase 4 (SaaS avanzado): Instalar spatie/laravel-multitenancy
-  - Landlord DB: tenants, users, plans, billing
-  - Tenant DB: events, products, orders, attendees (por organizador)
-  - Domain identification: middleware que resuelve tenant por HTTP host
+Sprint T0 planificado: integrar spatie/laravel-multitenancy en modo single database
+  - Resolver tenant por HTTP host / subdominio cuando exista dominio propio
+  - Mantener fallback compatible con rutas internas por organizer
+  - Preparar jobs/listeners para contexto tenant-aware
 ```
 
 **Como funciona la identificacion por dominio:**
@@ -455,18 +455,19 @@ Cada Organizer tiene:
   - Sus propios eventos, productos, pedidos
   - Su propio equipo de usuarios
 
-En fase single-DB:
-  - Global Scope filtra por organizer_id
-  - Middleware OrganizerContext establece el organizer actual
+En la implementacion actual:
+  - Global Scope / queries con organizer_id filtran el tenant
+  - Middleware organizer.detect establece el organizer actual por ruta/sesion
+  - Organizer.domain se usa como dato de branding y para UX, no para cambiar la conexion DB
 
-En fase multi-DB:
-  - Spatie Multitenancy cambia la conexion DB por tenant
-  - Los modelos de tenant usan la conexion del tenant actual
+Si en el futuro se aprueba multi-DB:
+  - Spatie Multitenancy cambiaria la conexion DB por tenant
+  - Los modelos de tenant usarian la conexion del tenant actual
 ```
 
 **Fase de instalacion:**
-- **No instalar en Fase 1-3.** Usar scopes de Eloquent.
-- **Instalar en Fase 4** cuando se necesite SaaS multi-dominio real.
+- **Sprint T0:** integrar la libreria en single DB + organizer_id.
+- **No activar multi-DB físico.** Si se necesitara en el futuro, será una nueva decision de arquitectura.
 
 ---
 

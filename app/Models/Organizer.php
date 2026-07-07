@@ -13,16 +13,19 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Override;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
+use Spatie\Multitenancy\Concerns\UsesMultitenancyConfig;
+use Spatie\Multitenancy\Contracts\IsTenant;
+use Spatie\Multitenancy\Models\Concerns\ImplementsTenant;
 
 /**
  * @phpstan-use \Illuminate\Database\Eloquent\Factories\HasFactory<\Database\Factories\OrganizerFactory>
  *
  * @property array<string, mixed>|null $settings
  */
-class Organizer extends Model
+class Organizer extends Model implements IsTenant
 {
     /** @use \Illuminate\Database\Eloquent\Factories\HasFactory<\Database\Factories\OrganizerFactory> */
-    use HasFactory, LogsActivity, SoftDeletes;
+    use HasFactory, ImplementsTenant, LogsActivity, SoftDeletes, UsesMultitenancyConfig;
 
     protected $fillable = [
         'name',
@@ -64,6 +67,19 @@ class Organizer extends Model
     public function venues(): HasMany
     {
         return $this->hasMany(Venue::class);
+    }
+
+    /**
+     * Single-database mode: return the default connection database name.
+     * Overrides `ImplementsTenant::getDatabaseName()` which expects a `database` column.
+     */
+    #[Override]
+    public function getDatabaseName(): string
+    {
+        /** @var non-empty-string $connectionName */
+        $connectionName = config('database.default');
+
+        return config("database.connections.{$connectionName}.database", $connectionName);
     }
 
     /**

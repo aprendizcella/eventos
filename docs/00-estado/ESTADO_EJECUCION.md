@@ -1,6 +1,6 @@
 # Estado de ejecución
 
-> **Resumen en una línea:** Sprints 1.1 al 1.4 (Fase 1), Sprints 2.1 al 2.4 (Fase 2), y Sprints 3.1 al 3.4 (Fase 3) están **implementados, auditados estáticamente, archivados y 100% verificados localmente**. El próximo paso es iniciar el Sprint 4.1 (Facturación).
+> **Resumen en una línea:** Sprints 1.1 al 1.4 (Fase 1), Sprints 2.1 al 2.4 (Fase 2), y Sprints 3.1 al 3.4 (Fase 3) están **implementados, auditados estáticamente, archivados y 100% verificados localmente**. El próximo paso es iniciar el **Sprint T0 (Multitenancy Foundation)** antes de Facturación.
 
 ---
 
@@ -180,4 +180,4 @@ Ninguno conocido a cierre de Sprint 3.4.
 
 ## Próximo paso
 
-- Iniciar el **Sprint 4.1: Facturación** para introducir facturas, notas de crédito y PDF de factura.
+- Iniciar el **Sprint T0: Multitenancy Foundation** para cerrar la base tenant-aware y multi-dominio antes de facturación, con el dominio raíz de superadmin definido por `APP_URL` por entorno.

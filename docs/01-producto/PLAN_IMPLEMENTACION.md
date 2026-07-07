@@ -6,7 +6,7 @@
 **Metodologia:** Sprints de 1 semana con entregables verificables por fase
 **Referencia:** Hi.Events (funcional), Attendize (ticketing), Eventbrite (benchmark)
 
-> **Estado de ejecucion (actualizacion post Sprint 3.4):** Sprints 1.1 al 1.4, Sprints 2.1 (Entradas), 2.2 (Checkout), 2.3 (Pagos con Stripe), 2.4 (Tickets PDF/QR), 3.1 (Check-in y Validación), 3.2 (Waitlist y Preguntas), 3.3 (Mensajes Masivos y Export) y 3.4 (Panel de Evento Completo) están **implementados, archivados y 100% verificados localmente**. Se cuenta con pasarela de cobros segura, generación de entradas con PDF y código QR únicos, control de reenvíos/concurrencia asíncrona, Magic Links seguros de un solo uso para asistentes, check-in operativo por cámara y lista manual, colas de lista de espera automáticas con transaccionalidad e idempotencia, recolección de información adicional (preguntas personalizadas) durante el checkout con validación en servidor, envíos masivos ad-hoc asíncronos con estrategia Outbox tolerante a fallos, exportación de asistentes a CSV en streaming nativo y un panel de evento completo con KPIs, settings y API operativa. El siguiente bloque planificado es el Sprint 4.1 (Facturación).
+> **Estado de ejecucion (actualizacion post Sprint 3.4):** Sprints 1.1 al 1.4, Sprints 2.1 (Entradas), 2.2 (Checkout), 2.3 (Pagos con Stripe), 2.4 (Tickets PDF/QR), 3.1 (Check-in y Validación), 3.2 (Waitlist y Preguntas), 3.3 (Mensajes Masivos y Export) y 3.4 (Panel de Evento Completo) están **implementados, archivados y 100% verificados localmente**. Se cuenta con pasarela de cobros segura, generación de entradas con PDF y código QR únicos, control de reenvíos/concurrencia asíncrona, Magic Links seguros de un solo uso para asistentes, check-in operativo por cámara y lista manual, colas de lista de espera automáticas con transaccionalidad e idempotencia, recolección de información adicional (preguntas personalizadas) durante el checkout con validación en servidor, envíos masivos ad-hoc asíncronos con estrategia Outbox tolerante a fallos, exportación de asistentes a CSV en streaming nativo y un panel de evento completo con KPIs, settings y API operativa. El siguiente bloque planificado es el **Sprint T0 (Multitenancy Foundation)**, antes de iniciar Facturación.
 
 ---
 
@@ -36,7 +36,8 @@ Construir una plataforma de eventos y ticketing self-hosted que permita:
 - **Organizadores:** Crear y gestionar eventos, configurar tipos de entrada, vender, gestionar asistentes, hacer check-in, ver metricas.
 - **Administradores:** Gestionar usuarios, moderar eventos, configurar comisiones, ver metricas globales.
 
-**No es:** Un marketplace tipo Eventbrite con efecto red. Es una plataforma que cada organizador puede desplegar y operar de forma independiente, con posibilidad de evolucionar a SaaS multi-tenant.
+**No es:** Un marketplace tipo Eventbrite con efecto red. Es una plataforma que cada organizador puede desplegar y operar de forma independiente.
+**Decisión vigente:** arquitectura SaaS tenant-aware con una sola BBDD y `organizer_id` como scope; `Organizer.domain` se usa para branding/routing, no para separar datos por base de datos.
 
 ---
 
@@ -632,11 +633,37 @@ Stack y artefactos entregados en el repositorio:
 
 ---
 
+### Sprint T0: Multitenancy Foundation (pre-Fase 4)
+
+**Objetivo:** dejar cerrada la base tenant-aware con `spatie/laravel-multitenancy` en single database antes de iniciar facturación.
+**Regla de precedencia:** host del dominio raíz configurado por `APP_URL` > fallback por ruta interna `organizers/{organizer}` > contexto global sin tenant para superadmin.
+
+| Tarea | Detalle | Entregable |
+| ----- | ------- | ---------- |
+| T0.1 | Integrar la librería y el `multitenancy.php` | Configuración base instalada |
+| T0.2 | Resolver tenant por host con fallback compatible con rutas internas | Contexto tenant consistente |
+| T0.3 | Hacer jobs/listeners tenant-aware y añadir tests de aislamiento | Runtime seguro para el resto de sprints |
+
+**Criterios de aceptacion:**
+
+- [ ] Tenant resuelto por el host del dominio raíz configurado por `APP_URL` cuando exista.
+- [ ] Rutas internas por `organizers/{organizer}` siguen funcionando.
+- [ ] Jobs/listeners restauran el tenant correcto.
+- [ ] QA del sprint pasa limpio.
+
+**Dependencias:** Sprints 1.1 al 3.4.
+
+---
+
 ## 7. Fase 4: Monetizacion y Facturacion (Semanas 13-16)
 
 **Objetivo:** Facturacion, reembolsos, comisiones de plataforma, payouts a organizadores, reportes avanzados.
 
 ### Sprint 4.1: Facturacion (Semana 13)
+
+**Dependencia previa:** Sprint T0 (Multitenancy Foundation) para dejar cerrada la resolución tenant-aware y el soporte multi-dominio antes de tocar facturación.
+
+**Ejecucion prevista:** mini-sprints secuenciales en `main` (`4.1a` base monetaria, `4.1b` facturacion automatica, `4.1c` UX/reportes), con QA al cierre de cada bloque.
 
 | Tarea | Detalle                                    | Entregable                           |
 | ----- | ------------------------------------------ | ------------------------------------ |

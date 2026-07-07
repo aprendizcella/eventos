@@ -10,9 +10,14 @@ use App\Services\Tickets\TicketPdfGenerator;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Mail;
+use Spatie\Multitenancy\Jobs\NotTenantAware;
 use Throwable;
 
-final class SendTicketEmailJob implements ShouldQueue
+/**
+ * This job receives the full order ID in its constructor and queries by it directly.
+ * It does NOT need tenant context — it processes the exact order it was given.
+ */
+final class SendTicketEmailJob implements NotTenantAware, ShouldQueue
 {
     use Queueable;
 

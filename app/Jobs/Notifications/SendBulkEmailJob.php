@@ -12,10 +12,15 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Spatie\Multitenancy\Jobs\NotTenantAware;
 use stdClass;
 use Throwable;
 
-final class SendBulkEmailJob implements ShouldQueue
+/**
+ * This job receives the notification log ID in its constructor and queries by it directly.
+ * It does NOT need tenant context — it processes the exact notification it was given.
+ */
+final class SendBulkEmailJob implements NotTenantAware, ShouldQueue
 {
     use Queueable;
 
