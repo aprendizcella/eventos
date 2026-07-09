@@ -10,7 +10,7 @@
 
 | Quiero saber… | Lee este documento |
 |---|---|
-| En qué punto está el proyecto (Sprint 3.2, próximos pasos) | [`00-estado/ESTADO_EJECUCION.md`](./00-estado/ESTADO_EJECUCION.md) |
+| En qué punto está el proyecto (Sprint 4.2, próximos pasos) | [`00-estado/ESTADO_EJECUCION.md`](./00-estado/ESTADO_EJECUCION.md) |
 | Qué se va a construir, fases y sprints | [`01-producto/PLAN_IMPLEMENTACION.md`](./01-producto/PLAN_IMPLEMENTACION.md) |
 | Cómo está montado el backend (capas, flujos, convenciones) | [`02-arquitectura/ESPECIFICACION_TECNICA_BOILERPLATE_EVENTOS.md`](./02-arquitectura/ESPECIFICACION_TECNICA_BOILERPLATE_EVENTOS.md) |
 | Cómo encaja la propuesta DDD en el boilerplate | [`02-arquitectura/MAPING_PROPUESTA_DDD_A_BOILERPLATE.md`](./02-arquitectura/MAPING_PROPUESTA_DDD_A_BOILERPLATE.md) |

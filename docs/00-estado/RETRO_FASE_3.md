@@ -23,3 +23,4 @@ Cerrar la Fase 3 con lo entregado en Sprint 3.1 a 3.4 y dejar lista la transici�
 ## Próximo paso
 
 - Iniciar Sprint 4.1: Facturación.
+  _Nota histórica_: ese paso ya quedó completado y archivado; el estado actual del proyecto pasa a Sprint 4.2 (Comisiones y Payouts) según [`ESTADO_EJECUCION.md`](./ESTADO_EJECUCION.md).

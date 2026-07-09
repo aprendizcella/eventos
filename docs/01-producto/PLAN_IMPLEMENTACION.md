@@ -665,7 +665,9 @@ Stack y artefactos entregados en el repositorio:
 
 **Ejecucion prevista:** mini-sprints secuenciales en `main` (`4.1a` base monetaria y esquema de factura, `4.1b` facturacion automatica, `4.1c` UX/reportes), con QA al cierre de cada bloque.
 
-### Sprint 4.1a: Base monetaria y esquema de factura (Semana 13) — PRÓXIMO
+**Estado final:** Sprint 4.1 quedó completado, verificado y archivado en OpenSpec. Esta sección se conserva como referencia histórica.
+
+### Sprint 4.1a: Base monetaria y esquema de factura (Semana 13) — COMPLETADO
 
 **Objetivo:** dejar lista la base de facturación exacta antes de generar facturas automáticas o mostrar PDF/UX.
 
@@ -684,6 +686,8 @@ Stack y artefactos entregados en el repositorio:
 - [ ] La numeración de factura es estable por organizador y año.
 - [ ] Billing settings mínimos se persisten sin tocar listeners ni PDF.
 - [ ] QA del mini-sprint pasa limpio.
+
+**Estado final:** ya ejecutado dentro de Sprint 4.1 y archivado.
 
 | Tarea | Detalle                                    | Entregable                           |
 | ----- | ------------------------------------------ | ------------------------------------ |
@@ -706,25 +710,42 @@ Stack y artefactos entregados en el repositorio:
 
 ---
 
-### Sprint 4.2: Comisiones y Payouts (Semana 14)
+### Sprint 4.2: Comisiones y Payouts (Semana 14) — PLANIFICADO
 
-| Tarea | Detalle                         | Entregable                          |
-| ----- | ------------------------------- | ----------------------------------- |
-| 4.2.1 | Migracion `payout`              | Payouts a organizadores             |
-| 4.2.2 | Servicio `CommissionCalculator` | Calcula comisiones de plataforma    |
-| 4.2.3 | Acciones de payout              | `CalculatePayout`, `ProcessPayout`  |
-| 4.2.4 | Stripe Connect                  | Payouts automaticos a organizadores |
-| 4.2.5 | Configuracion de comisiones     | Porcentaje + fee fijo por ticket    |
-| 4.2.6 | Tests de comisiones             | Calculo correcto, payout            |
+**Objetivo:** registrar comisiones y payouts internos sin mover dinero real todavía.
 
-**Criterios de aceptacion:**
+**Alcance funcional:**
 
-- [ ] Comision se calcula correctamente en cada pedido
-- [ ] Payout se genera periodicamente
-- [ ] Stripe Connect transfiere a organizador
-- [ ] QA pipeline pasa limpio
+- cálculo interno de comisiones usando los importes exactos de Sprint 4.1;
+- registro de payouts por organizer con estados operativos;
+- ajustes por refund para mantener trazabilidad;
+- reportes filtrables con export CSV;
+- settings con simulación de comisión y ayudas contextuales.
+
+**Fuera de alcance:**
+
+- Stripe Connect real;
+- onboarding/KYC;
+- transferencias automáticas de dinero;
+- contabilidad legal completa.
+
+**Estrategia de implementación:**
+
+| Slice | Objetivo | Resultado esperado |
+|---|---|---|
+| 4.2a | Base de comisiones y payout records | Modelo `payout`, estado interno, `CommissionCalculator`, tests unitarios. |
+| 4.2b | Flujo operativo y ajustes | Actions/listeners para crear y ajustar payouts cuando haya pagos o refunds. |
+| 4.2c | UX y reportes | Settings de comisión, vista de payouts con filtros y export CSV. |
 
 **Dependencias:** Sprint 4.1 (Invoice), Sprint 2.3 (Stripe).
+
+**Criterios de aceptación:**
+
+- [ ] La comisión se calcula con precisión exacta.
+- [ ] Cada payout queda trazado por organizer y estado.
+- [ ] Los refunds ajustan o revierten el payout afectado.
+- [ ] La UI permite simular y consultar la comisión.
+- [ ] Los reportes se pueden filtrar y exportar.
 
 ---
 

@@ -67,6 +67,20 @@ Es un árbol **extenso y específico de dashboard**: cada tipo de input, cada va
 
 ---
 
+## 5. Referencia adicional para monetización
+
+Para Sprint 4.2 se toma como referencia funcional la UX de HI.EVENTS en las superficies de tarifas, informes y configuración de pagos.
+
+| Superficie | Patrón útil |
+|---|---|
+| Settings de tarifas | Tabs claras, card de estado, simulación de comisión y CTA visible para conexión de pagos. |
+| Informes financieros | Filtros arriba, tabla abajo, totales resumidos y export CSV. |
+| Avisos contextuales | Banner corto con aviso operativo/legal para no confundir la vista interna con contabilidad externa. |
+
+La referencia sirve para estructura y jerarquía visual, no para replicar el diseño exacto.
+
+---
+
 ## Documentos relacionados
 
 - [`DECISIONES_UX.md`](./DECISIONES_UX.md) — decisión TailAdmin/Materio y filosofía de componentes.

@@ -1,6 +1,6 @@
 # Estado de ejecución
 
-> **Resumen en una línea:** Sprints 1.1 al 1.4 (Fase 1), Sprints 2.1 al 2.4 (Fase 2), Sprints 3.1 al 3.4 (Fase 3) y Sprint T0 (Multitenancy Foundation) están **implementados, auditados estáticamente, archivados y 100% verificados localmente**. El próximo paso es iniciar el **Sprint 4.1a (base monetaria y factura)** antes de la automatización de facturas.
+> **Resumen en una línea:** Sprints 1.1 al 1.4 (Fase 1), Sprints 2.1 al 2.4 (Fase 2), Sprints 3.1 al 3.4 (Fase 3), Sprint T0 (Multitenancy Foundation) y Sprint 4.1 (Facturación) están **implementados, auditados estáticamente, archivados y 100% verificados localmente**. El trabajo actual está en **planificación de Sprint 4.2 (Comisiones y Payouts)** con alcance limitado a tracking interno; el siguiente paso operativo es arrancar el slice **4.2a**.
 
 ---
 
@@ -169,11 +169,30 @@
 - Jobs tenant-aware con excepciones `NotTenantAware` donde el contexto se resuelve por ID propio.
 - Sprint archivado en `openspec/changes/archive/2026-07-07-sprint-t0-multitenancy-foundation/`.
 
+### Sprint 4.1 — Facturación ✅
+
+- Base monetaria exacta para nuevos importes de facturación y reportes.
+- Facturas automáticas con PDF descargable y numeración por organizador/año.
+- Notas de crédito al procesar reembolsos.
+- Billing settings y reportes de ingresos, impuestos y tarifas de plataforma con filtros y CSV.
+- Sprint archivado en `openspec/changes/archive/2026-07-09-sprint-4-1-facturacion/`.
+
+### Sprint 4.2 — Comisiones y Payouts (planificado) 🟡
+
+- Alcance cerrado a tracking interno de comisiones y payouts.
+- No incluye transferencias reales ni Stripe Connect todavía.
+- Se dividirá en slices `4.2a` base y modelo, `4.2b` flujo y ajustes por refund, `4.2c` UX/reportes.
+- La UX se inspirará en HI.EVENTS: tabs de settings, simulador de comisión, banner informativo y tablas filtrables con export CSV.
+
+### Síntesis ejecutiva de Sprint 4.2
+
+Sprint 4.2 cubrirá la capa interna de monetización que falta entre facturación y reportes operativos. Primero se construirá la base de comisiones y payout records (`4.2a`), después el flujo de creación y ajuste por refunds (`4.2b`) y, por último, la experiencia de configuración y reportes (`4.2c`). La idea es dejar trazabilidad completa de lo que se debe pagar y por qué, sin activar todavía transferencias reales con Stripe Connect.
+
 ---
 
 ## Qué NO está hecho
 
-- Fases 4–6 (Sprints 4.1 al 6.4).
+- Fases 4–6 (Sprint 4.2 en adelante; 4.1 ya está cerrado).
 
 El roadmap completo está en [`01-producto/PLAN_IMPLEMENTACION.md`](../01-producto/PLAN_IMPLEMENTACION.md).
 
@@ -187,4 +206,4 @@ Ninguno conocido a cierre de Sprint 3.4.
 
 ## Próximo paso
 
-- Iniciar el **Sprint 4.1a: base monetaria y esquema de factura** para cerrar la precisión exacta, la numeración por organizador/año y el almacenamiento mínimo de billing settings.
+- Iniciar el **Sprint 4.2a: base de comisiones y payout records** para cerrar el modelo interno de comisiones/payouts antes de automatizar cualquier transferencia real.
