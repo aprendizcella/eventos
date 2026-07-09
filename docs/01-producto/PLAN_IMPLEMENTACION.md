@@ -663,11 +663,31 @@ Stack y artefactos entregados en el repositorio:
 
 **Dependencia previa:** Sprint T0 (Multitenancy Foundation) para dejar cerrada la resolución tenant-aware y el soporte multi-dominio antes de tocar facturación.
 
-**Ejecucion prevista:** mini-sprints secuenciales en `main` (`4.1a` base monetaria, `4.1b` facturacion automatica, `4.1c` UX/reportes), con QA al cierre de cada bloque.
+**Ejecucion prevista:** mini-sprints secuenciales en `main` (`4.1a` base monetaria y esquema de factura, `4.1b` facturacion automatica, `4.1c` UX/reportes), con QA al cierre de cada bloque.
+
+### Sprint 4.1a: Base monetaria y esquema de factura (Semana 13) — PRÓXIMO
+
+**Objetivo:** dejar lista la base de facturación exacta antes de generar facturas automáticas o mostrar PDF/UX.
+
+**Decisión cerrada:** la numeración de factura será **por organizador y año** (`organizer_id + year`) para evitar colisiones y facilitar auditoría.
+
+| Tarea | Detalle | Entregable |
+| ----- | ------- | ---------- |
+| 4.1a.1 | Introducir precisión exacta para importes de facturación y reportes nuevos | Base sin `float` en el flujo nuevo |
+| 4.1a.2 | Crear la persistencia de `invoice` con serie/número por organizador y año | Esquema de factura listo |
+| 4.1a.3 | Añadir el almacenamiento mínimo de billing settings para evento y organizer | Metadatos operativos guardados |
+| 4.1a.4 | Verificar la base con tests de modelo/request y QA focalizado | Foundation validada |
+
+**Criterios de aceptacion:**
+
+- [ ] Los nuevos importes de billing usan precisión exacta.
+- [ ] La numeración de factura es estable por organizador y año.
+- [ ] Billing settings mínimos se persisten sin tocar listeners ni PDF.
+- [ ] QA del mini-sprint pasa limpio.
 
 | Tarea | Detalle                                    | Entregable                           |
 | ----- | ------------------------------------------ | ------------------------------------ |
-| 4.1.1 | Migracion `invoice`                        | Facturas con numero secuencial       |
+| 4.1.1 | Migracion `invoice`                        | Facturas con numero secuencial por organizador/año |
 | 4.1.2 | Servicio `InvoicePdfGenerator`             | PDF de factura                       |
 | 4.1.3 | Acciones de factura                        | `GenerateInvoice`, `IssueCreditNote` |
 | 4.1.4 | Listener `GenerateInvoiceOnOrderConfirmed` | Auto-genera factura                  |
@@ -677,7 +697,7 @@ Stack y artefactos entregados en el repositorio:
 **Criterios de aceptacion:**
 
 - [ ] Factura se genera automaticamente tras pago
-- [ ] Numero secuencial e inmutable
+- [ ] Numero secuencial e inmutable por organizador/año
 - [ ] PDF descargable
 - [ ] Nota de credito en reembolso
 - [ ] QA pipeline pasa limpio

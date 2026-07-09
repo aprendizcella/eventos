@@ -110,7 +110,7 @@ public function __construct(
 
 **Acción recomendada para Fase 4:** Migrar a enteros en céntimos (igual que Stripe internamente) o usar `bcmath` para aritmética exacta. Requiere migración de datos y refactor de la capa de precios.
 
-> **⚠️ Nota:** Este cambio tiene alto impacto en base de datos y en la UI (formato de moneda). Debe planificarse como primer task del Sprint 4.1, antes de añadir facturas.
+> **⚠️ Nota:** Este cambio tiene alto impacto en base de datos y en la UI (formato de moneda). Debe planificarse como primer task del Sprint 4.1a, antes de añadir facturas.
 
 ---
 

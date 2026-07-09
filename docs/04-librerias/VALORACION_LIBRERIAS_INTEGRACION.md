@@ -398,12 +398,12 @@ Activity::forSubject($organizer)
 
 ### 2.5 spatie/laravel-multitenancy v4.1.3
 
-**Veredicto: APROBADO. Requiere decision sobre modelo de tenancy.**
+**Veredicto: APROBADO. Integrado en Sprint T0 con modelo tenant-aware single DB.**
 
 | Aspecto | Detalle |
 |---|---|
 | Que hace | Hace la aplicacion tenant-aware. Identifica el tenant actual por request, permite cambiar conexion DB, y proporciona herramientas para jobs y comandos multi-tenant. |
-| Por que encaja | Cada organizador puede tener su propio dominio (ej. `eventos.organizadorA.com` o `organizadorA.tuplataforma.com`). Los datos de cada organizador se aislan por tenant. |
+| Por que encaja | Cada organizador puede resolver su contexto por host/dominio propio sin separar la base de datos. Los datos de cada organizador se aislan por tenant. |
 | Riesgo | Medio. Multitenancy añade complejidad significativa. No es trivial de implementar correctamente. |
 | Alternativas | `stancl/tenancy` (mas opinionado, mas features), implementacion manual con middleware + scope |
 
@@ -425,8 +425,8 @@ Estado actual / decision vigente: Single DB + tenant_id (organizer_id como scope
   - Usar Global Scopes de Eloquent y middleware organizer.detect para aislar por organizer
   - Mantener Organizer.domain como branding/routing opcional, no como señal de DB separada
 
-Sprint T0 planificado: integrar spatie/laravel-multitenancy en modo single database
-  - Resolver tenant por HTTP host / subdominio cuando exista dominio propio
+Sprint T0 ejecutado: integrar spatie/laravel-multitenancy en modo single database
+  - Resolver tenant por el host raíz configurado por `APP_URL` primero
   - Mantener fallback compatible con rutas internas por organizer
   - Preparar jobs/listeners para contexto tenant-aware
 ```
@@ -435,14 +435,13 @@ Sprint T0 planificado: integrar spatie/laravel-multitenancy en modo single datab
 
 ```php
 // config/multitenancy.php
-'tenant_finder' => DomainTenantFinder::class,
+'tenant_finder' => OrganizerTenantFinder::class,
 
-// El middleware identifica el tenant por el dominio HTTP:
+// El middleware identifica el tenant por el host HTTP:
+// APP_URL host → contexto superadmin sin tenant
 // eventos.acme.com → tenant: Acme Corp (organizer_id: 42)
 // tickets.beta-events.com → tenant: Beta Events (organizer_id: 17)
-
-// Tabla de tenants (landlord DB):
-// tenants: id, name, domain, database, is_active, plan, ...
+// rutas internas /organizers/{organizer} → fallback compatible
 ```
 
 **Integracion con el modelo Organizer:**

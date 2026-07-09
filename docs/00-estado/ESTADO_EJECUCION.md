@@ -1,6 +1,6 @@
 # Estado de ejecución
 
-> **Resumen en una línea:** Sprints 1.1 al 1.4 (Fase 1), Sprints 2.1 al 2.4 (Fase 2), y Sprints 3.1 al 3.4 (Fase 3) están **implementados, auditados estáticamente, archivados y 100% verificados localmente**. El próximo paso es iniciar el **Sprint T0 (Multitenancy Foundation)** antes de Facturación.
+> **Resumen en una línea:** Sprints 1.1 al 1.4 (Fase 1), Sprints 2.1 al 2.4 (Fase 2), Sprints 3.1 al 3.4 (Fase 3) y Sprint T0 (Multitenancy Foundation) están **implementados, auditados estáticamente, archivados y 100% verificados localmente**. El próximo paso es iniciar el **Sprint 4.1a (base monetaria y factura)** antes de la automatización de facturas.
 
 ---
 
@@ -162,6 +162,13 @@
 - **Verificación:** QA completo en verde antes de archivar el sprint.
 - **Cierre formal:** Sprint archivado en `openspec/changes/archive/2026-07-07-sprint-3-4-panel-evento-completo/`.
 
+### Sprint T0 — Multitenancy Foundation ✅
+
+- `spatie/laravel-multitenancy` integrado en modo single DB con `Organizer` como tenant.
+- Resolución tenant host-first con fallback por ruta interna y contexto global tenant-less para superadmin.
+- Jobs tenant-aware con excepciones `NotTenantAware` donde el contexto se resuelve por ID propio.
+- Sprint archivado en `openspec/changes/archive/2026-07-07-sprint-t0-multitenancy-foundation/`.
+
 ---
 
 ## Qué NO está hecho
@@ -180,4 +187,4 @@ Ninguno conocido a cierre de Sprint 3.4.
 
 ## Próximo paso
 
-- Iniciar el **Sprint T0: Multitenancy Foundation** para cerrar la base tenant-aware y multi-dominio antes de facturación, con el dominio raíz de superadmin definido por `APP_URL` por entorno.
+- Iniciar el **Sprint 4.1a: base monetaria y esquema de factura** para cerrar la precisión exacta, la numeración por organizador/año y el almacenamiento mínimo de billing settings.

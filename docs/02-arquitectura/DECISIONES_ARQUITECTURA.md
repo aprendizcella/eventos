@@ -29,6 +29,8 @@
 | A17 | Prevención de Doble Escaneo y Control de Aspect-Ratio en UI | Lector QR basado en `html5-qrcode` integrado en un contenedor auto-ajustable (evitando distorsión de video) con detención automática del stream al detectar el código para evitar lecturas duplicadas continuas. | `docs/01-producto/PLAN_IMPLEMENTACION.md` §Sprint 3.1 |
 | A18 | Precedencia de tenant = host primero, fallback de ruta solo en panel interno, global sin tenant | El tenant resuelto por el host del dominio raíz configurado por `APP_URL` es la fuente de verdad para accesos públicos. `organizer.detect` puede servir como fallback en rutas internas. La sesión nunca decide el tenant. | `openspec/changes/sprint-t0-multitenancy-foundation/design.md` |
 | A19 | Superadmin global = panel sin organizer activo | El superadministrador debe poder entrar en contexto global desde el dominio raíz configurado por `APP_URL`, ver todos los organizers y cambiar de tenant sin quedar atado a un organizer concreto. | `openspec/changes/sprint-t0-multitenancy-foundation/design.md` |
+| A20 | Numeración de factura = organizador + año | La serie de facturación debe ser estable por `organizer_id` y año natural para evitar colisiones entre organizers y facilitar auditoría. | `openspec/changes/sprint-4-1-facturacion/design.md` |
+| A21 | Base de facturación 4.1a = precisión exacta antes de automatizar facturas | La primera entrega de Sprint 4.1 debe resolver los importes exactos y el almacenamiento mínimo de invoice/settings antes de listeners, PDF o UX. | `docs/01-producto/PLAN_IMPLEMENTACION.md` §Sprint 4.1a |
 
 ---
 
@@ -39,6 +41,7 @@
 - **Estructura UI:** ~~movimiento de `components/auth/` a `components/form/` + `components/ui/`~~ → **hecho**. Ver [`03-ux-ui/COMPONENTES_UI.md`](../03-ux-ui/COMPONENTES_UI.md).
 - **Tenancy física:** el proyecto permanece en **single DB + `organizer_id` como scope**. Si en el futuro se decide multi-DB, debe abrirse una nueva decisión explícita.
 - **Dominio raíz:** el acceso global de superadmin se valida en el host configurado por `APP_URL` para cada entorno; `localhost` solo describe el entorno local actual, no una regla funcional.
+- **Facturación 4.1a:** la numeración de factura queda fijada por organizador y año; si cambia el formato de serie, debe abrirse una decisión nueva.
 
 ---
 
