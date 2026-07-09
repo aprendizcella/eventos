@@ -117,6 +117,10 @@ Route::middleware(['auth'])->group(function () {
                 Route::put('/{venue}', [VenueController::class, 'update'])->name('update');
             });
 
+            Route::prefix('{organizer}/reports')->name('reports.')->middleware('organizer.detect')->group(function () {
+                Route::get('/billing', [OrganizerController::class, 'reportsBilling'])->name('billing');
+            });
+
             Route::prefix('{organizer}/invoices')->name('invoices.')->middleware('organizer.detect')->group(function () {
                 Route::get('/{invoice}/download', DownloadInvoiceController::class)->name('download');
             });

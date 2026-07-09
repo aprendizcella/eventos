@@ -40,11 +40,11 @@ Chain strategy: pending
 
 ## Sprint 4.1c: UX and Reports
 
-- [ ] 3.1 Extend `resources/views/livewire/organizers/events/event-settings.blade.php` with the Hi.Events-style payment/facturation block.
-- [ ] 3.2 Extend `resources/views/livewire/organizers/settings.blade.php` and organizer reports with taxes/platform fees settings and summaries.
-- [ ] 3.3 Add report pages for income, taxes, and platform fees with filters and CSV export.
-- [ ] 3.4 Add feature tests for billing settings persistence, authorization, and report rendering.
+- [x] 3.1 Extend `resources/views/livewire/organizers/events/event-settings.blade.php` with the Hi.Events-style payment/facturation block.
+- [x] 3.2 Extend `resources/views/livewire/organizers/settings.blade.php` and organizer reports with taxes/platform fees settings and summaries.
+- [x] 3.3 Add report pages for income, taxes, and platform fees with filters and CSV export.
+- [x] 3.4 Add feature tests for billing settings persistence, authorization, and report rendering.
 
 ## Sprint 4.1 Final Verification
 
-- [ ] 4.1 Run `composer qa` and fix regressions before implementation is declared complete.
+- [x] 4.1 Run `composer qa` and fix regressions before implementation is declared complete.

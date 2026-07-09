@@ -17,6 +17,8 @@ new class extends Component {
     public bool $auto_reminders = false;
     public string $sender_email = '';
     public string $sender_name = '';
+    public bool $invoice_enabled = false;
+    public string $invoice_notes = '';
 
     // CRUD de Plantillas
     public ?int $editingTemplateId = null;
@@ -33,6 +35,8 @@ new class extends Component {
         $this->auto_reminders = (bool) ($settings['auto_reminders'] ?? false);
         $this->sender_email = (string) ($settings['sender_email'] ?? auth()->user()?->email ?? '');
         $this->sender_name = (string) ($settings['sender_name'] ?? auth()->user()?->name ?? '');
+        $this->invoice_enabled = (bool) ($settings['invoice_enabled'] ?? false);
+        $this->invoice_notes = (string) ($settings['invoice_notes'] ?? '');
     }
 
     protected function rules(): array
@@ -48,10 +52,21 @@ new class extends Component {
     {
         $this->authorize('manageSettings', $this->event);
 
-        $validated = $this->validate(EventSettingsRequest::rules());
+        $rules = [
+            ...EventSettingsRequest::rules(),
+            'invoice_enabled' => ['boolean'],
+            'invoice_notes' => ['nullable', 'string', 'max:1000'],
+        ];
+
+        $validated = $this->validate($rules);
+
+        $existing = $this->event->settings ?? [];
 
         $this->event->update([
-            'settings' => $validated,
+            'settings' => [
+                ...$existing,
+                ...$validated,
+            ],
         ]);
 
         session()->flash('success_settings', __('Event settings updated successfully.'));
@@ -175,6 +190,28 @@ new class extends Component {
                         :label="__('Sender Name')"
                         :value="$sender_name"
                         wire:model="sender_name"
+                    />
+                </div>
+
+                {{-- Billing Section --}}
+                <div class="border-t border-gray-200 pt-4 dark:border-gray-700">
+                    <h4 class="mb-3 text-sm font-semibold text-gray-900 dark:text-white">
+                        💳 {{ __('Billing / Facturación') }}
+                    </h4>
+
+                    <x-form.checkbox
+                        name="invoice_enabled"
+                        :label="__('Enable invoices for this event')"
+                        :help="__('When enabled, invoices will be generated automatically for completed payments.')"
+                        wire:model="invoice_enabled"
+                    />
+
+                    <x-form.input
+                        name="invoice_notes"
+                        :label="__('Invoice Notes')"
+                        :help="__('Optional notes or terms that will appear on generated invoices.')"
+                        :value="$invoice_notes"
+                        wire:model="invoice_notes"
                     />
                 </div>
 
