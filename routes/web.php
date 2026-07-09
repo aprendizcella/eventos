@@ -10,6 +10,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\RequestPasswordResetController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\Billing\DownloadInvoiceController;
 use App\Http\Controllers\Organizers\EventController;
 use App\Http\Controllers\Organizers\OrganizerController;
 use App\Http\Controllers\Organizers\TeamController;
@@ -114,6 +115,10 @@ Route::middleware(['auth'])->group(function () {
                 Route::post('/', [VenueController::class, 'store'])->name('store');
                 Route::get('/{venue}/edit', [VenueController::class, 'edit'])->name('edit');
                 Route::put('/{venue}', [VenueController::class, 'update'])->name('update');
+            });
+
+            Route::prefix('{organizer}/invoices')->name('invoices.')->middleware('organizer.detect')->group(function () {
+                Route::get('/{invoice}/download', DownloadInvoiceController::class)->name('download');
             });
         });
     });

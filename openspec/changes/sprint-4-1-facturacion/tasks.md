@@ -33,10 +33,10 @@ Chain strategy: pending
 
 ## Sprint 4.1b: Core Billing Flow
 
-- [ ] 2.1 Add `GenerateInvoiceAction` and listener(s) on payment completion so one paid order yields one invoice.
-- [ ] 2.2 Add `IssueCreditNoteAction` and listener(s) on refund completion so partial/full refunds create the right credit note.
-- [ ] 2.3 Add `InvoicePdfGenerator` and an invoice download surface from the panel.
-- [ ] 2.4 Add feature tests for invoice generation, PDF download, and credit-note creation.
+- [x] 2.1 Add `GenerateInvoiceAction` and listener(s) on payment completion so one paid order yields one invoice.
+- [x] 2.2 Add `IssueCreditNoteAction` and listener(s) on refund completion so partial/full refunds create the right credit note.
+- [x] 2.3 Add `InvoicePdfGenerator` and an invoice download surface from the panel.
+- [x] 2.4 Add feature tests for invoice generation, PDF download, and credit-note creation.
 
 ## Sprint 4.1c: UX and Reports
 

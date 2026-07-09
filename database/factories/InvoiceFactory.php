@@ -32,6 +32,21 @@ class InvoiceFactory extends Factory
             'type' => InvoiceType::Invoice,
             'year' => now()->year,
             'number' => fake()->unique()->numberBetween(1, 9999),
+            'invoice_number' => function (array $attrs): string {
+                $type = $attrs['type'] ?? InvoiceType::Invoice;
+
+                if (is_string($type)) {
+                    /** @var InvoiceType $type */
+                    $type = InvoiceType::from($type);
+                }
+
+                return sprintf(
+                    '%s-%d-%04d',
+                    $type->prefix(),
+                    (int) ($attrs['year'] ?? now()->year),
+                    (int) ($attrs['number'] ?? 1),
+                );
+            },
             'amount' => fake()->numberBetween(500, 50000),
             'tax_amount' => fake()->optional()->numberBetween(50, 5000),
             'fee_amount' => fake()->optional()->numberBetween(25, 2500),

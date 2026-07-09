@@ -49,5 +49,15 @@ class AppServiceProvider extends ServiceProvider
             \App\Events\Waitlist\WaitlistEntryExpired::class,
             \App\Listeners\Waitlist\NotifyWaitlistOnExpiredListener::class,
         );
+
+        \Illuminate\Support\Facades\Event::listen(
+            \App\Events\Payments\PaymentCompleted::class,
+            \App\Listeners\Payments\GenerateInvoiceOnPaymentCompleted::class,
+        );
+
+        \Illuminate\Support\Facades\Event::listen(
+            \App\Events\Payments\RefundProcessed::class,
+            \App\Listeners\Payments\IssueCreditNoteOnRefundProcessed::class,
+        );
     }
 }

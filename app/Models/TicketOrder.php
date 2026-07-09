@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Override;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
@@ -105,6 +106,27 @@ final class TicketOrder extends Model
     public function attendees(): HasMany
     {
         return $this->hasMany(Attendee::class, 'ticket_order_id', 'ticket_order_id');
+    }
+
+    /**
+     * Get the invoice for this order (one invoice per paid order).
+     *
+     * @return HasOne<Invoice, $this>
+     */
+    public function invoice(): HasOne
+    {
+        return $this->hasOne(Invoice::class, 'ticket_order_id', 'ticket_order_id')
+            ->where('type', \App\Enums\InvoiceType::Invoice);
+    }
+
+    /**
+     * Get all invoices and credit notes for this order.
+     *
+     * @return HasMany<Invoice, $this>
+     */
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class, 'ticket_order_id', 'ticket_order_id');
     }
 
     /**
