@@ -219,6 +219,13 @@ new class extends Component {
                 💰 {{ __('Billing & Taxes') }}
             </button>
             <button
+                @click="activeTab = 'comisiones'"
+                :class="activeTab === 'comisiones' ? 'border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-400' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'"
+                class="whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium focus:outline-none cursor-pointer"
+            >
+                📊 {{ __('Comisiones') }}
+            </button>
+            <button
                 @click="activeTab = 'danger'"
                 :class="activeTab === 'danger' ? 'border-red-500 text-red-600 dark:border-red-400 dark:text-red-400' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'"
                 class="whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium focus:outline-none cursor-pointer"
@@ -397,7 +404,102 @@ new class extends Component {
             </div>
         </div>
 
-        {{-- Tab 6: Danger Zone --}}
+        {{-- Tab 6: Comisiones (Commission Simulation) --}}
+        <div x-show="activeTab === 'comisiones'" class="space-y-4" x-cloak
+             x-data="{
+                exampleAmount: 10000,
+                get feePercent() { return parseFloat(document.getElementById('platform_fee_percentage')?.value || '5'); },
+                get feeFixed() { return parseInt(document.getElementById('platform_fee_fixed')?.value || '0'); },
+                get percentageAmount() { return Math.round(this.exampleAmount * this.feePercent / 100); },
+                get totalCommission() { return Math.min(this.exampleAmount, this.percentageAmount + this.feeFixed); },
+                get netAmount() { return Math.max(0, this.exampleAmount - this.totalCommission); }
+             }"
+        >
+            {{-- Read-only Fee Summary --}}
+            <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+                <h3 class="mb-4 text-base font-semibold text-gray-900 dark:text-white">
+                    📊 {{ __('Current Commission Policy') }}
+                </h3>
+                <p class="mb-4 text-sm text-gray-500 dark:text-gray-400">
+                    {{ __('These values are configured in the Billing & Taxes tab. Changes there are reflected here.') }}
+                </p>
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <div class="rounded-lg border border-gray-100 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800/30">
+                        <p class="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">{{ __('Fee Percentage') }}</p>
+                        <p class="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
+                            {{ $platform_fee_percentage ?? '0' }}<span class="text-base font-normal text-gray-500">%</span>
+                        </p>
+                    </div>
+                    <div class="rounded-lg border border-gray-100 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800/30">
+                        <p class="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">{{ __('Fixed Fee') }}</p>
+                        <p class="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
+                            {{ $platform_fee_fixed ?? '0' }}<span class="text-base font-normal text-gray-500"> {{ __('cents') }}</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Commission Simulator --}}
+            <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+                <h3 class="mb-4 text-base font-semibold text-gray-900 dark:text-white">
+                    🧮 {{ __('Commission Simulator') }}
+                </h3>
+                <p class="mb-4 text-sm text-gray-500 dark:text-gray-400">
+                    {{ __('Enter an example ticket amount to see how the commission and net payout would be calculated.') }}
+                </p>
+                <div class="mb-4">
+                    <label for="sim-example-amount" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        {{ __('Example Amount (cents)') }}
+                    </label>
+                    <div class="mt-1 flex rounded-md shadow-sm">
+                        <input type="number" id="sim-example-amount" x-model="exampleAmount" min="0" step="1"
+                               class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+                               placeholder="e.g. 10000">
+                    </div>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                        {{ __('Amount in cents (e.g. 10000 = $100.00).') }}
+                    </p>
+                </div>
+                <div class="grid gap-4 sm:grid-cols-3">
+                    <div class="rounded-lg border border-gray-100 bg-green-50 p-4 dark:border-green-900/20 dark:bg-green-950/20">
+                        <p class="text-xs font-medium uppercase tracking-wide text-green-600 dark:text-green-400">{{ __('Gross Amount') }}</p>
+                        <p class="mt-1 text-xl font-bold text-green-800 dark:text-green-300" x-text="(exampleAmount / 100).toFixed(2)"></p>
+                    </div>
+                    <div class="rounded-lg border border-gray-100 bg-amber-50 p-4 dark:border-amber-900/20 dark:bg-amber-950/20">
+                        <p class="text-xs font-medium uppercase tracking-wide text-amber-600 dark:text-amber-400">{{ __('Commission') }}</p>
+                        <p class="mt-1 text-xl font-bold text-amber-800 dark:text-amber-300" x-text="'− ' + (totalCommission / 100).toFixed(2)"></p>
+                        <p class="text-xs text-amber-600 dark:text-amber-400">
+                            <span x-text="'(' + feePercent + '% + ' + feeFixed + '¢'"></span>)
+                        </p>
+                    </div>
+                    <div class="rounded-lg border border-gray-100 bg-blue-50 p-4 dark:border-blue-900/20 dark:bg-blue-950/20">
+                        <p class="text-xs font-medium uppercase tracking-wide text-blue-600 dark:text-blue-400">{{ __('Net Payout') }}</p>
+                        <p class="mt-1 text-xl font-bold text-blue-800 dark:text-blue-300" x-text="(netAmount / 100).toFixed(2)"></p>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Stripe Connect CTA --}}
+            <div class="rounded-lg border border-dashed border-blue-300 bg-blue-50 p-6 dark:border-blue-700 dark:bg-blue-950/20">
+                <div class="flex items-start gap-4">
+                    <div class="flex-shrink-0">
+                        <svg class="size-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a2.25 2.25 0 0 0-2.25-2.25H15a3 3 0 1 1-6 0H5.25A2.25 2.25 0 0 0 3 12m18 0v6a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 9m18 0V6a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 6v3" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-semibold text-blue-800 dark:text-blue-300">
+                            {{ __('Stripe Connect — Coming Soon') }}
+                        </h4>
+                        <p class="mt-1 text-sm text-blue-700 dark:text-blue-400">
+                            {{ __('Actual payment settlement will be handled through Stripe Connect in a future update. The commission simulation above shows how fees will be calculated once Connect is active.') }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Tab 7: Danger Zone --}}
         <div id="danger-zone" x-show="activeTab === 'danger'" class="space-y-4" x-cloak>
             <div class="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-900/30 dark:bg-red-950/20">
                 <h4 class="text-sm font-semibold text-red-800 dark:text-red-300">{{ __('Delete Organization') }}</h4>
@@ -412,8 +514,8 @@ new class extends Component {
             </div>
         </div>
 
-        {{-- Submit Button (hide on danger zone) --}}
-        <div class="flex justify-end pt-4 border-t border-gray-100 dark:border-gray-800" x-show="activeTab !== 'danger'">
+        {{-- Submit Button (hide on danger zone and comisiones) --}}
+        <div class="flex justify-end pt-4 border-t border-gray-100 dark:border-gray-800" x-show="activeTab !== 'danger' && activeTab !== 'comisiones'">
             <button type="submit" class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus:outline-none cursor-pointer">
                 {{ __('Save Changes') }}
             </button>

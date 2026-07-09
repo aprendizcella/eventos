@@ -119,6 +119,7 @@ Route::middleware(['auth'])->group(function () {
 
             Route::prefix('{organizer}/reports')->name('reports.')->middleware('organizer.detect')->group(function () {
                 Route::get('/billing', [OrganizerController::class, 'reportsBilling'])->name('billing');
+                Route::get('/payouts', [OrganizerController::class, 'reportsPayouts'])->name('payouts');
             });
 
             Route::prefix('{organizer}/invoices')->name('invoices.')->middleware('organizer.detect')->group(function () {

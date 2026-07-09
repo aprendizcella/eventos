@@ -123,4 +123,11 @@ final class OrganizerController extends Controller
 
         return view('organizers.reports.billing', ['organizer' => $organizer]);
     }
+
+    public function reportsPayouts(Organizer $organizer): View
+    {
+        $this->authorize('view', $organizer);
+
+        return view('organizers.reports.payouts', ['organizer' => $organizer]);
+    }
 }

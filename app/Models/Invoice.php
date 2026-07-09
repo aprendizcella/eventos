@@ -10,6 +10,7 @@ use Database\Factories\InvoiceFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Override;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
@@ -116,6 +117,14 @@ final class Invoice extends Model
     public function refund(): BelongsTo
     {
         return $this->belongsTo(Refund::class, 'refund_id', 'refund_id');
+    }
+
+    /**
+     * @return HasOne<Payout, $this>
+     */
+    public function payout(): HasOne
+    {
+        return $this->hasOne(Payout::class, 'invoice_id', 'invoice_id');
     }
 
     /**

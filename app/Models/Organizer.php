@@ -70,6 +70,14 @@ class Organizer extends Model implements IsTenant
     }
 
     /**
+     * @return HasMany<Payout, $this>
+     */
+    public function payouts(): HasMany
+    {
+        return $this->hasMany(Payout::class);
+    }
+
+    /**
      * Single-database mode: return the default connection database name.
      * Overrides `ImplementsTenant::getDatabaseName()` which expects a `database` column.
      */
