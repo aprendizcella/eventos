@@ -6,9 +6,9 @@ namespace App\Actions\Payments;
 
 use App\Enums\InvoiceStatus;
 use App\Enums\InvoiceType;
+use App\Exceptions\Invoices\InvoiceGenerationException;
 use App\Models\Invoice;
 use App\Models\Refund;
-use RuntimeException;
 
 final readonly class IssueCreditNoteAction
 {
@@ -24,25 +24,24 @@ final readonly class IssueCreditNoteAction
         $payment = $refund->payment;
 
         if ($payment === null || $payment->ticketOrder === null) {
-            throw new RuntimeException('Cannot issue credit note: refund has no associated payment or order.');
+            throw new InvoiceGenerationException('Cannot issue credit note: refund has no associated payment or order.');
         }
 
         $ticketOrder = $payment->ticketOrder;
 
         if ($ticketOrder->event === null) {
-            throw new RuntimeException('Cannot issue credit note: order has no associated event.');
+            throw new InvoiceGenerationException('Cannot issue credit note: order has no associated event.');
         }
 
         $organizer = $ticketOrder->event->organizer;
 
         if ($organizer === null) {
-            throw new RuntimeException('Cannot issue credit note: event has no associated organizer.');
+            throw new InvoiceGenerationException('Cannot issue credit note: event has no associated organizer.');
         }
 
         $numbering = ($this->generateInvoiceNumberAction)($organizer, InvoiceType::CreditNote);
 
-        /** @var Invoice $invoice */
-        $invoice = Invoice::query()->create([
+        return Invoice::query()->create([
             'organizer_id' => $organizer->getKey(),
             'ticket_order_id' => $ticketOrder->getKey(),
             'payment_id' => $payment->getKey(),
@@ -55,7 +54,5 @@ final readonly class IssueCreditNoteAction
             'amount' => (int) round($refund->amount * 100),
             'currency' => $payment->currency,
         ]);
-
-        return $invoice;
     }
 }

@@ -6,10 +6,10 @@ namespace App\Actions\Payments;
 
 use App\Enums\InvoiceStatus;
 use App\Enums\InvoiceType;
+use App\Exceptions\Invoices\InvoiceGenerationException;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\TicketOrder;
-use RuntimeException;
 
 final readonly class GenerateInvoiceAction
 {
@@ -25,19 +25,18 @@ final readonly class GenerateInvoiceAction
         $event = $ticketOrder->event;
 
         if ($event === null) {
-            throw new RuntimeException('Cannot generate invoice: order has no associated event.');
+            throw new InvoiceGenerationException('Cannot generate invoice: order has no associated event.');
         }
 
         $organizer = $event->organizer;
 
         if ($organizer === null) {
-            throw new RuntimeException('Cannot generate invoice: event has no associated organizer.');
+            throw new InvoiceGenerationException('Cannot generate invoice: event has no associated organizer.');
         }
 
         $numbering = ($this->generateInvoiceNumberAction)($organizer, InvoiceType::Invoice);
 
-        /** @var Invoice $invoice */
-        $invoice = Invoice::query()->create([
+        return Invoice::query()->create([
             'organizer_id' => $organizer->getKey(),
             'ticket_order_id' => $ticketOrder->getKey(),
             'payment_id' => $payment->getKey(),
@@ -50,7 +49,5 @@ final readonly class GenerateInvoiceAction
             'amount' => (int) round($payment->amount * 100),
             'currency' => $payment->currency,
         ]);
-
-        return $invoice;
     }
 }

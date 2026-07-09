@@ -72,6 +72,11 @@ it('listener creates invoice when PaymentCompleted is dispatched', function (): 
         'status' => PaymentStatus::Completed,
     ]);
 
+    // Enable invoicing for the event
+    $payment->ticketOrder->event->update([
+        'settings' => ['billing' => ['invoice_enabled' => true]],
+    ]);
+
     event(new PaymentCompleted($payment));
 
     $this->assertDatabaseHas('invoice', [
@@ -89,6 +94,11 @@ it('is idempotent — does not create duplicate invoices for the same payment', 
     $payment = Payment::factory()->create([
         'amount' => 100.00,
         'status' => PaymentStatus::Completed,
+    ]);
+
+    // Enable invoicing for the event
+    $payment->ticketOrder->event->update([
+        'settings' => ['billing' => ['invoice_enabled' => true]],
     ]);
 
     Invoice::factory()->create([
