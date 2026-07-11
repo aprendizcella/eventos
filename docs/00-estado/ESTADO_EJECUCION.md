@@ -1,6 +1,6 @@
 # Estado de ejecución
 
-> **Resumen en una línea:** Sprints 1.1 al 1.4 (Fase 1), Sprints 2.1 al 2.4 (Fase 2), Sprints 3.1 al 3.4 (Fase 3), Sprint T0 (Multitenancy Foundation) y Sprint 4.1 (Facturación) están **implementados, auditados estáticamente, archivados y 100% verificados localmente**. El trabajo actual está en **planificación de Sprint 4.2 (Comisiones y Payouts)** con alcance limitado a tracking interno; el siguiente paso operativo es arrancar el slice **4.2a**.
+> **Resumen en una línea:** Sprints 1.1 al 1.4 (Fase 1), Sprints 2.1 al 2.4 (Fase 2), Sprints 3.1 al 3.4 (Fase 3), Sprint T0 (Multitenancy Foundation), Sprint 4.1 (Facturación), Sprint 4.2 (Comisiones y Payouts) y Sprint 4.3 (Reportes Avanzados) están **implementados, auditados estáticamente, archivados y 100% verificados localmente**. El trabajo actual se enfoca hacia la **planificación del Sprint 4.4 (Retro y Ajustes)**; el siguiente paso operativo es avanzar a la finalización de la fase 4.
 
 ---
 
@@ -177,22 +177,29 @@
 - Billing settings y reportes de ingresos, impuestos y tarifas de plataforma con filtros y CSV.
 - Sprint archivado en `openspec/changes/archive/2026-07-09-sprint-4-1-facturacion/`.
 
-### Sprint 4.2 — Comisiones y Payouts (planificado) 🟡
+### Sprint 4.2 — Comisiones y Payouts (implementado) ✅
 
 - Alcance cerrado a tracking interno de comisiones y payouts.
-- No incluye transferencias reales ni Stripe Connect todavía.
-- Se dividirá en slices `4.2a` base y modelo, `4.2b` flujo y ajustes por refund, `4.2c` UX/reportes.
-- La UX se inspirará en HI.EVENTS: tabs de settings, simulador de comisión, banner informativo y tablas filtrables con export CSV.
+- No incluye transferencias reales ni Stripe Connect.
+- Implementado en slices `4.2a` base y modelo, `4.2b` flujo y ajustes por refund, `4.2c` UX/reportes.
+- La UX se inspiró en HI.EVENTS: tabs de settings, simulador de comisión, banner informativo y tablas filtrables con export CSV.
+
+### Sprint 4.3 — Reportes Avanzados (implementado) ✅
+
+- Alcance para organizer y admin/plataforma.
+- Reportes read-only con 5 familias de reporte por scope, filtros por defecto de 90 días, tarjetas resumen, tablas y export CSV.
+- UI inspirada en HI.EVENTS pero adaptada a Eventos, sin copia literal.
+- **Estado actual**: Implementado, verificado y archivado. Slices `4.3a` (Foundation), `4.3b` (Organizer Reports) y `4.3c` (Platform Reports) operativos.
 
 ### Síntesis ejecutiva de Sprint 4.2
 
-Sprint 4.2 cubrirá la capa interna de monetización que falta entre facturación y reportes operativos. Primero se construirá la base de comisiones y payout records (`4.2a`), después el flujo de creación y ajuste por refunds (`4.2b`) y, por último, la experiencia de configuración y reportes (`4.2c`). La idea es dejar trazabilidad completa de lo que se debe pagar y por qué, sin activar todavía transferencias reales con Stripe Connect.
+Sprint 4.2 cubrió la capa interna de monetización que faltaba entre facturación y reportes operativos. La base de comisiones y payout records (`4.2a`), el flujo de creación y ajuste por refunds (`4.2b`) y la experiencia de configuracion/reportes (`4.2c`) ya estan implementados. La trazabilidad de lo que se debe pagar y por que queda cerrada sin activar transferencias reales con Stripe Connect.
 
 ---
 
 ## Qué NO está hecho
 
-- Fases 4–6 (Sprint 4.2 en adelante; 4.1 ya está cerrado).
+- Fases 4.3–6 (4.1 y 4.2 ya estan cerrados).
 
 El roadmap completo está en [`01-producto/PLAN_IMPLEMENTACION.md`](../01-producto/PLAN_IMPLEMENTACION.md).
 
@@ -206,4 +213,4 @@ Ninguno conocido a cierre de Sprint 3.4.
 
 ## Próximo paso
 
-- Iniciar el **Sprint 4.2a: base de comisiones y payout records** para cerrar el modelo interno de comisiones/payouts antes de automatizar cualquier transferencia real.
+- Iniciar el Sprint **4.4: Retro y Ajustes** para terminar oficialmente la Fase 4 de Monetización.

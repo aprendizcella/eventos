@@ -135,6 +135,94 @@ it('generates csv rows from recent payouts', function (): void {
         ->and($rows[0]['status'])->toBe('ready');
 });
 
+it('excludes soft-deleted payouts from summaries', function (): void {
+    $organizer = Organizer::factory()->create();
+
+    $activeInvoice = Invoice::factory()->create([
+        'organizer_id' => $organizer->id,
+        'type' => InvoiceType::Invoice,
+        'status' => InvoiceStatus::Paid,
+    ]);
+
+    $deletedInvoice = Invoice::factory()->create([
+        'organizer_id' => $organizer->id,
+        'type' => InvoiceType::Invoice,
+        'status' => InvoiceStatus::Paid,
+    ]);
+
+    Payout::factory()->create([
+        'organizer_id' => $organizer->id,
+        'invoice_id' => $activeInvoice->invoice_id,
+        'gross_amount' => 10000,
+        'commission_amount' => 500,
+        'net_amount' => 9500,
+        'currency' => 'USD',
+    ]);
+
+    $deleted = Payout::factory()->create([
+        'organizer_id' => $organizer->id,
+        'invoice_id' => $deletedInvoice->invoice_id,
+        'gross_amount' => 50000,
+        'commission_amount' => 2500,
+        'net_amount' => 47500,
+        'currency' => 'USD',
+    ]);
+    $deleted->delete(); // soft delete
+
+    $viewModel = new PayoutReportsViewModel($organizer);
+    $gross = $viewModel->totalGross();
+
+    expect($gross->first()->total_gross)->toBe(10000)
+        ->and($gross->first()->payout_count)->toBe(1);
+});
+
+it('denies payout report access to organizer viewers', function (): void {
+    $user = User::factory()->create();
+    $organizer = Organizer::factory()->create();
+    $organizer->users()->attach($user, ['role' => OrganizerRoles::Viewer->value]);
+
+    $this->actingAs($user);
+
+    Volt::test('organizers.reports.payout-reports', ['organizer' => $organizer])
+        ->assertForbidden();
+});
+
+it('denies payout report access to organizer editors', function (): void {
+    $user = User::factory()->create();
+    $organizer = Organizer::factory()->create();
+    $organizer->users()->attach($user, ['role' => OrganizerRoles::Editor->value]);
+
+    $this->actingAs($user);
+
+    Volt::test('organizers.reports.payout-reports', ['organizer' => $organizer])
+        ->assertForbidden();
+});
+
+it('exports complete CSV without row limit', function (): void {
+    $organizer = Organizer::factory()->create();
+
+    // Create 60 payouts (exceeds the former 50-row limit)
+    $invoices = Invoice::factory()->count(60)->create([
+        'organizer_id' => $organizer->id,
+        'type' => InvoiceType::Invoice,
+        'status' => InvoiceStatus::Paid,
+    ]);
+
+    $invoices->each(function (Invoice $invoice) use ($organizer): void {
+        Payout::factory()->create([
+            'organizer_id' => $organizer->id,
+            'invoice_id' => $invoice->invoice_id,
+            'gross_amount' => 1000,
+            'currency' => 'USD',
+        ]);
+    });
+
+    $viewModel = new PayoutReportsViewModel($organizer);
+    $rows = $viewModel->csvRows();
+
+    expect($rows)->toHaveCount(60);
+});
+
 it('filters payouts by date range', function (): void {
     $organizer = Organizer::factory()->create();
 

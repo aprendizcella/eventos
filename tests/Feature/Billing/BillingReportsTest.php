@@ -128,6 +128,106 @@ it('generates csv rows from income summary', function (): void {
     expect($rows[0])->toHaveKeys(['currency', 'total_income', 'total_tax', 'total_fees', 'invoice_count']);
 });
 
+it('excludes soft-deleted invoices from summaries', function (): void {
+    $organizer = Organizer::factory()->create();
+
+    $activeInvoice = Invoice::factory()->create([
+        'organizer_id' => $organizer->id,
+        'type' => InvoiceType::Invoice,
+        'status' => InvoiceStatus::Paid,
+        'amount' => 10000,
+        'currency' => 'USD',
+    ]);
+
+    $deletedInvoice = Invoice::factory()->create([
+        'organizer_id' => $organizer->id,
+        'type' => InvoiceType::Invoice,
+        'status' => InvoiceStatus::Paid,
+        'amount' => 50000,
+        'currency' => 'USD',
+    ]);
+    $deletedInvoice->delete(); // soft delete
+
+    $viewModel = new BillingReportsViewModel($organizer);
+    $summary = $viewModel->incomeSummary();
+
+    expect($summary)->toHaveCount(1);
+    expect($summary->first()->total_income)->toBe(10000);
+});
+
+it('normalizes string date_from to start of day', function (): void {
+    $organizer = Organizer::factory()->create();
+
+    $included = Invoice::factory()->create([
+        'organizer_id' => $organizer->id,
+        'type' => InvoiceType::Invoice,
+        'status' => InvoiceStatus::Paid,
+        'amount' => 10000,
+        'created_at' => now()->subDays(5)->setTime(10, 0, 0),
+    ]);
+
+    $excluded = Invoice::factory()->create([
+        'organizer_id' => $organizer->id,
+        'type' => InvoiceType::Invoice,
+        'status' => InvoiceStatus::Paid,
+        'amount' => 5000,
+        'created_at' => now()->subDays(10)->setTime(23, 59, 59),
+    ]);
+
+    // Filter from 7 days ago — the 10-day-old invoice should be excluded
+    $viewModel = new BillingReportsViewModel($organizer, [
+        'date_from' => now()->subDays(7)->format('Y-m-d'),
+        'date_to' => now()->format('Y-m-d'),
+    ]);
+
+    $summary = $viewModel->incomeSummary();
+    expect($summary->first()->total_income)->toBe(10000)
+        ->and($summary->first()->invoice_count)->toBe(1);
+});
+
+it('normalizes string date_to to end of day', function (): void {
+    $organizer = Organizer::factory()->create();
+
+    $included = Invoice::factory()->create([
+        'organizer_id' => $organizer->id,
+        'type' => InvoiceType::Invoice,
+        'status' => InvoiceStatus::Paid,
+        'amount' => 10000,
+        'created_at' => now()->subDays(2)->setTime(23, 30, 0),
+    ]);
+
+    // Filter with date_to as today — the 2-day-old invoice at 23:30 should be included
+    $viewModel = new BillingReportsViewModel($organizer, [
+        'date_from' => now()->subDays(30)->format('Y-m-d'),
+        'date_to' => now()->format('Y-m-d'),
+    ]);
+
+    $summary = $viewModel->incomeSummary();
+    expect($summary->first()->total_income)->toBe(10000);
+});
+
+it('denies report access to organizer viewers', function (): void {
+    $user = User::factory()->create();
+    $organizer = Organizer::factory()->create();
+    $organizer->users()->attach($user, ['role' => OrganizerRoles::Viewer->value]);
+
+    $this->actingAs($user);
+
+    Volt::test('organizers.reports.billing-reports', ['organizer' => $organizer])
+        ->assertForbidden();
+});
+
+it('denies report access to organizer editors', function (): void {
+    $user = User::factory()->create();
+    $organizer = Organizer::factory()->create();
+    $organizer->users()->attach($user, ['role' => OrganizerRoles::Editor->value]);
+
+    $this->actingAs($user);
+
+    Volt::test('organizers.reports.billing-reports', ['organizer' => $organizer])
+        ->assertForbidden();
+});
+
 it('filters invoices by date range', function (): void {
     $organizer = Organizer::factory()->create();
 

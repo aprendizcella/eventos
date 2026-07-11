@@ -128,7 +128,8 @@ final class BillingReportsViewModel extends ViewModel
         $query = DB::table('invoice')
             ->where('organizer_id', $this->organizer->id)
             ->where('type', InvoiceType::Invoice->value)
-            ->whereIn('status', [InvoiceStatus::Paid->value, InvoiceStatus::Issued->value]);
+            ->whereIn('status', [InvoiceStatus::Paid->value, InvoiceStatus::Issued->value])
+            ->whereNull('deleted_at');
 
         $this->applyDateFilter($query, 'created_at');
 
@@ -145,14 +146,14 @@ final class BillingReportsViewModel extends ViewModel
 
         if ($from instanceof CarbonInterface) {
             $query->where($column, '>=', $from->startOfDay());
-        } elseif (is_string($from)) {
-            $query->where($column, '>=', $from);
+        } elseif (is_string($from) && $from !== '') {
+            $query->where($column, '>=', \Carbon\Carbon::parse($from)->startOfDay());
         }
 
         if ($to instanceof CarbonInterface) {
             $query->where($column, '<=', $to->endOfDay());
-        } elseif (is_string($to)) {
-            $query->where($column, '<=', $to);
+        } elseif (is_string($to) && $to !== '') {
+            $query->where($column, '<=', \Carbon\Carbon::parse($to)->endOfDay());
         }
     }
 }

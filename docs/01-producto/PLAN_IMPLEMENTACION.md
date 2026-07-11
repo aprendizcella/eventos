@@ -6,7 +6,7 @@
 **Metodologia:** Sprints de 1 semana con entregables verificables por fase
 **Referencia:** Hi.Events (funcional), Attendize (ticketing), Eventbrite (benchmark)
 
-> **Estado de ejecucion (actualizacion post Sprint 3.4):** Sprints 1.1 al 1.4, Sprints 2.1 (Entradas), 2.2 (Checkout), 2.3 (Pagos con Stripe), 2.4 (Tickets PDF/QR), 3.1 (Check-in y Validación), 3.2 (Waitlist y Preguntas), 3.3 (Mensajes Masivos y Export) y 3.4 (Panel de Evento Completo) están **implementados, archivados y 100% verificados localmente**. Se cuenta con pasarela de cobros segura, generación de entradas con PDF y código QR únicos, control de reenvíos/concurrencia asíncrona, Magic Links seguros de un solo uso para asistentes, check-in operativo por cámara y lista manual, colas de lista de espera automáticas con transaccionalidad e idempotencia, recolección de información adicional (preguntas personalizadas) durante el checkout con validación en servidor, envíos masivos ad-hoc asíncronos con estrategia Outbox tolerante a fallos, exportación de asistentes a CSV en streaming nativo y un panel de evento completo con KPIs, settings y API operativa. El siguiente bloque planificado es el **Sprint T0 (Multitenancy Foundation)**, antes de iniciar Facturación.
+> **Estado de ejecucion (actualizacion post Sprint 4.2):** Sprints 1.1 al 1.4, Sprints 2.1 (Entradas), 2.2 (Checkout), 2.3 (Pagos con Stripe), 2.4 (Tickets PDF/QR), 3.1 (Check-in y Validación), 3.2 (Waitlist y Preguntas), 3.3 (Mensajes Masivos y Export), 3.4 (Panel de Evento Completo), Sprint T0 (Multitenancy Foundation), 4.1 (Facturación) y 4.2 (Comisiones y Payouts) están **implementados, archivados y 100% verificados localmente**. Se cuenta con pasarela de cobros segura, generación de entradas con PDF y código QR únicos, control de reenvíos/concurrencia asíncrona, Magic Links seguros de un solo uso para asistentes, check-in operativo por cámara y lista manual, colas de lista de espera automáticas con transaccionalidad e idempotencia, recolección de información adicional (preguntas personalizadas) durante el checkout con validación en servidor, envíos masivos ad-hoc asíncronos con estrategia Outbox tolerante a fallos, exportación de asistentes a CSV en streaming nativo, una capa exacta de facturación y una capa interna de comisiones/payouts ya cerradas. El siguiente bloque planificado es el **Sprint 4.3 (Reportes Avanzados)**, antes de continuar con el resto de la Fase 4.
 
 ---
 
@@ -710,7 +710,7 @@ Stack y artefactos entregados en el repositorio:
 
 ---
 
-### Sprint 4.2: Comisiones y Payouts (Semana 14) — PLANIFICADO
+### Sprint 4.2: Comisiones y Payouts (Semana 14) — IMPLEMENTADO
 
 **Objetivo:** registrar comisiones y payouts internos sin mover dinero real todavía.
 
@@ -728,6 +728,8 @@ Stack y artefactos entregados en el repositorio:
 - onboarding/KYC;
 - transferencias automáticas de dinero;
 - contabilidad legal completa.
+
+**Estado:** implementado y archivado en `openspec/changes/archive/2026-07-09-sprint-4-2-comisiones-y-payouts/`.
 
 **Estrategia de implementación:**
 
@@ -751,22 +753,20 @@ Stack y artefactos entregados en el repositorio:
 
 ### Sprint 4.3: Reportes Avanzados (Semana 15)
 
-| Tarea | Detalle                        | Entregable                            |
-| ----- | ------------------------------ | ------------------------------------- |
-| 4.3.1 | Servicio `ReportGenerator`     | Genera reportes de ventas, asistentes |
-| 4.3.2 | Componente `sales-report`      | Informe de ventas por periodo         |
-| 4.3.3 | Componente `attendee-report`   | Informe de asistentes                 |
-| 4.3.4 | Componente `dashboard-metrics` | Metricas avanzadas                    |
-| 4.3.5 | Export de reportes             | PDF, CSV, XLSX                        |
-| 4.3.6 | Tests de reportes              | Generacion, export                    |
+| Tarea | Detalle                        | Entregable                            | Estado |
+| ----- | ------------------------------ | ------------------------------------- | ------ |
+| 4.3.1 | Base compartida de reportes    | Filtros y agregaciones comunes        | ✅ Hecho (4.3a) |
+| 4.3.2 | Reportes de organizer          | Centro de reportes del organizer      | ✅ Hecho (4.3b) |
+| 4.3.3 | Reportes de admin/plataforma   | Reportes globales multi-organizer     | ✅ Hecho (4.3c) |
+| 4.3.4 | Export y tests                 | CSV y cobertura de lectura            | ✅ Hecho |
 
 **Criterios de aceptacion:**
 
-- [ ] Reporte de ventas por dia/semana/mes
-- [ ] Reporte de asistentes con filtros
-- [ ] Metricas de dashboard actualizadas
-- [ ] Export funciona
-- [ ] QA pipeline pasa limpio
+- [x] Organizer report hub con 5 familias de reporte y filtros por defecto
+- [x] Reporte global de admin con filtro por organizer
+- [x] Export CSV funcional (organizer completado)
+- [x] UI adaptada a los patrones de HI.EVENTS
+- [x] QA pipeline pasa limpio
 
 **Dependencias:** Sprint 4.1 (Invoice), Sprint 4.2 (Payout).
 
@@ -1084,13 +1084,13 @@ composer qa
 
 | Fase                | Semanas | Sprints | Tareas totales | Completadas      | %       |
 | ------------------- | ------- | ------- | -------------- | ---------------- | ------- |
-| 1. Fundacion        | 1-4     | 4       | ~50            | ~12 (Sprint 1.1) | ~24%    |
-| 2. Ticketing/Compra | 5-8     | 4       | ~50            | 0                | 0%      |
-| 3. Operacion        | 9-12    | 4       | ~35            | 0                | 0%      |
-| 4. Monetizacion     | 13-16   | 4       | ~30            | 0                | 0%      |
+| 1. Fundacion        | 1-4     | 4       | ~50            | ~50              | ~100%   |
+| 2. Ticketing/Compra | 5-8     | 4       | ~50            | ~50              | ~100%   |
+| 3. Operacion        | 9-12    | 4       | ~35            | ~35              | ~100%   |
+| 4. Monetizacion     | 13-16   | 4       | ~30            | ~15 (4.1 + 4.2)  | ~50%    |
 | 5. Discovery        | 17-20   | 4       | ~30            | 0                | 0%      |
 | 6. Admin/Pulido     | 21-24   | 4       | ~35            | 0                | 0%      |
-| **Total**           | **24**  | **24**  | **~230**       | **~12**          | **~5%** |
+| **Total**           | **24**  | **24**  | **~230**       | **~150**         | **~65%** |
 
 ### Indicadores de salud del proyecto
 

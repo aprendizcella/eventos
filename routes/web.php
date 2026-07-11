@@ -72,6 +72,10 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['verified'])->group(function () {
         Volt::route('/dashboard', 'dashboard')->name('dashboard');
 
+        Route::prefix('admin')->name('admin.')->middleware(['role:super_admin|platform_admin'])->group(function () {
+            Volt::route('/reports', 'admin.reports.platform-hub')->name('reports.index');
+        });
+
         Route::prefix('account')->name('account.')->group(function () {
             Route::get('/profile', [AccountController::class, 'editProfile'])->name('profile.edit');
             Route::put('/profile', [AccountController::class, 'updateProfile'])->name('profile.update');
@@ -118,6 +122,7 @@ Route::middleware(['auth'])->group(function () {
             });
 
             Route::prefix('{organizer}/reports')->name('reports.')->middleware('organizer.detect')->group(function () {
+                Route::get('/', [OrganizerController::class, 'reportsIndex'])->name('index');
                 Route::get('/billing', [OrganizerController::class, 'reportsBilling'])->name('billing');
                 Route::get('/payouts', [OrganizerController::class, 'reportsPayouts'])->name('payouts');
             });

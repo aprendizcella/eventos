@@ -77,7 +77,30 @@ Para Sprint 4.2 se toma como referencia funcional la UX de HI.EVENTS en las supe
 | Informes financieros | Filtros arriba, tabla abajo, totales resumidos y export CSV. |
 | Avisos contextuales | Banner corto con aviso operativo/legal para no confundir la vista interna con contabilidad externa. |
 
-La referencia sirve para estructura y jerarquía visual, no para replicar el diseño exacto.
+La referencia sirve para estructura y jerarquia visual, no para replicar el diseno exacto.
+
+---
+
+## 6. Referencia para Sprint 4.3: reportes avanzados
+
+Las imagenes de HI.EVENTS dejan una pauta util para la siguiente fase de reportes, tanto para organizer como para admin/plataforma:
+
+| Patron observado | Utilidad para Eventos |
+|---|---|
+| Overview de reportes con tarjetas grandes y lista de secciones | Sirve como landing de reportes para que el usuario no entre directo a una tabla densa. |
+| Tablas con filtros arriba a la derecha y export CSV visible | Encaja con reportes operativos de lectura rapida y descarga inmediata. |
+| Banners de aviso contextual en reportes financieros | Ayuda a separar informacion operativa de contabilidad o settlement real. |
+| Resumenes por dia con columnas de bruto/neto/impuestos/tarifas/pedidos | Muy util para consolidar facturacion, payouts y metrics sin copiar el layout. |
+| Simulador de comision en settings | Puede reutilizarse como ayuda contextual para explicar el impacto de las tarifas y payouts. |
+| Dashboard con cards KPI + recientes | Buen formato para una cabecera de reportes agregados antes de entrar en el detalle. |
+
+### Adaptacion propuesta
+
+- Organizer: reportes por organizer con filtros por fecha, evento y moneda.
+- Admin/plataforma: reportes globales con filtro por organizer, fecha y moneda.
+- Ambos: lectura sola, resumenes arriba, tablas debajo y export CSV.
+- Default UX: periodo de 90 dias, moneda todas, CTA de export visible arriba.
+- Ninguna pantalla debe copiar literalmente HI.EVENTS; solo se reutiliza la jerarquia de informacion.
 
 ---
 

@@ -45,6 +45,16 @@ class OrganizerPolicy
         return $this->update($user, $organizer);
     }
 
+    public function viewReports(User $user, Organizer $organizer): bool
+    {
+        // Global admins can view any organizer's reports
+        if ($user->hasRole(['super_admin', 'platform_admin'])) {
+            return true;
+        }
+
+        return $this->isOrganizerAdmin($user, $organizer);
+    }
+
     private function isOrganizerAdmin(User $user, Organizer $organizer): bool
     {
         $pivot = $organizer->users()

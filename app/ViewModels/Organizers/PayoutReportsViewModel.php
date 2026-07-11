@@ -81,15 +81,17 @@ final class PayoutReportsViewModel extends ViewModel
      */
     public function recentPayouts(): Collection
     {
-        $query = Payout::query()
-            ->where('organizer_id', $this->organizer->id)
-            ->with('invoice.ticketOrder.event')
-            ->latest();
+        return $this->buildPayoutQuery()->limit(50)->get();
+    }
 
-        $this->applyDateFilter($query, 'created_at');
-        $this->applyStatusFilter($query);
-
-        return $query->limit(50)->get();
+    /**
+     * All matching payouts for CSV export (unlimited).
+     *
+     * @return Collection<int, Payout>
+     */
+    public function allPayoutsExport(): Collection
+    {
+        return $this->buildPayoutQuery()->get();
     }
 
     /**
@@ -97,7 +99,7 @@ final class PayoutReportsViewModel extends ViewModel
      */
     public function csvRows(): array
     {
-        return $this->recentPayouts()
+        return $this->allPayoutsExport()
             ->map(fn (Payout $payout): array => [
                 'date' => $payout->created_at?->format('Y-m-d') ?? '',
                 'invoice_number' => $payout->invoice->invoice_number ?? '',
@@ -120,12 +122,29 @@ final class PayoutReportsViewModel extends ViewModel
     }
 
     /**
+     * @return Builder<Payout>
+     */
+    private function buildPayoutQuery(): Builder
+    {
+        $query = Payout::query()
+            ->where('organizer_id', $this->organizer->id)
+            ->with('invoice.ticketOrder.event')
+            ->latest();
+
+        $this->applyDateFilter($query, 'created_at');
+        $this->applyStatusFilter($query);
+
+        return $query;
+    }
+
+    /**
      * @return QueryBuilder
      */
     private function baseQuery()
     {
         $query = DB::table('payout')
-            ->where('organizer_id', $this->organizer->id);
+            ->where('organizer_id', $this->organizer->id)
+            ->whereNull('deleted_at');
 
         $this->applyDateFilter($query, 'created_at');
         $this->applyStatusFilter($query);
@@ -143,14 +162,14 @@ final class PayoutReportsViewModel extends ViewModel
 
         if ($from instanceof CarbonInterface) {
             $query->where($column, '>=', $from->startOfDay());
-        } elseif (is_string($from)) {
-            $query->where($column, '>=', $from);
+        } elseif (is_string($from) && $from !== '') {
+            $query->where($column, '>=', \Carbon\Carbon::parse($from)->startOfDay());
         }
 
         if ($to instanceof CarbonInterface) {
             $query->where($column, '<=', $to->endOfDay());
-        } elseif (is_string($to)) {
-            $query->where($column, '<=', $to);
+        } elseif (is_string($to) && $to !== '') {
+            $query->where($column, '<=', \Carbon\Carbon::parse($to)->endOfDay());
         }
     }
 

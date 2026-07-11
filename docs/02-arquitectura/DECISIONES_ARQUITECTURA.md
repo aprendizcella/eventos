@@ -31,7 +31,7 @@
 | A19 | Superadmin global = panel sin organizer activo | El superadministrador debe poder entrar en contexto global desde el dominio raíz configurado por `APP_URL`, ver todos los organizers y cambiar de tenant sin quedar atado a un organizer concreto. | `openspec/changes/sprint-t0-multitenancy-foundation/design.md` |
 | A20 | Numeración de factura = organizador + año | La serie de facturación debe ser estable por `organizer_id` y año natural para evitar colisiones entre organizers y facilitar auditoría. | `openspec/changes/sprint-4-1-facturacion/design.md` |
 | A21 | Base de facturación 4.1a = precisión exacta antes de automatizar facturas | La primera entrega de Sprint 4.1 debe resolver los importes exactos y el almacenamiento mínimo de invoice/settings antes de listeners, PDF o UX. | `docs/01-producto/PLAN_IMPLEMENTACION.md` §Sprint 4.1a |
-| A22 | Sprint 4.2 = tracking interno de comisiones y payouts | El siguiente bloque de monetización registrará comisiones y payouts sin mover dinero real todavía; Stripe Connect queda diferido para una fase posterior. | `docs/01-producto/PLAN_IMPLEMENTACION.md` §Sprint 4.2 |
+| A22 | Sprint 4.2 = tracking interno de comisiones y payouts | El bloque de monetizacion registra comisiones y payouts sin mover dinero real; Stripe Connect queda diferido para una fase posterior. | `docs/01-producto/PLAN_IMPLEMENTACION.md` §Sprint 4.2 |
 
 ---
 
@@ -43,7 +43,7 @@
 - **Tenancy física:** el proyecto permanece en **single DB + `organizer_id` como scope**. Si en el futuro se decide multi-DB, debe abrirse una nueva decisión explícita.
 - **Dominio raíz:** el acceso global de superadmin se valida en el host configurado por `APP_URL` para cada entorno; `localhost` solo describe el entorno local actual, no una regla funcional.
 - **Facturación 4.1a:** la numeración de factura queda fijada por organizador y año; si cambia el formato de serie, debe abrirse una decisión nueva.
-- **Sprint 4.2:** comisiones y payouts se implementan primero como tracking interno; si se decide mover dinero real, habrá que abrir una decisión separada sobre Stripe Connect y operación financiera.
+- **Sprint 4.2:** comisiones y payouts quedaron implementados como tracking interno; si se decide mover dinero real, habrá que abrir una decisión separada sobre Stripe Connect y operación financiera.
 
 ---
 

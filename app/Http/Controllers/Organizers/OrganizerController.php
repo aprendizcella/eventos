@@ -117,16 +117,23 @@ final class OrganizerController extends Controller
         return view('organizers.settings', ['organizer' => $organizer]);
     }
 
+    public function reportsIndex(Organizer $organizer): View
+    {
+        $this->authorize('viewReports', $organizer);
+
+        return view('organizers.reports.index', ['organizer' => $organizer]);
+    }
+
     public function reportsBilling(Organizer $organizer): View
     {
-        $this->authorize('view', $organizer);
+        $this->authorize('viewReports', $organizer);
 
         return view('organizers.reports.billing', ['organizer' => $organizer]);
     }
 
     public function reportsPayouts(Organizer $organizer): View
     {
-        $this->authorize('view', $organizer);
+        $this->authorize('viewReports', $organizer);
 
         return view('organizers.reports.payouts', ['organizer' => $organizer]);
     }

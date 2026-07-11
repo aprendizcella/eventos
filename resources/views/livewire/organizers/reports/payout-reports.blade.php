@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Organizers\Reports;
 
 use App\Models\Organizer;
+use App\Support\Reports\CsvHelper;
 use App\ViewModels\Organizers\PayoutReportsViewModel;
 use Livewire\Volt\Component;
 
@@ -19,7 +20,7 @@ new class extends Component {
 
     public function mount(): void
     {
-        $this->authorize('view', $this->organizer);
+        $this->authorize('viewReports', $this->organizer);
 
         // Default to last 30 days
         $this->dateFrom = now()->subDays(30)->format('Y-m-d');
@@ -28,7 +29,7 @@ new class extends Component {
 
     public function filter(): void
     {
-        $this->authorize('view', $this->organizer);
+        $this->authorize('viewReports', $this->organizer);
 
         $this->validate([
             'dateFrom' => ['nullable', 'date'],
@@ -39,7 +40,7 @@ new class extends Component {
 
     public function exportCsv(): \Symfony\Component\HttpFoundation\StreamedResponse
     {
-        $this->authorize('view', $this->organizer);
+        $this->authorize('viewReports', $this->organizer);
 
         $viewModel = $this->getViewModel();
         $rows = $viewModel->csvRows();
@@ -54,7 +55,7 @@ new class extends Component {
             fputcsv($handle, ['Date', 'Invoice #', 'Event', 'Gross (cents)', 'Commission (cents)', 'Net (cents)', 'Currency', 'Status']);
 
             foreach ($rows as $row) {
-                fputcsv($handle, [
+                fputcsv($handle, CsvHelper::sanitizeRow([
                     $row['date'],
                     $row['invoice_number'],
                     $row['event'],
@@ -63,7 +64,7 @@ new class extends Component {
                     (string) $row['net_amount'],
                     $row['currency'],
                     $row['status'],
-                ]);
+                ]));
             }
 
             fclose($handle);
@@ -135,31 +136,20 @@ new class extends Component {
     {{-- Filters --}}
     <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
         <form wire:submit="filter" class="flex flex-wrap items-end gap-4">
-            <div>
-                <label for="dateFrom" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('From') }}</label>
-                <input type="date" id="dateFrom" wire:model="dateFrom" class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
-                @error('dateFrom') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
+            <div class="w-40 -mb-4">
+                <x-form.date id="dateFrom" name="dateFrom" label="{{ __('From') }}" wire:model="dateFrom" />
             </div>
-            <div>
-                <label for="dateTo" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('To') }}</label>
-                <input type="date" id="dateTo" wire:model="dateTo" class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
-                @error('dateTo') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
+            <div class="w-40 -mb-4">
+                <x-form.date id="dateTo" name="dateTo" label="{{ __('To') }}" wire:model="dateTo" />
             </div>
-            <div>
-                <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Status') }}</label>
-                <select id="status" wire:model="status" class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
-                    <option value="">{{ __('All Statuses') }}</option>
-                    <option value="pending">{{ __('Pending') }}</option>
-                    <option value="ready">{{ __('Ready') }}</option>
-                    <option value="processed">{{ __('Processed') }}</option>
-                    <option value="reversed">{{ __('Reversed') }}</option>
-                    <option value="failed">{{ __('Failed') }}</option>
-                </select>
-                @error('status') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
+            <div class="w-48 -mb-4">
+                <x-form.select id="status" name="status" label="{{ __('Status') }}" wire:model="status" placeholder="{{ __('All Statuses') }}" :options="['pending' => __('Pending'), 'ready' => __('Ready'), 'processed' => __('Processed'), 'reversed' => __('Reversed'), 'failed' => __('Failed')]" />
             </div>
-            <button type="submit" class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus:outline-none cursor-pointer">
-                {{ __('Filter') }}
-            </button>
+            <div class="pb-4">
+                <x-ui.button type="submit" variant="primary">
+                    {{ __('Filter') }}
+                </x-ui.button>
+            </div>
         </form>
     </div>
 
