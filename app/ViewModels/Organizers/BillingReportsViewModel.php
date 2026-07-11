@@ -13,6 +13,7 @@ use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use stdClass;
 
@@ -147,13 +148,13 @@ final class BillingReportsViewModel extends ViewModel
         if ($from instanceof CarbonInterface) {
             $query->where($column, '>=', $from->startOfDay());
         } elseif (is_string($from) && $from !== '') {
-            $query->where($column, '>=', \Carbon\Carbon::parse($from)->startOfDay());
+            $query->where($column, '>=', Date::parse($from)->startOfDay());
         }
 
         if ($to instanceof CarbonInterface) {
             $query->where($column, '<=', $to->endOfDay());
         } elseif (is_string($to) && $to !== '') {
-            $query->where($column, '<=', \Carbon\Carbon::parse($to)->endOfDay());
+            $query->where($column, '<=', Date::parse($to)->endOfDay());
         }
     }
 }
