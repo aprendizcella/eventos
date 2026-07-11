@@ -27,12 +27,7 @@ class OrganizerPolicy
 
     public function update(User $user, Organizer $organizer): bool
     {
-        // Global admins can update any organizer
-        if ($user->hasRole(['super_admin', 'platform_admin'])) {
-            return true;
-        }
-
-        return $this->isOrganizerAdmin($user, $organizer);
+        return $this->isGlobalAdmin($user) || $this->isOrganizerAdmin($user, $organizer);
     }
 
     public function delete(User $user, Organizer $organizer): bool
@@ -47,12 +42,16 @@ class OrganizerPolicy
 
     public function viewReports(User $user, Organizer $organizer): bool
     {
-        // Global admins can view any organizer's reports
-        if ($user->hasRole(['super_admin', 'platform_admin'])) {
+        if ($this->isGlobalAdmin($user)) {
             return true;
         }
 
         return $this->isOrganizerAdmin($user, $organizer);
+    }
+
+    private function isGlobalAdmin(User $user): bool
+    {
+        return $user->hasRole(['super_admin', 'platform_admin']);
     }
 
     private function isOrganizerAdmin(User $user, Organizer $organizer): bool
