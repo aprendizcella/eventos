@@ -42,6 +42,18 @@
             </div>
         @endif
 
+        {{-- Validation Errors --}}
+        @if ($errors->any())
+            <div class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800 dark:border-red-900/30 dark:bg-red-950/20 dark:text-red-300" role="alert">
+                <p class="font-bold">{{ __('The action could not be completed:') }}</p>
+                <ul class="mt-2 list-inside list-disc">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         {{-- Sub-Navigation Tabs --}}
         <div class="border-b border-gray-200 dark:border-gray-800">
             <nav class="-mb-px flex space-x-8" aria-label="Event tabs">
