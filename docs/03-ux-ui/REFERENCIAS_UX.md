@@ -104,6 +104,28 @@ Las imagenes de HI.EVENTS dejan una pauta util para la siguiente fase de reporte
 
 ---
 
+## 7. Referencia para Sprint 5.1: catálogo público
+
+Para el catálogo público de Fase 5, HI.EVENTS aporta referencias útiles en superficies orientadas a descubrimiento y presentación de eventos:
+
+| Patrón observado | Utilidad para Eventos |
+|---|---|
+| Diseñador de página de inicio del organizer | Sirve como proxy visual del catálogo público: cards con fecha destacada, imagen, título y metadatos. |
+| Listado de eventos | Ayuda a definir la densidad del listado, la barra de filtros y los estados de publicación. |
+| Diseño de página de inicio del evento | Referencia para el detalle público: cabecera limpia, acciones contextuales y bloques de información ordenados. |
+| Acciones de calendario | Útiles para el detalle público como valor añadido (Google Calendar e ICS). |
+| Estados vacíos | Importantes para cuando no hay eventos visibles o los filtros no devuelven resultados. |
+
+### Adaptación propuesta
+
+- Catálogo global en el dominio raíz y catálogo tenant-scoped en dominios de organizer.
+- Cards simples, densas y responsivas, con fecha visible de un vistazo.
+- Filtros visibles por categoría, ciudad y fecha.
+- Detalle público con CTA claro hacia checkout y ayuda contextual mínima.
+- Ninguna pantalla debe copiar literalmente HI.EVENTS; solo se reutiliza la jerarquía de información y la lógica de presentación.
+
+---
+
 ## Documentos relacionados
 
 - [`DECISIONES_UX.md`](./DECISIONES_UX.md) — decisión TailAdmin/Materio y filosofía de componentes.

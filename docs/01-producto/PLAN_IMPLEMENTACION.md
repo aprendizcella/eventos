@@ -815,6 +815,8 @@ Stack y artefactos entregados en el repositorio:
 
 ### Sprint 5.1: Catalogo Publico (Semana 17)
 
+**Criterio de alcance cerrado:** el dominio raíz definido por `config('app.url')` mostrará el catálogo global de eventos publicados de todos los organizers. En los dominios propios de cada organizer, el catálogo quedará restringido al tenant actual. En ambos casos solo se expondrán eventos `public` y el acceso al checkout existente se reutilizará desde el detalle público.
+
 | Tarea | Detalle                              | Entregable                  |
 | ----- | ------------------------------------ | --------------------------- |
 | 5.1.1 | Layout publico                       | `layouts/public.blade.php`  |
@@ -826,12 +828,16 @@ Stack y artefactos entregados en el repositorio:
 
 **Criterios de aceptacion:**
 
-- [ ] Pagina publica lista eventos con filtros
-- [ ] Detalle de evento visible sin login
-- [ ] Compra desde pagina publica
+- [ ] La pagina publica lista eventos publicados con filtros por categoria, ciudad y fecha.
+- [ ] El dominio raíz muestra el catálogo global de todos los organizers.
+- [ ] El dominio de un organizer solo muestra sus eventos publicados.
+- [ ] El detalle de evento es visible sin login.
+- [ ] La compra desde la pagina publica reutiliza el checkout existente.
 - [ ] QA pipeline pasa limpio
 
 **Dependencias:** Sprint 1.3 (Event), Sprint 2.4 (Attendee).
+
+**Fuera de alcance:** búsqueda full-text, SEO avanzado, widget embebible y optimización de rendimiento. Eso queda reservado para los sprints 5.2, 5.3 y 5.4.
 
 ---
 

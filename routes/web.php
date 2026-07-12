@@ -20,7 +20,9 @@ use Livewire\Volt\Volt;
 
 Volt::mount();
 
-Route::get('/', fn () => view('welcome'));
+Volt::route('/', 'public.events.event-list-public')->name('public.events.catalog');
+
+Volt::route('/events/{event}', 'public.events.event-detail-public')->name('public.events.detail');
 
 Volt::route('/login', 'auth.login')->name('login');
 Volt::route('/register', 'auth.register')->name('register');

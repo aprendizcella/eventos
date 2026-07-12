@@ -126,6 +126,16 @@ final class Event extends Model
         return $query->where('status', EventStatus::Published->value);
     }
 
+    /**
+     * @param  Builder<$this>  $query
+     * @return Builder<$this>
+     */
+    #[\Illuminate\Database\Eloquent\Attributes\Scope]
+    protected function public(Builder $query): Builder
+    {
+        return $query->where('visibility', EventVisibility::Public->value);
+    }
+
     #[Override]
     protected function casts(): array
     {
