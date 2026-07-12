@@ -33,7 +33,10 @@ final class SendBulkEmailJob implements NotTenantAware, ShouldQueue
 
     public int $timeout = 600;
 
-    public function __construct(public int $notificationLogId) {}
+    public function __construct(public int $notificationLogId)
+    {
+        $this->onQueue('emails');
+    }
 
     public function handle(): void
     {

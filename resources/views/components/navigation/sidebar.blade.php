@@ -161,6 +161,18 @@
                 </svg>
                 {{ __('Platform Reports') }}
             </a>
+
+            <!-- Horizon (Queue Monitoring) -->
+            <a
+                href="{{ url('/horizon') }}"
+                class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {{ request()->is('horizon*') ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100' }}"
+                @if(request()->is('horizon*')) aria-current="page" @endif
+            >
+                <svg class="size-5 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z" />
+                </svg>
+                {{ __('Queue Monitor') }}
+            </a>
         @endif
     </nav>
 </aside>

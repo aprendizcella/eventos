@@ -47,7 +47,9 @@ final class SendTicketEmailJob implements NotTenantAware, ShouldQueue
      */
     public function __construct(
         public int $orderId,
-    ) {}
+    ) {
+        $this->onQueue('tickets');
+    }
 
     /**
      * Execute the job.
