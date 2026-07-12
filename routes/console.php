@@ -12,3 +12,5 @@ Artisan::command('inspire', function () {
 
 Schedule::command(App\Console\Commands\ReleaseExpiredReservations::class)->everyMinute();
 Schedule::command(App\Console\Commands\ExpireWaitlistEntries::class)->everyMinute();
+
+Schedule::command('horizon:snapshot')->everyFiveMinutes();
