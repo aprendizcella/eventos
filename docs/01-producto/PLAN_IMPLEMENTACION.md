@@ -6,7 +6,7 @@
 **Metodologia:** Sprints de 1 semana con entregables verificables por fase
 **Referencia:** Hi.Events (funcional), Attendize (ticketing), Eventbrite (benchmark)
 
-> **Estado de ejecucion (actualizacion post Sprint 4.2):** Sprints 1.1 al 1.4, Sprints 2.1 (Entradas), 2.2 (Checkout), 2.3 (Pagos con Stripe), 2.4 (Tickets PDF/QR), 3.1 (Check-in y Validación), 3.2 (Waitlist y Preguntas), 3.3 (Mensajes Masivos y Export), 3.4 (Panel de Evento Completo), Sprint T0 (Multitenancy Foundation), 4.1 (Facturación) y 4.2 (Comisiones y Payouts) están **implementados, archivados y 100% verificados localmente**. Se cuenta con pasarela de cobros segura, generación de entradas con PDF y código QR únicos, control de reenvíos/concurrencia asíncrona, Magic Links seguros de un solo uso para asistentes, check-in operativo por cámara y lista manual, colas de lista de espera automáticas con transaccionalidad e idempotencia, recolección de información adicional (preguntas personalizadas) durante el checkout con validación en servidor, envíos masivos ad-hoc asíncronos con estrategia Outbox tolerante a fallos, exportación de asistentes a CSV en streaming nativo, una capa exacta de facturación y una capa interna de comisiones/payouts ya cerradas. El siguiente bloque planificado es el **Sprint 4.3 (Reportes Avanzados)**, antes de continuar con el resto de la Fase 4.
+> **Estado de ejecucion (actualizacion post Sprint 4.4):** Todos los sprints de la Fase 1 (1.1-1.4), Fase 2 (2.1-2.4), Fase 3 (3.1-3.4), Sprint T0 (Multitenancy Foundation) y Fase 4 (4.1 Facturación, 4.2 Comisiones y Payouts, 4.3 Reportes Avanzados, 4.4 Retro y Ajustes) están **implementados, archivados y 100% verificados localmente**. Se cuenta con pasarela de cobros segura, generación de entradas con PDF y código QR únicos, control de reenvíos/concurrencia asíncrona, Magic Links seguros de un solo uso para asistentes, check-in operativo por cámara y lista manual, colas de lista de espera automáticas con transaccionalidad e idempotencia, recolección de información adicional (preguntas personalizadas) durante el checkout con validación en servidor, envíos masivos ad-hoc asíncronos con estrategia Outbox tolerante a fallos, exportación de asistentes a CSV en streaming nativo, una capa exacta de facturación, una capa interna de comisiones/payouts ya cerradas, un bloque de reportes avanzados ya operativo, y monitorización de colas con Horizon protegido por roles. El siguiente bloque planificado es la **Fase 5 (Discovery y Escalabilidad)**.
 
 ---
 
@@ -99,7 +99,7 @@ Fase 6: Admin/Pulido       ░░░░░░░░░░░░░░░░░�
 | 1. Fundacion        | 1-4     | 4       | Auth, organizadores, eventos basicos, panel organizador | Sanctum, Permission, Activitylog, Purifier, Livewire, Volt |
 | 2. Ticketing/Compra | 5-8     | 4       | Productos, checkout, Stripe, pedidos, tickets PDF       | Stripe SDK, Bacon QR, DomPDF                               |
 | 3. Operacion        | 9-12    | 4       | Check-in, waitlist, preguntas, mensajes masivos, export | —                                                          |
-| 4. Monetizacion     | 13-16   | 4       | Facturas, reembolsos, comisiones, payouts, reportes     | Horizon                                                    |
+| 4. Monetizacion     | 13-16   | 4       | Facturas, reembolsos, comisiones, payouts, reportes     | Horizon / Redis queues                                     |
 | 5. Discovery        | 17-20   | 4       | Catalogo publico, busqueda, SEO, widget, CDN            | Scout                                                      |
 | 6. Admin/Pulido     | 21-24   | 4       | Backoffice, audit, GDPR, MFA, webhooks, deploy          | Deptrac (opcional)                                         |
 
@@ -772,23 +772,40 @@ Stack y artefactos entregados en el repositorio:
 
 ---
 
-### Sprint 4.4: Retro y Ajustes (Semana 16)
+### Sprint 4.4: Retro y Ajustes (Semana 16) — COMPLETADO ✅
 
-| Tarea | Detalle                  | Entregable              |
-| ----- | ------------------------ | ----------------------- |
-| 4.4.1 | Instalar Laravel Horizon | Monitor de colas Redis  |
-| 4.4.2 | Optimizacion de colas    | Priorizacion de jobs    |
-| 4.4.3 | Retro de Fase 4          | Review de lo construido |
-| 4.4.4 | Ajustes y fixes          | Issues pendientes       |
+**Objetivo:** cerrar la Fase 4 con observabilidad de colas, priorización operativa y cierre documental.
+
+**Decisión de planificación:** se mantiene como un único sprint de cierre, pero se divide en slices internos para separar infraestructura, tuning y retro.
+
+**Ejecución:** mini-sprints secuenciales en `main` (`4.4a` base Horizon/Redis, `4.4b` priorización de jobs y acceso admin, `4.4c` retro, ajustes y cierre documental), con QA al cierre de cada bloque.
+
+| Slice | Detalle | Entregable | Estado |
+| --- | --- | --- | --- |
+| 4.4a.1 | Instalar y configurar Laravel Horizon | Monitor operativo de colas | ✅ |
+| 4.4a.2 | Cambiar el backend de colas a Redis | Jobs productivos en Redis | ✅ |
+| 4.4a.3 | Definir gate de acceso al panel de Horizon | Solo `super_admin` y `platform_admin` | ✅ |
+| 4.4a.4 | Verificar arranque reproducible en Sail | Supervisor y worker listos | ✅ |
+| 4.4b.1 | Segmentar jobs por prioridad | `tickets`, `emails`, `default` | ✅ |
+| 4.4b.2 | Ajustar jobs existentes a colas dedicadas | `SendTicketEmailJob`, `SendBulkEmailJob` | ✅ |
+| 4.4b.3 | Añadir acceso visible al monitor desde el backoffice | Link condicional admin | ✅ |
+| 4.4b.4 | Validar comportamiento con tests y QA | Cobertura y estabilidad | ✅ |
+| 4.4c.1 | Cerrar fixes residuales y deuda menor | Gate `viewHorizon` corregido, tests añadidos | ✅ |
+| 4.4c.2 | Redactar la retro de Fase 4 | `docs/00-estado/RETRO_FASE_4.md` | ✅ |
+| 4.4c.3 | Sincronizar estado y roadmap | `ESTADO_EJECUCION.md` + `PLAN_IMPLEMENTACION.md` | ✅ |
+| 4.4c.4 | QA final | 761 tests, 2021 assertions, PHPStan OK | ✅ |
 
 **Criterios de aceptacion:**
 
-- [ ] Horizon operativo
-- [ ] Colas optimizadas
-- [ ] QA pipeline pasa limpio
-- [ ] Fase 4 completa: Facturacion + Comisiones + Reportes
+- [x] Horizon operativo y protegido.
+- [x] Colas críticas priorizadas sobre Redis.
+- [x] No se altera la lógica funcional de monetización/reportes.
+- [x] QA pipeline pasa limpio.
+- [x] Fase 4 queda lista para archivo.
 
 **Dependencias:** Sprints 4.1, 4.2, 4.3.
+
+**Cierre formal:** Sprint archivado como `sprint-4-4-retro-y-ajustes`.
 
 ---
 
@@ -1087,10 +1104,10 @@ composer qa
 | 1. Fundacion        | 1-4     | 4       | ~50            | ~50              | ~100%   |
 | 2. Ticketing/Compra | 5-8     | 4       | ~50            | ~50              | ~100%   |
 | 3. Operacion        | 9-12    | 4       | ~35            | ~35              | ~100%   |
-| 4. Monetizacion     | 13-16   | 4       | ~30            | ~15 (4.1 + 4.2)  | ~50%    |
+| 4. Monetizacion     | 13-16   | 4       | ~32            | ~32              | ~100%   |
 | 5. Discovery        | 17-20   | 4       | ~30            | 0                | 0%      |
 | 6. Admin/Pulido     | 21-24   | 4       | ~35            | 0                | 0%      |
-| **Total**           | **24**  | **24**  | **~230**       | **~150**         | **~65%** |
+| **Total**           | **24**  | **24**  | **~232**       | **~167**         | **~72%** |
 
 ### Indicadores de salud del proyecto
 

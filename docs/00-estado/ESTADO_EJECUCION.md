@@ -1,6 +1,6 @@
 # Estado de ejecución
 
-> **Resumen en una línea:** Sprints 1.1 al 1.4 (Fase 1), Sprints 2.1 al 2.4 (Fase 2), Sprints 3.1 al 3.4 (Fase 3), Sprint T0 (Multitenancy Foundation), Sprint 4.1 (Facturación), Sprint 4.2 (Comisiones y Payouts) y Sprint 4.3 (Reportes Avanzados) están **implementados, auditados estáticamente, archivados y 100% verificados localmente**. El trabajo actual se enfoca hacia la **planificación del Sprint 4.4 (Retro y Ajustes)**; el siguiente paso operativo es avanzar a la finalización de la fase 4.
+> **Resumen en una línea:** Sprints 1.1 al 1.4 (Fase 1), Sprints 2.1 al 2.4 (Fase 2), Sprints 3.1 al 3.4 (Fase 3), Sprint T0 (Multitenancy Foundation), y todos los sprints de la Fase 4 (4.1 Facturación, 4.2 Comisiones y Payouts, 4.3 Reportes Avanzados, 4.4 Retro y Ajustes) están **implementados, auditados estáticamente, verificados localmente y con documentación sincronizada**. La Fase 4 queda cerrada y lista para archivo. El siguiente bloque planificado es la **Fase 5 (Discovery y Escalabilidad)**.
 
 ---
 
@@ -199,7 +199,7 @@ Sprint 4.2 cubrió la capa interna de monetización que faltaba entre facturaci�
 
 ## Qué NO está hecho
 
-- Fases 4.3–6 (4.1 y 4.2 ya estan cerrados).
+- Fases 5–6 (Discovery, Escalabilidad, Admin, Pulido).
 
 El roadmap completo está en [`01-producto/PLAN_IMPLEMENTACION.md`](../01-producto/PLAN_IMPLEMENTACION.md).
 
@@ -213,4 +213,4 @@ Ninguno conocido a cierre de Sprint 3.4.
 
 ## Próximo paso
 
-- Iniciar el Sprint **4.4: Retro y Ajustes** para terminar oficialmente la Fase 4 de Monetización.
+- Iniciar la Fase 5 (Discovery y Escalabilidad), comenzando por el Sprint 5.1 (Catálogo Público).
