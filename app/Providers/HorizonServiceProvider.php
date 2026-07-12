@@ -7,12 +7,14 @@ namespace App\Providers;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Horizon\Horizon;
 use Laravel\Horizon\HorizonApplicationServiceProvider;
+use Override;
 
 final class HorizonServiceProvider extends HorizonApplicationServiceProvider
 {
     /**
      * Bootstrap any application services.
      */
+    #[Override]
     public function boot(): void
     {
         parent::boot();
@@ -23,10 +25,9 @@ final class HorizonServiceProvider extends HorizonApplicationServiceProvider
      *
      * This gate determines who can access Horizon in non-local environments.
      */
+    #[Override]
     protected function gate(): void
     {
-        Horizon::auth(function ($user) {
-            return $user?->hasRole(['super_admin', 'platform_admin']) ?? false;
-        });
+        Gate::define('viewHorizon', fn ($user) => $user?->hasRole(['super_admin', 'platform_admin']) ?? false);
     }
 }
