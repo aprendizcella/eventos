@@ -51,7 +51,7 @@ The system MUST exclude events that are not public or not published from the pub
 
 ### Requirement: Catalog Filters
 
-The system MUST allow filtering the public catalog by category, city, and date, and the filters MUST work together with search.
+The system MUST allow filtering the public catalog by category, city, and date (inclusive from-date lower bound). Date ranges remain deferred per the product roadmap.
 
 #### Scenario: Filter by category
 - GIVEN public events in multiple categories
@@ -63,10 +63,11 @@ The system MUST allow filtering the public catalog by category, city, and date, 
 - WHEN the city filter is applied
 - THEN only events in the selected city MUST remain
 
-#### Scenario: Filter by date
+#### Scenario: Filter by from-date (inclusive lower bound)
 - GIVEN public events on different dates
-- WHEN the date filter is applied
-- THEN only events matching the selected date MUST remain
+- WHEN the date filter is set to a specific date
+- THEN events on that date and later MUST remain
+- AND events strictly before that date MUST be excluded
 
 #### Scenario: Search and filters combine
 - GIVEN a text query and active filters
@@ -89,3 +90,4 @@ The system MUST show a friendly empty state when no events match the current fil
 - Featured events ranking
 - SEO metadata
 - Widget embedding
+- Date range filters (from-to); only inclusive from-date is supported

@@ -80,7 +80,16 @@ it('filters events by city', function (): void {
         ->assertDontSee('LA Event');
 });
 
-it('filters events by date', function (): void {
+it('filters events by from-date inclusive lower bound', function (): void {
+    Event::factory()->create([
+        'organizer_id' => $this->organizer->id,
+        'category_id' => $this->musicCategory->category_id,
+        'status' => EventStatus::Published,
+        'visibility' => EventVisibility::Public,
+        'starts_at' => '2026-07-01 10:00:00',
+        'title' => 'July Event',
+    ]);
+
     Event::factory()->create([
         'organizer_id' => $this->organizer->id,
         'category_id' => $this->musicCategory->category_id,
@@ -102,7 +111,8 @@ it('filters events by date', function (): void {
     Livewire::test('public.events.event-list-public')
         ->set('filterDate', '2026-08-15')
         ->assertSee('August Event')
-        ->assertDontSee('September Event');
+        ->assertSee('September Event')   // same or later → included by from-date
+        ->assertDontSee('July Event');    // before from-date → excluded
 });
 
 it('shows empty state when no events match filters', function (): void {

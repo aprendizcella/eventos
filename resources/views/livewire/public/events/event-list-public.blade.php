@@ -104,6 +104,12 @@ new #[Layout('layouts.public')] class extends Component {
         $this->resetPage();
     }
 
+    public function clearDate(): void
+    {
+        $this->filterDate = null;
+        $this->resetPage();
+    }
+
     public function clearSearchAndFilters(): void
     {
         $this->search = '';
@@ -193,9 +199,9 @@ new #[Layout('layouts.public')] class extends Component {
                 </select>
             </div>
 
-            {{-- Date filter --}}
+            {{-- Date filter (inclusive from-date) --}}
             <div class="w-full sm:w-48">
-                <label for="filterDate" class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">{{ __('Date') }}</label>
+                <label for="filterDate" class="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">{{ __('From date') }}</label>
                 <input id="filterDate" type="date" wire:model.live="filterDate" class="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
             </div>
 
@@ -222,6 +228,9 @@ new #[Layout('layouts.public')] class extends Component {
             @endif
             @if($filterCity !== null && $filterCity !== '')
                 <x-catalog.filter-chip :label="$filterCity" wireClick="resetFilters" />
+            @endif
+            @if($filterDate !== null && $filterDate !== '')
+                <x-catalog.filter-chip :label="__('From: :date', ['date' => $filterDate])" wireClick="clearDate" />
             @endif
         </div>
     @endif

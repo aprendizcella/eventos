@@ -26,7 +26,109 @@ beforeEach(function (): void {
     ]);
 });
 
-it('filters by date when searching with text query', function (): void {
+// ─── From-date (inclusive lower bound) — same-day inclusion ───
+
+it('from-date filter includes events on the same date', function (): void {
+    Event::factory()->create([
+        'organizer_id' => $this->organizer->id,
+        'category_id' => $this->category->category_id,
+        'venue_id' => $this->venue->venue_id,
+        'status' => EventStatus::Published,
+        'visibility' => EventVisibility::Public,
+        'title' => 'Summer Music Festival',
+        'starts_at' => '2026-08-15 20:00:00',
+    ]);
+
+    $service = app(EventSearchService::class);
+    $results = $service->search(
+        query: '',
+        filters: ['date' => '2026-08-15'],
+    );
+
+    expect($results->items())->toHaveCount(1);
+    expect($results->items()[0]->title)->toBe('Summer Music Festival');
+});
+
+// ─── From-date — later-date inclusion ───
+
+it('from-date filter includes events after the selected date', function (): void {
+    Event::factory()->create([
+        'organizer_id' => $this->organizer->id,
+        'category_id' => $this->category->category_id,
+        'venue_id' => $this->venue->venue_id,
+        'status' => EventStatus::Published,
+        'visibility' => EventVisibility::Public,
+        'title' => 'Summer Music Festival',
+        'starts_at' => '2026-08-15 20:00:00',
+    ]);
+
+    Event::factory()->create([
+        'organizer_id' => $this->organizer->id,
+        'category_id' => $this->category->category_id,
+        'venue_id' => $this->venue->venue_id,
+        'status' => EventStatus::Published,
+        'visibility' => EventVisibility::Public,
+        'title' => 'Fall Concert',
+        'starts_at' => '2026-09-01 09:00:00',
+    ]);
+
+    $service = app(EventSearchService::class);
+    $results = $service->search(
+        query: '',
+        filters: ['date' => '2026-08-15'],
+    );
+
+    expect($results->items())->toHaveCount(2);
+    expect($results->items()[0]->title)->toBe('Summer Music Festival');
+    expect($results->items()[1]->title)->toBe('Fall Concert');
+});
+
+// ─── From-date — earlier-date exclusion ───
+
+it('from-date filter excludes events strictly before the selected date', function (): void {
+    Event::factory()->create([
+        'organizer_id' => $this->organizer->id,
+        'category_id' => $this->category->category_id,
+        'venue_id' => $this->venue->venue_id,
+        'status' => EventStatus::Published,
+        'visibility' => EventVisibility::Public,
+        'title' => 'Early Bird Jazz',
+        'starts_at' => '2026-07-20 21:00:00',
+    ]);
+
+    Event::factory()->create([
+        'organizer_id' => $this->organizer->id,
+        'category_id' => $this->category->category_id,
+        'venue_id' => $this->venue->venue_id,
+        'status' => EventStatus::Published,
+        'visibility' => EventVisibility::Public,
+        'title' => 'Summer Music Festival',
+        'starts_at' => '2026-08-15 20:00:00',
+    ]);
+
+    $service = app(EventSearchService::class);
+    $results = $service->search(
+        query: '',
+        filters: ['date' => '2026-08-15'],
+    );
+
+    expect($results->items())->toHaveCount(1);
+    expect($results->items()[0]->title)->toBe('Summer Music Festival');
+});
+
+// ─── From-date + text search combo ───
+
+it('from-date filter combines with text search via fallback', function (): void {
+    Event::factory()->create([
+        'organizer_id' => $this->organizer->id,
+        'category_id' => $this->category->category_id,
+        'venue_id' => $this->venue->venue_id,
+        'status' => EventStatus::Published,
+        'visibility' => EventVisibility::Public,
+        'title' => 'July Music Jazz',
+        'starts_at' => '2026-07-20 21:00:00',
+    ]);
+
     Event::factory()->create([
         'organizer_id' => $this->organizer->id,
         'category_id' => $this->category->category_id,
@@ -50,45 +152,18 @@ it('filters by date when searching with text query', function (): void {
     $service = app(EventSearchService::class);
     // With SCOUT_DRIVER=database in tests, the DatabaseEngine fails on
     // virtual columns (venue_city), falling back to Eloquent LIKE which
-    // correctly applies the date filter.
+    // correctly applies the from-date filter.
     $results = $service->search(
         query: 'Music',
         filters: ['date' => '2026-08-15'],
     );
 
-    expect($results->items())->toHaveCount(1);
+    // "July Music Jazz" is before 2026-08-15 → excluded by from-date.
+    // "Summer Music Festival" and "Fall Music Concert" both have "Music"
+    // in the title AND are on/after the filter date → included.
+    expect($results->items())->toHaveCount(2);
     expect($results->items()[0]->title)->toBe('Summer Music Festival');
-});
-
-it('filters by date without text query', function (): void {
-    Event::factory()->create([
-        'organizer_id' => $this->organizer->id,
-        'category_id' => $this->category->category_id,
-        'venue_id' => $this->venue->venue_id,
-        'status' => EventStatus::Published,
-        'visibility' => EventVisibility::Public,
-        'title' => 'Summer Music Festival',
-        'starts_at' => '2026-08-15 20:00:00',
-    ]);
-
-    Event::factory()->create([
-        'organizer_id' => $this->organizer->id,
-        'category_id' => $this->category->category_id,
-        'venue_id' => $this->venue->venue_id,
-        'status' => EventStatus::Published,
-        'visibility' => EventVisibility::Public,
-        'title' => 'Fall Music Concert',
-        'starts_at' => '2026-09-01 09:00:00',
-    ]);
-
-    $service = app(EventSearchService::class);
-    $results = $service->search(
-        query: '',
-        filters: ['date' => '2026-08-15'],
-    );
-
-    expect($results->items())->toHaveCount(1);
-    expect($results->items()[0]->title)->toBe('Summer Music Festival');
+    expect($results->items()[1]->title)->toBe('Fall Music Concert');
 });
 
 it('returns empty when date filter matches no events', function (): void {

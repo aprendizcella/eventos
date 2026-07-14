@@ -147,7 +147,7 @@ it('restores date filter from url query parameter', function (): void {
         ->assertSet('filterDate', '2026-08-15');
 });
 
-it('combines search with city and date filters', function (): void {
+it('combines search with city and date from-date filters', function (): void {
     Venue::factory()->create([
         'organizer_id' => $this->organizer->id,
         'city' => 'Los Angeles',
@@ -162,14 +162,28 @@ it('combines search with city and date filters', function (): void {
         'starts_at' => '2026-07-20 21:00:00',
     ]);
 
-    // Event in New York on 2026-08-15
+    // Event in New York on 2026-08-15 — should be included by from-date
     Livewire::test('public.events.event-list-public')
         ->set('search', 'Music')
         ->set('filterCity', 'New York')
         ->set('filterDate', '2026-08-15')
         ->assertSee('Summer Music Festival')
-        ->assertDontSee('LA Jazz Night')
-        ->assertDontSee('Tech Conference 2026');
+        ->assertDontSee('LA Jazz Night')       // before the from-date
+        ->assertDontSee('Tech Conference 2026'); // no venue → city filter excludes
+});
+
+it('shows from-date chip with From: label when date filter is active', function (): void {
+    Livewire::test('public.events.event-list-public')
+        ->set('filterDate', '2026-08-15')
+        ->assertSee('From: 2026-08-15')
+        ->assertSeeHtml('wire:click="clearDate"');
+});
+
+it('clears date filter independently when clearDate is called', function (): void {
+    Livewire::test('public.events.event-list-public')
+        ->set('filterDate', '2026-08-15')
+        ->call('clearDate')
+        ->assertSet('filterDate', null);
 });
 
 it('isolates events by tenant organizer', function (): void {

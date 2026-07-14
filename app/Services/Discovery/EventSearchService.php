@@ -30,7 +30,11 @@ final class EventSearchService
     /**
      * Search events by text query and/or structured filters.
      *
-     * @param  array<string, mixed>  $filters  Structured filters: organizer_id, category_id, city, selected_date.
+     * The date filter acts as an inclusive lower bound (from-date):
+     * events on or after the given date are included. Date ranges
+     * remain deferred per the product roadmap.
+     *
+     * @param  array<string, mixed>  $filters  Structured filters: organizer_id, category_id, city, from_date.
      * @return LengthAwarePaginator<int, Event>
      */
     public function search(
@@ -82,6 +86,20 @@ final class EventSearchService
      * returned by the search engine (Meilisearch). In the fallback
      * path, results are ordered by start date ascending.
      *
+     * ── Hybrid Strategy for from-date filter ──
+     *
+     * Scout v10's Builder::where() only supports exact match ($field, $value).
+     * The >= operator required for inclusive from-date is not available.
+     * Instead of faking an unsupported operator:
+     *
+     *  1. Exact-match filters (category, city, organizer)  → Scout where()
+     *  2. From-date filter (>= lower bound)                 → Eloquent hydration callback
+     *
+     * This means Scout retrieves candidate IDs from Meilisearch using text
+     * relevance + exact filters, then Eloquent applies the date range during
+     * hydration. Pagination totals may slightly overcount (Scout counts hits
+     * in Meilisearch before the date filter), but per-page items are correct.
+     *
      * @param  EloquentBuilder<Event>  $baseQuery
      * @param  array<string, mixed>  $filters
      * @return LengthAwarePaginator<int, Event>
@@ -96,7 +114,15 @@ final class EventSearchService
             /** @var ScoutBuilder<Event> $scoutBuilder */
             $scoutBuilder = Event::search($query);
 
-            $scoutBuilder = $this->applyScoutFilters($scoutBuilder, $filters);
+            // Step 1: apply exact-match filters (category, city, organizer) via Scout's native where()
+            $this->applyScoutFiltersWithoutDate($scoutBuilder, $filters);
+
+            // Step 2: apply from-date filter via Eloquent hydration callback
+            // (Scout v10 where() does not support >=, see hybrid strategy doc above)
+            if (!empty($filters['date'])) {
+                $date = (string) $filters['date'];
+                $scoutBuilder->query(fn (EloquentBuilder $q) => $q->where('starts_at', '>=', $date));
+            }
 
             /** @var LengthAwarePaginator<int, Event> */
             return $scoutBuilder->paginate($perPage);
@@ -119,13 +145,17 @@ final class EventSearchService
     }
 
     /**
-     * Apply structured filters to a Scout builder.
+     * Apply exact-match structured filters to a Scout builder.
+     *
+     * The date filter is intentionally excluded: Scout v10's Builder::where()
+     * only supports exact match, so the from-date (>=) filter is handled
+     * separately via an Eloquent hydration callback in searchWithScout().
      *
      * @param  ScoutBuilder<Event>  $builder
      * @param  array<string, mixed>  $filters
      * @return ScoutBuilder<Event>
      */
-    private function applyScoutFilters(ScoutBuilder $builder, array $filters): ScoutBuilder
+    private function applyScoutFiltersWithoutDate(ScoutBuilder $builder, array $filters): ScoutBuilder
     {
         if (isset($filters['organizer_id'])) {
             $builder->where('organizer_id', (int) $filters['organizer_id']);
@@ -137,10 +167,6 @@ final class EventSearchService
 
         if (!empty($filters['city'])) {
             $builder->where('venue_city', (string) $filters['city']);
-        }
-
-        if (!empty($filters['date'])) {
-            $builder->where('starts_at_date', (string) $filters['date']);
         }
 
         return $builder;
@@ -169,7 +195,10 @@ final class EventSearchService
         }
 
         if (!empty($filters['date'])) {
-            $query->whereDate('starts_at', (string) $filters['date']);
+            // Inclusive lower-bound: events on or after the selected date.
+            // Uses WHERE starts_at >= 'YYYY-MM-DD 00:00:00' so that an event
+            // on the same date (e.g. 2026-08-15 at 20:00) is included.
+            $query->where('starts_at', '>=', (string) $filters['date']);
         }
     }
 }
