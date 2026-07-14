@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\Api\EventApiController;
 use App\Http\Controllers\Api\OrganizerApiController;
 use App\Http\Controllers\Api\V1\EventApiController as EventApiV1Controller;
+use App\Http\Controllers\Public\EventWidgetController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum', 'organizer.detect'])->prefix('v1')->group(function (): void {
@@ -18,5 +19,7 @@ Route::middleware(['auth:sanctum', 'organizer.detect'])->prefix('v1')->group(fun
         Route::post('/messages', [EventApiV1Controller::class, 'messages'])->name('api.events.messages');
     });
 });
+
+Route::get('/widget/events', EventWidgetController::class)->name('api.widget.events');
 
 Route::post('/v1/webhooks/stripe', App\Http\Controllers\Payments\StripeWebhookController::class)->name('webhooks.stripe');

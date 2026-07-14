@@ -159,6 +159,16 @@ final class Event extends Model
     }
 
     /**
+     * Get the canonical public URL for this event.
+     *
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute<string, never>
+     */
+    protected function canonicalUrl(): \Illuminate\Database\Eloquent\Casts\Attribute
+    {
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: fn () => route('public.events.detail', $this->slug));
+    }
+
+    /**
      * @param  Builder<$this>  $query
      * @return Builder<$this>
      */

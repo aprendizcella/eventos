@@ -214,9 +214,17 @@ Sprint 4.2 cubrió la capa interna de monetización que faltaba entre facturaci�
 - Indexación asíncrona automática tras commit para eventos `published` + `public`.
 - Sprint implementado, corregido, verificado y archivado.
 
+### Sprint 5.3 — SEO y Widget ✅
+
+- URLs canónicas configuradas por `slug` con redirección automática HTTP 301 para IDs legacy.
+- Metadatos SEO (Title, Description, Canonical, Open Graph, Twitter Cards) inyectados vía `@stack('seo')`.
+- Sitemap XML público en `/sitemap.xml` para eventos publicados.
+- Widget embebible con endpoint JSON (`/api/widget/events`) y script JS (`public/js/widget.js`) con soporte CORS.
+- Todo testeado, verificado y archivado sin agregar dependencias de terceros.
+
 ## Qué NO está hecho
 
-- Fases 5.3–6 (SEO, Widget, Rendimiento, Admin, Pulido).
+- Fases 5.4–6 (Rendimiento, Admin de Discovery, Pulido).
 
 El roadmap completo está en [`01-producto/PLAN_IMPLEMENTACION.md`](../01-producto/PLAN_IMPLEMENTACION.md).
 
@@ -224,10 +232,10 @@ El roadmap completo está en [`01-producto/PLAN_IMPLEMENTACION.md`](../01-produc
 
 ## Bloqueos actuales
 
-Ninguno conocido a cierre de Sprint 5.2.
+Ninguno conocido a cierre de Sprint 5.3.
 
 ---
 
 ## Próximo paso
 
-- Iniciar Sprint 5.3 (SEO y Widget).
+- Iniciar Sprint 5.4 (Rendimiento y CDN).

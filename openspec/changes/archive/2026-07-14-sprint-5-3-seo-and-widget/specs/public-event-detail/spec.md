@@ -1,10 +1,6 @@
-# Public Event Detail Specification
+# Delta for Public Event Detail
 
-## Purpose
-
-Expose a public event detail page that can be opened without login and serves as the entry point to checkout.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: Public Event Detail Route
 

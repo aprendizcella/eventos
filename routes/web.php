@@ -15,6 +15,8 @@ use App\Http\Controllers\Organizers\EventController;
 use App\Http\Controllers\Organizers\OrganizerController;
 use App\Http\Controllers\Organizers\TeamController;
 use App\Http\Controllers\Organizers\VenueController;
+use App\Http\Controllers\Public\EventRedirectController;
+use App\Http\Controllers\Public\SitemapController;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
@@ -22,7 +24,14 @@ Volt::mount();
 
 Volt::route('/', 'public.events.event-list-public')->name('public.events.catalog');
 
-Volt::route('/events/{event}', 'public.events.event-detail-public')->name('public.events.detail');
+// Numeric redirect route must come before slug route to avoid slug resolution of numeric IDs
+Route::get('/events/{id}', EventRedirectController::class)
+    ->whereNumber('id')
+    ->name('public.events.redirect');
+
+Volt::route('/events/{event:slug}', 'public.events.event-detail-public')->name('public.events.detail');
+
+Route::get('/sitemap.xml', SitemapController::class)->name('public.sitemap');
 
 Volt::route('/login', 'auth.login')->name('login');
 Volt::route('/register', 'auth.register')->name('register');

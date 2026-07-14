@@ -872,23 +872,25 @@ Stack y artefactos entregados en el repositorio:
 
 ---
 
-### Sprint 5.3: SEO y Widget (Semana 19)
+### Sprint 5.3: SEO y Widget (Semana 19) — COMPLETADO ✅
 
 | Tarea | Detalle                | Entregable                      |
 | ----- | ---------------------- | ------------------------------- |
 | 5.3.1 | SEO meta tags          | Title, description, OG, Twitter |
-| 5.3.2 | Sitemap XML            | Generacion automatica           |
-| 5.3.3 | URLs amigables         | Slugs por evento                |
-| 5.3.4 | Widget embebible       | JS snippet para webs externas   |
-| 5.3.5 | API publica del widget | `/api/v1/events/{slug}/widget`  |
+| 5.3.2 | Sitemap XML            | Generacion automatica en `/sitemap.xml` |
+| 5.3.3 | URLs amigables         | Slugs por evento (canónicos con redirect 301) |
+| 5.3.4 | Widget embebible       | JS snippet para webs externas con limitación |
+| 5.3.5 | API publica del widget | `/api/widget/events` con soporte CORS  |
 | 5.3.6 | Tests de SEO           | Meta tags, sitemap, widget      |
 
 **Criterios de aceptacion:**
 
-- [ ] Meta tags correctos en cada pagina
-- [ ] Sitemap.xml generado
-- [ ] URLs amigables con slug
-- [ ] Widget embebible funcional
+- [x] Meta tags correctos en cada pagina (via EventSeoViewModel y layout stack).
+- [x] Sitemap.xml generado (vía SitemapController).
+- [x] URLs amigables por slug, con fallback/redirect 301 desde ID.
+- [x] Widget embebible funcional, listando eventos publicados por organizador.
+
+**Estado final:** Implementado sin dependencias externas agresivas (solución nativa con Controllers/JS ligero). SDD archivado en `openspec/changes/archive/2026-07-14-sprint-5-3-seo-and-widget/`.
 - [ ] QA pipeline pasa limpio
 
 **Dependencias:** Sprint 5.2 (Busqueda).

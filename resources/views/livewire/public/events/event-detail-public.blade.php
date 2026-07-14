@@ -7,6 +7,7 @@ namespace App\Livewire\Public\Events;
 use App\Enums\EventStatus;
 use App\Enums\EventVisibility;
 use App\Models\Event;
+use App\ViewModels\Public\EventSeoViewModel;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
@@ -22,6 +23,11 @@ new #[Layout('layouts.public')] class extends Component {
         }
 
         $this->event = $event->load(['organizer', 'venue', 'category']);
+    }
+
+    public function seo(): EventSeoViewModel
+    {
+        return new EventSeoViewModel($this->event);
     }
 
     public function googleCalendarUrl(): string
@@ -70,6 +76,10 @@ new #[Layout('layouts.public')] class extends Component {
 };
 
 ?>
+
+@push('seo')
+    <x-seo.head :viewModel="$this->seo()" />
+@endpush
 
 <div>
     {{-- Breadcrumb via layout slot --}}
