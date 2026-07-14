@@ -205,9 +205,18 @@ Sprint 4.2 cubrió la capa interna de monetización que faltaba entre facturaci�
 - El acceso al checkout existente se reutiliza desde el detalle público.
 - El header público ahora incluye acceso al login o Dashboard según el estado de autenticación.
 
+### Sprint 5.2 — Búsqueda y Discovery UX ✅
+
+- Implementada búsqueda híbrida con Laravel Scout + Meilisearch y fallback a Eloquent.
+- Búsqueda textual sobre título y descripción.
+- Filtros estructurados preservados: organizer, categoría, ciudad y fecha (como límite inferior inclusivo `From date`).
+- Interfaz de descubrimiento componenteizada: `search-bar`, `filter-bar`, `filter-chip`, `result-summary` y `skeleton-card`.
+- Indexación asíncrona automática tras commit para eventos `published` + `public`.
+- Sprint implementado, corregido, verificado y archivado.
+
 ## Qué NO está hecho
 
-- Fases 5.2–6 (Búsqueda, SEO, Widget, Rendimiento, Admin, Pulido).
+- Fases 5.3–6 (SEO, Widget, Rendimiento, Admin, Pulido).
 
 El roadmap completo está en [`01-producto/PLAN_IMPLEMENTACION.md`](../01-producto/PLAN_IMPLEMENTACION.md).
 
@@ -215,10 +224,10 @@ El roadmap completo está en [`01-producto/PLAN_IMPLEMENTACION.md`](../01-produc
 
 ## Bloqueos actuales
 
-Ninguno conocido a cierre de Sprint 5.1.
+Ninguno conocido a cierre de Sprint 5.2.
 
 ---
 
 ## Próximo paso
 
-- Sprint 5.2 tiene propuesta, specs, diseño y tareas SDD preparados; el siguiente paso es iniciar `sdd-apply` para implementar Scout + Meilisearch y la UX de discovery.
+- Iniciar Sprint 5.3 (SEO y Widget).

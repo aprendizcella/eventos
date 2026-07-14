@@ -843,7 +843,7 @@ Stack y artefactos entregados en el repositorio:
 
 ---
 
-### Sprint 5.2: Busqueda con Meilisearch (Semana 18) — SDD COMPLETO, PENDIENTE IMPLEMENTACIÓN
+### Sprint 5.2: Busqueda con Meilisearch (Semana 18) — COMPLETADO ✅
 
 **Objetivo UX:** convertir el catálogo público en una experiencia de discovery más sólida, con búsqueda textual visible, filtros reutilizables y mejor feedback visual (chips, resumen de resultados y estados de carga), manteniendo el catálogo raíz/tenant ya implementado.
 
@@ -860,15 +860,15 @@ Stack y artefactos entregados en el repositorio:
 
 **Criterios de aceptacion:**
 
-- [ ] Busqueda full-text funcional en el catalogo publico.
-- [ ] La UI de discovery muestra barra de busqueda, filtros, chips y resumen de resultados.
-- [ ] Los filtros por categoria, ciudad y fecha siguen funcionando junto con Scout.
-- [ ] Los resultados mantienen el scoping global/tenant ya implementado.
-- [ ] QA pipeline pasa limpio.
+- [x] Busqueda full-text funcional en el catalogo publico.
+- [x] La UI de discovery muestra barra de busqueda, filtros, chips y resumen de resultados.
+- [x] Los filtros por categoria, ciudad y fecha siguen funcionando junto con Scout.
+- [x] Los resultados mantienen el scoping global/tenant ya implementado.
+- [x] QA pipeline pasa limpio.
 
 **Dependencias:** Sprint 5.1 (Catalogo), Meilisearch disponible en Sail.
 
-**Propuesta SDD:** `openspec/changes/sprint-5-2-search-and-ux/`
+**Estado final:** Sprint implementado con Scout + Meilisearch (y fallback Eloquent), verificado exhaustivamente y archivado en OpenSpec (`openspec/changes/archive/2026-07-14-sprint-5-2-search-and-ux/`).
 
 ---
 
