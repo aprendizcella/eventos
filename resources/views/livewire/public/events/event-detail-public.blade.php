@@ -72,12 +72,18 @@ new #[Layout('layouts.public')] class extends Component {
 ?>
 
 <div>
-    {{-- Breadcrumb --}}
-    <div class="mb-6">
-        <a href="{{ route('public.events.catalog') }}" class="text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">
-            &larr; {{ __('Back to Events') }}
-        </a>
-    </div>
+    {{-- Breadcrumb via layout slot --}}
+    <x-slot name="breadcrumb">
+        <nav class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+            <a href="{{ route('public.events.catalog') }}" class="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">
+                {{ __('Events') }}
+            </a>
+            <svg class="size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 0 1 .02-1.06L11.168 10 7.23 6.29a.75.75 0 1 1 1.04-1.08l4.5 4.25a.75.75 0 0 1 0 1.08l-4.5 4.25a.75.75 0 0 1-1.06-.02Z" clip-rule="evenodd" />
+            </svg>
+            <span class="font-medium text-gray-700 dark:text-gray-300 truncate max-w-[200px]">{{ $event->title }}</span>
+        </nav>
+    </x-slot>
 
     <div class="grid gap-8 lg:grid-cols-3">
         {{-- Main Content --}}

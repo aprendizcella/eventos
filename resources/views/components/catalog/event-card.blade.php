@@ -3,6 +3,23 @@
     /** @var \App\Models\Event $event */
     $hasStarted = $event->starts_at !== null && $event->starts_at->isPast();
     $hasEnded = $event->ends_at !== null && $event->ends_at->isPast();
+
+    // Compute minimum available price / sold out
+    $minPrice = null;
+    $soldOut = false;
+    $products = $event->products;
+    if ($products && $products->isNotEmpty()) {
+        $availablePrices = $products->flatMap->prices->filter(function ($price) {
+            $capacity = $price->capacity;
+
+            return $capacity === null || $price->quantity_sold < $capacity;
+        });
+        if ($availablePrices->isNotEmpty()) {
+            $minPrice = $availablePrices->min('price');
+        } else {
+            $soldOut = true;
+        }
+    }
 @endphp
 
 <a href="{{ route('public.events.detail', $event) }}" class="group block rounded-xl border border-gray-200 bg-white shadow-sm transition-all hover:shadow-md hover:border-blue-300 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-blue-700 overflow-hidden">
@@ -50,6 +67,19 @@
                     <span>{{ $event->starts_at->format('g:i A') }}</span>
                 </div>
             @endif
+
+            {{-- Price / Sold out --}}
+            <div class="flex items-center gap-1.5 pt-1">
+                @if($soldOut)
+                    <span class="inline-flex items-center rounded-full bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-600 dark:bg-red-950/30 dark:text-red-400">
+                        {{ __('Sold out') }}
+                    </span>
+                @elseif($minPrice !== null)
+                    <span class="font-semibold text-gray-700 dark:text-gray-300">
+                        {{ Number::currency($minPrice, 'USD') }}
+                    </span>
+                @endif
+            </div>
         </div>
 
         {{-- Organizer --}}

@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Laravel\Scout\Searchable;
 use Override;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
@@ -29,7 +30,7 @@ use Spatie\Activitylog\Support\LogOptions;
 final class Event extends Model
 {
     /** @use HasFactory<EventFactory> */
-    use HasFactory, LogsActivity, SoftDeletes;
+    use HasFactory, LogsActivity, Searchable, SoftDeletes;
 
     protected $table = 'event';
 
@@ -49,6 +50,23 @@ final class Event extends Model
         'custom_questions',
         'settings',
     ];
+
+    /**
+     * Handle removal from search index on soft-delete.
+     * Scout's `soft_delete` config is disabled, so we must explicitly
+     * unsearchable when an event is soft-deleted (not force-deleted,
+     * because Scout handles force-deletion automatically).
+     */
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        self::deleted(function (self $event): void {
+            if (!$event->isForceDeleting()) {
+                $event->unsearchable();
+            }
+        });
+    }
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -104,6 +122,38 @@ final class Event extends Model
     public function notificationTemplates(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(NotificationTemplate::class, 'event_id', 'event_id');
+    }
+
+    /**
+     * Get the indexable data array for Scout.
+     *
+     * @return array<string, mixed>
+     */
+    public function toSearchableArray(): array
+    {
+        return [
+            'title' => $this->title,
+            'description' => $this->description,
+            'organizer_id' => $this->organizer_id,
+            'category_id' => $this->category_id,
+            'venue_city' => $this->venue?->city,
+            'starts_at' => $this->starts_at?->timestamp,
+        ];
+    }
+
+    /**
+     * Determine if the model should be searchable.
+     *
+     * Excludes soft-deleted, non-published, and non-public events.
+     * Removal from the search index is handled explicitly on soft-delete
+     * via the `deleted` model event (see ::boot), since Scout's
+     * `soft_delete` config is set to `false`.
+     */
+    public function shouldBeSearchable(): bool
+    {
+        return !$this->trashed()
+            && $this->status === EventStatus::Published
+            && $this->visibility === EventVisibility::Public;
     }
 
     /**

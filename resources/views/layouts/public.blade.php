@@ -45,6 +45,13 @@
         </header>
 
         <main class="flex-1 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+            {{-- Optional breadcrumb slot --}}
+            @isset($breadcrumb)
+                <div class="mb-6">
+                    {{ $breadcrumb }}
+                </div>
+            @endisset
+
             @yield('content', $slot ?? '')
         </main>
 
