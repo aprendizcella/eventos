@@ -376,6 +376,8 @@ app/
 | Reporting | `Actions/Reporting/` (lectura) | ViewModels | — |
 | Administration | `Actions/Admin/` | — | — |
 
+Para Sprint 5.2, la orquestación concreta de búsqueda se ubicará en `app/Services/Discovery/EventSearchService.php`; el modelo `Event` conservará la responsabilidad de definir el payload y la elegibilidad de indexación, no la composición completa de filtros públicos.
+
 ---
 
 ## 4. Adaptaciones de la propuesta original

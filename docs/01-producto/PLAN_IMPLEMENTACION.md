@@ -813,7 +813,7 @@ Stack y artefactos entregados en el repositorio:
 
 **Objetivo:** Catalogo publico, busqueda, SEO, widget embebible, optimizacion de rendimiento.
 
-### Sprint 5.1: Catalogo Publico (Semana 17)
+### Sprint 5.1: Catalogo Publico (Semana 17) — COMPLETADO ✅
 
 **Criterio de alcance cerrado:** el dominio raíz definido por `config('app.url')` mostrará el catálogo global de eventos publicados de todos los organizers. En los dominios propios de cada organizer, el catálogo quedará restringido al tenant actual. En ambos casos solo se expondrán eventos `public` y el acceso al checkout existente se reutilizará desde el detalle público.
 
@@ -828,38 +828,47 @@ Stack y artefactos entregados en el repositorio:
 
 **Criterios de aceptacion:**
 
-- [ ] La pagina publica lista eventos publicados con filtros por categoria, ciudad y fecha.
-- [ ] El dominio raíz muestra el catálogo global de todos los organizers.
-- [ ] El dominio de un organizer solo muestra sus eventos publicados.
-- [ ] El detalle de evento es visible sin login.
-- [ ] La compra desde la pagina publica reutiliza el checkout existente.
-- [ ] QA pipeline pasa limpio
+- [x] La pagina publica lista eventos publicados con filtros por categoria, ciudad y fecha.
+- [x] El dominio raíz muestra el catálogo global de todos los organizers.
+- [x] El dominio de un organizer solo muestra sus eventos publicados.
+- [x] El detalle de evento es visible sin login.
+- [x] La compra desde la pagina publica reutiliza el checkout existente.
+- [x] QA pipeline pasa limpio
 
 **Dependencias:** Sprint 1.3 (Event), Sprint 2.4 (Attendee).
 
 **Fuera de alcance:** búsqueda full-text, SEO avanzado, widget embebible y optimización de rendimiento. Eso queda reservado para los sprints 5.2, 5.3 y 5.4.
 
+**Estado final:** Sprint implementado, verificado y archivado en OpenSpec (`openspec/changes/archive/2026-07-12-sprint-5-1-catalogo-publico/`).
+
 ---
 
-### Sprint 5.2: Busqueda con Meilisearch (Semana 18)
+### Sprint 5.2: Busqueda con Meilisearch (Semana 18) — SDD COMPLETO, PENDIENTE IMPLEMENTACIÓN
+
+**Objetivo UX:** convertir el catálogo público en una experiencia de discovery más sólida, con búsqueda textual visible, filtros reutilizables y mejor feedback visual (chips, resumen de resultados y estados de carga), manteniendo el catálogo raíz/tenant ya implementado.
+
+**Decisiones cerradas:** la búsqueda textual cubrirá título y descripción; organizer, categoría, ciudad y fecha estarán indexados solo como atributos filtrables; solo se indexarán eventos `published` + `public`; la sincronización será asíncrona tras commit; habrá fallback a Eloquent/`LIKE`; se mantendrán paginación de 12 resultados, URL sincronizada y filtros sin contadores dinámicos.
 
 | Tarea | Detalle                       | Entregable                       |
 | ----- | ----------------------------- | -------------------------------- |
 | 5.2.1 | Instalar Laravel Scout        | `composer require laravel/scout` |
-| 5.2.2 | Configurar Meilisearch driver | `config/scout.php`               |
-| 5.2.3 | Modelo Event con Searchable   | Indexacion automatica            |
-| 5.2.4 | Busqueda full-text            | Texto, categoria, ciudad, fecha  |
-| 5.2.5 | Facets y filtros              | Meilisearch facets               |
-| 5.2.6 | Tests de busqueda             | Indexacion, busqueda, facets     |
+| 5.2.2 | Configurar Meilisearch driver | `config/scout.php`, `.env.example` |
+| 5.2.3 | Componentes UX de discovery   | `search-bar`, `filters`, `chips`, `summary`, `skeleton` |
+| 5.2.4 | Modelo Event con Searchable   | Indexacion automatica            |
+| 5.2.5 | Busqueda full-text            | Texto + filtros estructurados    |
+| 5.2.6 | Tests de busqueda             | Indexacion, busqueda, UX         |
 
 **Criterios de aceptacion:**
 
-- [ ] Busqueda full-text funcional
-- [ ] Filtros por categoria, ciudad, fecha
-- [ ] Resultados ordenados por relevancia/fecha
-- [ ] QA pipeline pasa limpio
+- [ ] Busqueda full-text funcional en el catalogo publico.
+- [ ] La UI de discovery muestra barra de busqueda, filtros, chips y resumen de resultados.
+- [ ] Los filtros por categoria, ciudad y fecha siguen funcionando junto con Scout.
+- [ ] Los resultados mantienen el scoping global/tenant ya implementado.
+- [ ] QA pipeline pasa limpio.
 
-**Dependencias:** Sprint 5.1 (Catalogo).
+**Dependencias:** Sprint 5.1 (Catalogo), Meilisearch disponible en Sail.
+
+**Propuesta SDD:** `openspec/changes/sprint-5-2-search-and-ux/`
 
 ---
 

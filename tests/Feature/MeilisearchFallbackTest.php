@@ -34,7 +34,7 @@ beforeEach(function (): void {
 });
 
 it('falls back to eloquent like search when scout fails', function (): void {
-    $service = app(EventSearchService::class);
+    $service = resolve(EventSearchService::class);
 
     // With SCOUT_DRIVER=database in testing, the service should
     // still return results via the Eloquent fallback
@@ -47,7 +47,7 @@ it('falls back to eloquent like search when scout fails', function (): void {
 it('logs a warning when scout search is unavailable', function (): void {
     Log::spy();
 
-    $service = app(EventSearchService::class);
+    $service = resolve(EventSearchService::class);
     $service->search(query: 'Fallback');
 
     Log::shouldHaveReceived('warning')
@@ -57,7 +57,7 @@ it('logs a warning when scout search is unavailable', function (): void {
 });
 
 it('returns empty results when fallback finds nothing', function (): void {
-    $service = app(EventSearchService::class);
+    $service = resolve(EventSearchService::class);
 
     $results = $service->search(query: 'NonExistentTermXYZ');
 
@@ -65,7 +65,7 @@ it('returns empty results when fallback finds nothing', function (): void {
 });
 
 it('falls back without search query returns upcoming events by date', function (): void {
-    $service = app(EventSearchService::class);
+    $service = resolve(EventSearchService::class);
 
     $results = $service->search(query: '');
 

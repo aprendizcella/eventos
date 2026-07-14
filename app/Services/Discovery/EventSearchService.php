@@ -25,7 +25,7 @@ use Throwable;
  */
 final class EventSearchService
 {
-    private const PER_PAGE = 12;
+    private const int PER_PAGE = 12;
 
     /**
      * Search events by text query and/or structured filters.
@@ -51,7 +51,7 @@ final class EventSearchService
         }
 
         $this->applyEloquentFilters($baseQuery, $filters);
-        $baseQuery->orderBy('starts_at');
+        $baseQuery->oldest('starts_at');
 
         /** @var LengthAwarePaginator<int, Event> */
         return $baseQuery->paginate($perPage);
@@ -72,7 +72,7 @@ final class EventSearchService
 
         $tenant = Organizer::current();
 
-        if ($tenant !== null) {
+        if ($tenant instanceof Organizer) {
             $query->where('organizer_id', $tenant->id);
         }
 
@@ -137,7 +137,7 @@ final class EventSearchService
                 $q->where('title', 'like', "%{$query}%")
                     ->orWhere('description', 'like', "%{$query}%");
             });
-            $baseQuery->orderBy('starts_at');
+            $baseQuery->oldest('starts_at');
 
             /** @var LengthAwarePaginator<int, Event> */
             return $baseQuery->paginate($perPage);

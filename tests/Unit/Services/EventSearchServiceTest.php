@@ -11,7 +11,6 @@ use App\Models\Event;
 use App\Models\Organizer;
 use App\Models\Venue;
 use App\Services\Discovery\EventSearchService;
-use Carbon\Carbon;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Tests\TestCase;
 
@@ -39,7 +38,7 @@ it('from-date filter includes events on the same date', function (): void {
         'starts_at' => '2026-08-15 20:00:00',
     ]);
 
-    $service = app(EventSearchService::class);
+    $service = resolve(EventSearchService::class);
     $results = $service->search(
         query: '',
         filters: ['date' => '2026-08-15'],
@@ -72,7 +71,7 @@ it('from-date filter includes events after the selected date', function (): void
         'starts_at' => '2026-09-01 09:00:00',
     ]);
 
-    $service = app(EventSearchService::class);
+    $service = resolve(EventSearchService::class);
     $results = $service->search(
         query: '',
         filters: ['date' => '2026-08-15'],
@@ -106,7 +105,7 @@ it('from-date filter excludes events strictly before the selected date', functio
         'starts_at' => '2026-08-15 20:00:00',
     ]);
 
-    $service = app(EventSearchService::class);
+    $service = resolve(EventSearchService::class);
     $results = $service->search(
         query: '',
         filters: ['date' => '2026-08-15'],
@@ -149,7 +148,7 @@ it('from-date filter combines with text search via fallback', function (): void 
         'starts_at' => '2026-09-01 09:00:00',
     ]);
 
-    $service = app(EventSearchService::class);
+    $service = resolve(EventSearchService::class);
     // With SCOUT_DRIVER=database in tests, the DatabaseEngine fails on
     // virtual columns (venue_city), falling back to Eloquent LIKE which
     // correctly applies the from-date filter.
@@ -177,7 +176,7 @@ it('returns empty when date filter matches no events', function (): void {
         'starts_at' => '2026-08-15 20:00:00',
     ]);
 
-    $service = app(EventSearchService::class);
+    $service = resolve(EventSearchService::class);
     $results = $service->search(
         query: 'Music',
         filters: ['date' => '2027-01-01'],
@@ -209,7 +208,7 @@ it('combines date filter with category filter via text search', function (): voi
         'starts_at' => '2026-08-15 20:00:00',
     ]);
 
-    $service = app(EventSearchService::class);
+    $service = resolve(EventSearchService::class);
     $results = $service->search(
         query: 'Music',
         filters: [
@@ -223,7 +222,7 @@ it('combines date filter with category filter via text search', function (): voi
 });
 
 it('includes starts_at_date in searchable array for Scout filtering', function (): void {
-    Carbon::setTestNow(Carbon::parse('2026-08-15 12:00:00'));
+    \Illuminate\Support\Facades\Date::setTestNow(\Illuminate\Support\Facades\Date::parse('2026-08-15 12:00:00'));
 
     $event = Event::factory()->create([
         'organizer_id' => $this->organizer->id,
@@ -240,5 +239,5 @@ it('includes starts_at_date in searchable array for Scout filtering', function (
     expect($searchable)->toHaveKey('starts_at_date');
     expect($searchable['starts_at_date'])->toBe('2026-08-15');
 
-    Carbon::setTestNow();
+    \Illuminate\Support\Facades\Date::setTestNow();
 });

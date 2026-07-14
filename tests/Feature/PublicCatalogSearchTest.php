@@ -62,7 +62,7 @@ it('combines search with category filter', function (): void {
 
     Livewire::test('public.events.event-list-public')
         ->set('search', 'Conference')
-        ->set('filterCategory', null)
+        ->set('filterCategory')
         ->assertSee('Tech Conference 2026');
 
     Livewire::test('public.events.event-list-public')

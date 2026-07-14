@@ -122,6 +122,7 @@ Para el catálogo público de Fase 5, HI.EVENTS aporta referencias útiles en su
 - Cards simples, densas y responsivas, con fecha visible de un vistazo.
 - Filtros visibles por categoría, ciudad y fecha.
 - Detalle público con CTA claro hacia checkout y ayuda contextual mínima.
+- Header público con acceso secundario a login para visitantes y acceso a Dashboard para usuarios autenticados, manteniendo el toggle de tema como acción primaria de preferencias.
 - Ninguna pantalla debe copiar literalmente HI.EVENTS; solo se reutiliza la jerarquía de información y la lógica de presentación.
 
 ---
@@ -130,3 +131,22 @@ Para el catálogo público de Fase 5, HI.EVENTS aporta referencias útiles en su
 
 - [`DECISIONES_UX.md`](./DECISIONES_UX.md) — decisión TailAdmin/Materio y filosofía de componentes.
 - [`COMPONENTES_UI.md`](./COMPONENTES_UI.md) — estructura actual y objetivo.
+
+---
+
+## 8. Referencia para Sprint 5.2: búsqueda y discovery
+
+La UX de Sprint 5.2 debe convertir el catálogo en una experiencia de descubrimiento más guiada sin perder ligereza.
+
+### Adaptación propuesta
+
+- Barra de búsqueda visible en el catálogo, conectada al texto libre.
+- Filtros reutilizables para categoría, ciudad y fecha, con estado activo visible.
+- Chips removibles para entender qué está filtrando el usuario.
+- Resumen de resultados y empty state más informativo.
+- Loading skeleton para evitar una experiencia vacía mientras llegan resultados.
+- Mantener tarjetas densas y responsivas como en Sprint 5.1, pero con mejor jerarquía en la cabecera.
+- Mostrar 12 resultados por página, sin infinite scroll, autocomplete ni selector de orden visible.
+- Mantener fuera los contadores dinámicos de facets y las imágenes; preparar solo una extensión futura no visual en la card.
+- Mostrar en cada card el precio mínimo disponible y el estado `Sold out` cuando corresponda.
+- En detalle, reforzar el contexto de navegación y dejar los CTA secundarios más claros.

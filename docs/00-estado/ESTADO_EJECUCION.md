@@ -1,6 +1,6 @@
 # Estado de ejecución
 
-> **Resumen en una línea:** Sprints 1.1 al 1.4 (Fase 1), Sprints 2.1 al 2.4 (Fase 2), Sprints 3.1 al 3.4 (Fase 3), Sprint T0 (Multitenancy Foundation), y todos los sprints de la Fase 4 (4.1 Facturación, 4.2 Comisiones y Payouts, 4.3 Reportes Avanzados, 4.4 Retro y Ajustes) están **implementados, auditados estáticamente, verificados localmente y con documentación sincronizada**. La Fase 4 queda cerrada y lista para archivo. El siguiente bloque planificado es la **Fase 5 (Discovery y Escalabilidad)**, empezando por el catálogo público global/tenant-scoped del Sprint 5.1.
+> **Resumen en una línea:** Sprints 1.1 al 1.4 (Fase 1), Sprints 2.1 al 2.4 (Fase 2), Sprints 3.1 al 3.4 (Fase 3), Sprint T0 (Multitenancy Foundation), todos los sprints de la Fase 4 y Sprint 5.1 (Catálogo Público) están **implementados, auditados estáticamente, verificados localmente y con documentación sincronizada**. El siguiente bloque es Sprint 5.2 (Búsqueda con Scout + Meilisearch y mejora UX de discovery).
 
 ---
 
@@ -197,15 +197,17 @@ Sprint 4.2 cubrió la capa interna de monetización que faltaba entre facturaci�
 
 ---
 
+### Sprint 5.1 — Catálogo Público ✅
+
+- Catálogo público implementado, verificado y archivado.
+- El dominio raíz (`config('app.url')`) muestra el catálogo global.
+- Cada dominio de organizer muestra solo sus eventos publicados.
+- El acceso al checkout existente se reutiliza desde el detalle público.
+- El header público ahora incluye acceso al login o Dashboard según el estado de autenticación.
+
 ## Qué NO está hecho
 
-- Fases 5–6 (Discovery, Escalabilidad, Admin, Pulido).
-
-### Fase 5 — Preparación de Sprint 5.1
-
-- Catálogo público todavía no implementado.
-- El comportamiento objetivo ya quedó definido: el dominio raíz (`config('app.url')`) mostrará el catálogo global, y cada dominio de organizer mostrará solo sus eventos publicados.
-- La referencia UX prioritaria para esta fase es HI.EVENTS, usando sus patrones de tarjeta, filtros y detalle como inspiración, no como copia.
+- Fases 5.2–6 (Búsqueda, SEO, Widget, Rendimiento, Admin, Pulido).
 
 El roadmap completo está en [`01-producto/PLAN_IMPLEMENTACION.md`](../01-producto/PLAN_IMPLEMENTACION.md).
 
@@ -213,11 +215,10 @@ El roadmap completo está en [`01-producto/PLAN_IMPLEMENTACION.md`](../01-produc
 
 ## Bloqueos actuales
 
-Ninguno conocido a cierre de Sprint 3.4.
+Ninguno conocido a cierre de Sprint 5.1.
 
 ---
 
 ## Próximo paso
 
-- Iniciar la Fase 5 (Discovery y Escalabilidad), comenzando por el Sprint 5.1 (Catálogo Público).
-- Formalizar el cambio OpenSpec `sprint-5-1-catalogo-publico` antes de implementar código.
+- Sprint 5.2 tiene propuesta, specs, diseño y tareas SDD preparados; el siguiente paso es iniciar `sdd-apply` para implementar Scout + Meilisearch y la UX de discovery.

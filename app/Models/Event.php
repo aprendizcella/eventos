@@ -57,6 +57,7 @@ final class Event extends Model
      * unsearchable when an event is soft-deleted (not force-deleted,
      * because Scout handles force-deletion automatically).
      */
+    #[Override]
     protected static function boot(): void
     {
         parent::boot();
