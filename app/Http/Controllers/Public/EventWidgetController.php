@@ -48,6 +48,6 @@ final class EventWidgetController
                 'starts_at' => $event->starts_at?->toIso8601String(),
                 'url' => route('public.events.detail', $event->slug),
             ]),
-        ])->header('Access-Control-Allow-Origin', '*'); // NOSONAR
+        ]);
     }
 }
