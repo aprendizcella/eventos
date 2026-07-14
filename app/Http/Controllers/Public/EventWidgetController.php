@@ -21,7 +21,7 @@ final class EventWidgetController
         if ($organizerSlug->isEmpty() || $limit < 1 || $limit > 20) {
             $status = $organizerSlug->isEmpty() ? 400 : 422;
             $message = $organizerSlug->isEmpty() ? 'Organizer parameter is required.' : 'Limit must be between 1 and 20.';
-            
+
             return response()->json(['error' => $message], $status);
         }
 
