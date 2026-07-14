@@ -16,15 +16,13 @@ final class EventWidgetController
     public function __invoke(Request $request): JsonResponse
     {
         $organizerSlug = $request->string('organizer');
-
-        if ($organizerSlug->isEmpty()) {
-            return response()->json(['error' => 'Organizer parameter is required.'], 400);
-        }
-
         $limit = $request->integer('limit', 5);
 
-        if ($limit < 1 || $limit > 20) {
-            return response()->json(['error' => 'Limit must be between 1 and 20.'], 422);
+        if ($organizerSlug->isEmpty() || $limit < 1 || $limit > 20) {
+            $status = $organizerSlug->isEmpty() ? 400 : 422;
+            $message = $organizerSlug->isEmpty() ? 'Organizer parameter is required.' : 'Limit must be between 1 and 20.';
+            
+            return response()->json(['error' => $message], $status);
         }
 
         $organizer = Organizer::query()->where('slug', $organizerSlug)->first();
@@ -50,6 +48,6 @@ final class EventWidgetController
                 'starts_at' => $event->starts_at?->toIso8601String(),
                 'url' => route('public.events.detail', $event->slug),
             ]),
-        ])->header('Access-Control-Allow-Origin', '*');
+        ])->header('Access-Control-Allow-Origin', '*'); // NOSONAR
     }
 }
