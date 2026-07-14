@@ -138,6 +138,7 @@ final class Event extends Model
             'category_id' => $this->category_id,
             'venue_city' => $this->venue?->city,
             'starts_at' => $this->starts_at?->timestamp,
+            'starts_at_date' => $this->starts_at?->toDateString(),
         ];
     }
 

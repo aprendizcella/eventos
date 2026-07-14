@@ -30,7 +30,7 @@ final class EventSearchService
     /**
      * Search events by text query and/or structured filters.
      *
-     * @param  array<string, mixed>  $filters  Structured filters: organizer_id, category_id, city, date.
+     * @param  array<string, mixed>  $filters  Structured filters: organizer_id, category_id, city, selected_date.
      * @return LengthAwarePaginator<int, Event>
      */
     public function search(
@@ -139,7 +139,9 @@ final class EventSearchService
             $builder->where('venue_city', (string) $filters['city']);
         }
 
-        // Date range filtering is handled in the Eloquent fallback path.
+        if (!empty($filters['date'])) {
+            $builder->where('starts_at_date', (string) $filters['date']);
+        }
 
         return $builder;
     }

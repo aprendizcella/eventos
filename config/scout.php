@@ -99,6 +99,7 @@ return [
                     'category_id',
                     'venue_city',
                     'starts_at',
+                    'starts_at_date',
                 ],
                 'searchableAttributes' => [
                     'title',

@@ -31,7 +31,7 @@ The system MUST show all published public events from all organizers when the re
 The system MUST show only the current organizer's published public events when the request host resolves to an organizer domain.
 
 #### Scenario: Organizer domain shows scoped catalog
-- GIVEN a request to an organizer custom domain
+- GIVEN a request to a organizer custom domain
 - WHEN the catalog is rendered
 - THEN only that organizer's published public events MUST appear
 
@@ -51,7 +51,7 @@ The system MUST exclude events that are not public or not published from the pub
 
 ### Requirement: Catalog Filters
 
-The system MUST allow filtering the public catalog by category, city, and date.
+The system MUST allow filtering the public catalog by category, city, and date, and the filters MUST work together with search.
 
 #### Scenario: Filter by category
 - GIVEN public events in multiple categories
@@ -66,17 +66,22 @@ The system MUST allow filtering the public catalog by category, city, and date.
 #### Scenario: Filter by date
 - GIVEN public events on different dates
 - WHEN the date filter is applied
-- THEN only events matching the selected date or range MUST remain
+- THEN only events matching the selected date MUST remain
+
+#### Scenario: Search and filters combine
+- GIVEN a text query and active filters
+- WHEN results are returned
+- THEN the system MUST apply both search and filters together
 
 ### Requirement: Empty State
 
 The system MUST show a friendly empty state when no events match the current filters.
 
 #### Scenario: No results are found
-- GIVEN filters that return no events
+- GIVEN filters or search return no events
 - WHEN the catalog is rendered
 - THEN the system MUST show an empty state message
-- AND the page MUST keep the active filters visible
+- AND the page MUST keep the active search and filters visible
 
 ## Out of Scope
 
