@@ -222,9 +222,22 @@ Sprint 4.2 cubrió la capa interna de monetización que faltaba entre facturaci�
 - Widget embebible con endpoint JSON (`/api/widget/events`) y script JS (`public/js/widget.js`) con soporte CORS.
 - Todo testeado, verificado y archivado sin agregar dependencias de terceros.
 
+### Sprint 5.4 — Rendimiento y Escalabilidad ✅
+
+- Caché de Redis configurado como backend principal (`CACHE_STORE=redis`).
+- Búsquedas fallback y metadatos cacheados con `Cache::tags(['catalog'])`.
+- Invalidación de caché automática mediante Eventos Eloquent (`booted()` hooks en `Event`, `Category`, `Venue`).
+- Agregados 7 índices de base de datos críticos faltantes (fechas, slugs, llaves foráneas).
+- Solucionados N+1 query problems (eager loading `with()`) en `EventApiController` y `EventWidgetController`.
+- Adapter S3 habilitado (`league/flysystem-aws-s3-v3`) para uso con MinIO local y S3 en producción.
+- Endpoint de status profundo `/health` implementado mediante `spatie/laravel-health` (monitorea MySQL, Redis, Cache y Meilisearch).
+- Comando de Benchmark de catálogo (`php artisan catalog:benchmark`) creado para medir throughput de búsquedas.
+
+**Con este Sprint, la Fase 5 queda oficialmente CERRADA.**
+
 ## Qué NO está hecho
 
-- Fases 5.4–6 (Rendimiento, Admin de Discovery, Pulido).
+- Fase 6: Backoffice de Plataforma, Auditoría, Ajustes Finales (Admin de Discovery, Pulido, Moderación).
 
 El roadmap completo está en [`01-producto/PLAN_IMPLEMENTACION.md`](../01-producto/PLAN_IMPLEMENTACION.md).
 
@@ -232,10 +245,10 @@ El roadmap completo está en [`01-producto/PLAN_IMPLEMENTACION.md`](../01-produc
 
 ## Bloqueos actuales
 
-Ninguno conocido a cierre de Sprint 5.3.
+Ninguno conocido a cierre de la Fase 5 (Sprint 5.4).
 
 ---
 
 ## Próximo paso
 
-- Iniciar Sprint 5.4 (Rendimiento y CDN).
+- Iniciar Fase 6 (Sprint 6.1: Backoffice de Plataforma).
