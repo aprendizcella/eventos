@@ -19,7 +19,7 @@ final class EventApiController extends Controller
     {
         $this->authorize('viewAny', [Event::class, $organizer]);
 
-        $events = $organizer->events()->paginate(15);
+        $events = $organizer->events()->with(['organizer', 'venue', 'category'])->paginate(15);
 
         return EventResource::collection($events);
     }

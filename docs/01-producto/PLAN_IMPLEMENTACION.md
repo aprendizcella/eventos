@@ -100,7 +100,7 @@ Fase 6: Admin/Pulido       ░░░░░░░░░░░░░░░░░�
 | 2. Ticketing/Compra | 5-8     | 4       | Productos, checkout, Stripe, pedidos, tickets PDF       | Stripe SDK, Bacon QR, DomPDF                               |
 | 3. Operacion        | 9-12    | 4       | Check-in, waitlist, preguntas, mensajes masivos, export | —                                                          |
 | 4. Monetizacion     | 13-16   | 4       | Facturas, reembolsos, comisiones, payouts, reportes     | Horizon / Redis queues                                     |
-| 5. Discovery        | 17-20   | 4       | Catalogo publico, busqueda, SEO, widget, CDN            | Scout                                                      |
+| 5. Discovery        | 17-20   | 4       | Catalogo publico, busqueda, SEO, widget, object storage | Scout                                                      |
 | 6. Admin/Pulido     | 21-24   | 4       | Backoffice, audit, GDPR, MFA, webhooks, deploy          | Deptrac (opcional)                                         |
 
 ---
@@ -903,8 +903,8 @@ Stack y artefactos entregados en el repositorio:
 | ----- | ----------------------- | ---------------------------- |
 | 5.4.1 | Cache Redis             | Cache de lecturas frecuentes con tags |
 | 5.4.2 | Optimizacion de queries | Indexes en DB, N+1 eager loading solucionado |
-| 5.4.3 | CDN para assets         | MinIO (S3-compatible) Adapter Instalado |
-| 5.4.4 | Paginacion optimizada   | Cursor pagination (Diferido a futuro) |
+| 5.4.3 | Object storage para assets | MinIO/S3-compatible adapter instalado |
+| 5.4.4 | Paginacion optimizada   | Cursor pagination (diferida a futuro) |
 | 5.4.5 | Health checks           | `/health` usando spatie/laravel-health |
 | 5.4.6 | Tests de rendimiento    | Load testing basico (`catalog:benchmark`) |
 | 5.4.7 | Retro de Fase 5         | Review de lo construido      |
@@ -913,9 +913,11 @@ Stack y artefactos entregados en el repositorio:
 
 - [x] Cache activo para lecturas (Redis tags flusheados por eventos en Modelos).
 - [x] Queries optimizadas (sin N+1, 7 índices creados).
-- [x] Assets preparables via CDN (driver `s3` habilitado nativamente).
-- [x] Health checks funcionales (DB, Cache, Redis, Meilisearch).
+- [x] Assets preparados para object storage S3/MinIO (driver `s3` habilitado).
+- [x] Health checks funcionales (DB, Cache, Redis, Meilisearch), con HTTP 503 si falla un check crítico.
 - [x] Comando de benchmark creado y operando.
+- [ ] Integración real con CDN (diferida a futuro).
+- [ ] Cursor pagination (diferida a futuro).
 - [x] QA pipeline pasa limpio.
 - [x] Fase 5 completa: Catalogo + Busqueda + SEO + Rendimiento.
 
@@ -1109,7 +1111,7 @@ composer qa
 | Livewire v4 breaking changes                   | Baja         | Medio   | Pin version. Leer changelog antes de actualizar.       | 1     |
 | Scope creep (anadir funcionalidad sin control) | Alta         | Alto    | Roadmap por fases. MVP claro. Backlog priorizado.      | Todas |
 | Complejidad DDD prematura                      | Media        | Medio   | Solo bounded contexts necesarios por fase.             | 1-3   |
-| Rendimiento en venta masiva                    | Media        | Alto    | Redis queue, CDN, cache, paginacion, indexes.          | 5     |
+| Rendimiento en venta masiva                    | Media        | Alto    | Redis queue, object storage, cache, paginacion, indexes. | 5     |
 | GDPR compliance                                | Media        | Alto    | Export de datos, derecho al olvido, consentimiento.    | 6     |
 | Fraude en pagos                                | Media        | Alto    | Stripe Radar, rate limiting, monitor de anomalias.     | 2     |
 

@@ -701,7 +701,7 @@ Antes de empezar la Fase 1, verificar:
 - [ ] `./sonar.sh` funciona sin errores
 - [ ] MariaDB accesible desde el contenedor Laravel
 - [ ] Redis operativo (CACHE_STORE=redis en .env)
-- [ ] MinIO configurado como filesystem (FILESYSTEM_DISK=s3)
+- [ ] MinIO configurado como filesystem S3-compatible (FILESYSTEM_DISK=s3); el driver también permite S3 en producción
 - [ ] Meilisearch accesible (SCOUT_DRIVER=meilisearch)
 - [ ] Mailpit captura emails (MAIL_MAILER=smtp, MAIL_PORT=1025)
 
@@ -717,6 +717,10 @@ Antes de empezar la Fase 1, verificar:
 - `declare(strict_types=1)` en todo
 - Clases `final` por defecto
 - Inyeccion de dependencias, no Facades
+
+### Alcance de assets y paginacion
+
+Sprint 5.4 habilita object storage S3-compatible con MinIO local y S3 en producción. No implementa una CDN real: la distribución mediante CDN queda diferida. Cursor pagination también queda diferida a un sprint futuro.
 - Pest para testing
 - QA pipeline: Rector → Pint → PHPStan → Tests → SonarQube
 - OpenSpec/SDD workflow

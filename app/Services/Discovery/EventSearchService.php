@@ -8,6 +8,8 @@ use App\Models\Event;
 use App\Models\Organizer;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Laravel\Scout\Builder as ScoutBuilder;
 use Throwable;
@@ -53,8 +55,11 @@ final class EventSearchService
         $this->applyEloquentFilters($baseQuery, $filters);
         $baseQuery->oldest('starts_at');
 
+        $page = Paginator::resolveCurrentPage();
+        $key = 'catalog:list:'.md5(serialize($filters)."|page={$page}|perPage={$perPage}");
+
         /** @var LengthAwarePaginator<int, Event> */
-        return $baseQuery->paginate($perPage);
+        return Cache::tags(['catalog'])->remember($key, 3600, fn () => $baseQuery->paginate($perPage));
     }
 
     /**
@@ -139,8 +144,11 @@ final class EventSearchService
             });
             $baseQuery->oldest('starts_at');
 
+            $page = Paginator::resolveCurrentPage();
+            $key = 'catalog:search:'.md5($query.serialize($filters)."|page={$page}|perPage={$perPage}");
+
             /** @var LengthAwarePaginator<int, Event> */
-            return $baseQuery->paginate($perPage);
+            return Cache::tags(['catalog'])->remember($key, 3600, fn () => $baseQuery->paginate($perPage));
         }
     }
 

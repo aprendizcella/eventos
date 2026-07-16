@@ -45,6 +45,20 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $meiliCheck = \Spatie\Health\Checks\Checks\MeilisearchCheck::new()
+            ->url(config('scout.meilisearch.host').'/health');
+
+        if (config('scout.meilisearch.key')) {
+            $meiliCheck->token(config('scout.meilisearch.key'));
+        }
+
+        \Spatie\Health\Facades\Health::checks([
+            \Spatie\Health\Checks\Checks\DatabaseCheck::new(),
+            \Spatie\Health\Checks\Checks\RedisCheck::new(),
+            \Spatie\Health\Checks\Checks\CacheCheck::new(),
+            $meiliCheck,
+        ]);
+
         \Illuminate\Support\Facades\Event::listen(
             \App\Events\Waitlist\WaitlistEntryExpired::class,
             \App\Listeners\Waitlist\NotifyWaitlistOnExpiredListener::class,

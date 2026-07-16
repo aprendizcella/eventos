@@ -230,8 +230,10 @@ Sprint 4.2 cubrió la capa interna de monetización que faltaba entre facturaci�
 - Agregados 7 índices de base de datos críticos faltantes (fechas, slugs, llaves foráneas).
 - Solucionados N+1 query problems (eager loading `with()`) en `EventApiController` y `EventWidgetController`.
 - Adapter S3 habilitado (`league/flysystem-aws-s3-v3`) para uso con MinIO local y S3 en producción.
-- Endpoint de status profundo `/health` implementado mediante `spatie/laravel-health` (monitorea MySQL, Redis, Cache y Meilisearch).
+- Endpoint de status profundo `/health` implementado mediante `spatie/laravel-health` (monitorea MySQL, Redis, Cache y Meilisearch) y devuelve HTTP 503 si falla un check crítico.
 - Comando de Benchmark de catálogo (`php artisan catalog:benchmark`) creado para medir throughput de búsquedas.
+- Object storage S3/MinIO habilitado para assets; la integración real con CDN queda diferida.
+- Cursor pagination queda diferida a un sprint futuro.
 
 **Con este Sprint, la Fase 5 queda oficialmente CERRADA.**
 
@@ -245,7 +247,7 @@ El roadmap completo está en [`01-producto/PLAN_IMPLEMENTACION.md`](../01-produc
 
 ## Bloqueos actuales
 
-Ninguno conocido a cierre de la Fase 5 (Sprint 5.4).
+Limitaciones conocidas a cierre de la Fase 5 (Sprint 5.4): integración real con CDN y cursor pagination quedan diferidas a futuros sprints.
 
 ---
 

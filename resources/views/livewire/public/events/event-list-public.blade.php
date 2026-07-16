@@ -47,14 +47,19 @@ new #[Layout('layouts.public')] class extends Component {
 
     public function mount(): void
     {
-        $this->categories = Category::query()->orderBy('name')->get();
-        $this->availableCities = Venue::query()
-            ->whereNotNull('city')
-            ->select('city')
-            ->distinct()
-            ->orderBy('city')
-            ->get()
-            ->pluck('city');
+        $this->categories = \Illuminate\Support\Facades\Cache::tags(['catalog'])->remember('catalog:categories', 3600, function () {
+            return Category::query()->orderBy('name')->get();
+        });
+
+        $this->availableCities = \Illuminate\Support\Facades\Cache::tags(['catalog'])->remember('catalog:cities', 3600, function () {
+            return Venue::query()
+                ->whereNotNull('city')
+                ->select('city')
+                ->distinct()
+                ->orderBy('city')
+                ->get()
+                ->pluck('city');
+        });
     }
 
     #[Computed]

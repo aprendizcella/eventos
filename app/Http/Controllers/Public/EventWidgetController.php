@@ -36,6 +36,7 @@ final class EventWidgetController
             ->where('status', EventStatus::Published->value)
             ->where('visibility', EventVisibility::Public->value)
             ->oldest('starts_at')
+            ->with(['venue'])
             ->limit($limit)
             ->get();
 

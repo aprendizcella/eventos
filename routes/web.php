@@ -34,6 +34,8 @@ Volt::route('/events/{event:slug}', 'public.events.event-detail-public')->name('
 Route::get('/sitemap.xml', SitemapController::class)->name('public.sitemap');
 
 Volt::route('/login', 'auth.login')->name('login');
+
+Route::get('/health', Spatie\Health\Http\Controllers\HealthCheckJsonResultsController::class)->name('health');
 Volt::route('/register', 'auth.register')->name('register');
 Volt::route('/forgot-password', 'auth.forgot-password')->name('forgot-password');
 Volt::route('/reset-password/{token}', 'auth.reset-password')->name('password.reset');

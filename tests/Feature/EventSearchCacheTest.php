@@ -9,6 +9,7 @@ use App\Models\Venue;
 use App\Services\Discovery\EventSearchService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Laravel\Scout\EngineManager;
 use Tests\TestCase;
@@ -79,11 +80,33 @@ it('serves repeated searches from cache when scout fallback is used', function (
     $cached = Cache::tags(['catalog'])->get('catalog:search:'.md5('testa'.serialize(['date' => '2026-08-15']).'|page=1|perPage=12'));
     expect($cached)->not->toBeNull();
 
-    // Change DB, but cache should serve old data
-    Event::factory()->create(['title' => 'testa new event']);
-
     $results2 = $service->search('testa', ['date' => '2026-08-15']);
     expect($results2->total())->toBe($results1->total());
+});
+
+it('reuses the cached fallback result without a second database query', function () {
+    $service = resolve(EventSearchService::class);
+
+    $mockEngine = Mockery::mock(Laravel\Scout\Engines\Engine::class);
+    $mockEngine->shouldReceive('paginate')->andThrow(new Exception('Scout failed'));
+    $mockEngine->shouldReceive('delete')->andReturn(null);
+    $mockEngine->shouldReceive('update')->andReturn(null);
+    resolve(EngineManager::class)->extend('mock-cache', fn () => $mockEngine);
+    config(['scout.driver' => 'mock-cache']);
+
+    Cache::tags(['catalog'])->flush();
+    $queryCount = 0;
+    DB::listen(function () use (&$queryCount): void {
+        $queryCount++;
+    });
+
+    $service->search('cached query');
+    $queriesAfterFirstCall = $queryCount;
+
+    $service->search('cached query');
+
+    expect($queriesAfterFirstCall)->toBeGreaterThan(0)
+        ->and($queryCount)->toBe($queriesAfterFirstCall);
 });
 
 it('logs a warning when search fallback is triggered', function () {
