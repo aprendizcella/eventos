@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Override;
 
 /**
  * @phpstan-use \Illuminate\Database\Eloquent\Factories\HasFactory<\Database\Factories\CategoryFactory>
@@ -29,6 +30,18 @@ final class Category extends Model
         'name',
         'slug',
     ];
+
+    #[Override]
+    protected static function booted(): void
+    {
+        self::saved(function () {
+            \Illuminate\Support\Facades\Cache::tags(['catalog'])->flush();
+        });
+
+        self::deleted(function () {
+            \Illuminate\Support\Facades\Cache::tags(['catalog'])->flush();
+        });
+    }
 
     /**
      * @return BelongsTo<self, $this>

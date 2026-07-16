@@ -34,6 +34,18 @@ final class Venue extends Model
         'description',
     ];
 
+    #[Override]
+    protected static function booted(): void
+    {
+        self::saved(function () {
+            \Illuminate\Support\Facades\Cache::tags(['catalog'])->flush();
+        });
+
+        self::deleted(function () {
+            \Illuminate\Support\Facades\Cache::tags(['catalog'])->flush();
+        });
+    }
+
     /**
      * @return BelongsTo<Organizer, $this>
      */

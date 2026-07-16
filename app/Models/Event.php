@@ -51,6 +51,18 @@ final class Event extends Model
         'settings',
     ];
 
+    #[Override]
+    protected static function booted(): void
+    {
+        self::saved(function () {
+            \Illuminate\Support\Facades\Cache::tags(['catalog'])->flush();
+        });
+
+        self::deleted(function () {
+            \Illuminate\Support\Facades\Cache::tags(['catalog'])->flush();
+        });
+    }
+
     /**
      * Handle removal from search index on soft-delete.
      * Scout's `soft_delete` config is disabled, so we must explicitly
