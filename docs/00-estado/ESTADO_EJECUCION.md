@@ -1,6 +1,6 @@
 # Estado de ejecución
 
-> **Resumen en una línea:** Sprints 1.1 al 1.4 (Fase 1), Sprints 2.1 al 2.4 (Fase 2), Sprints 3.1 al 3.4 (Fase 3), Sprint T0 (Multitenancy Foundation), todos los sprints de la Fase 4 y Sprint 5.1 (Catálogo Público) están **implementados, auditados estáticamente, verificados localmente y con documentación sincronizada**. El siguiente bloque es Sprint 5.2 (Búsqueda con Scout + Meilisearch y mejora UX de discovery).
+> **Resumen en una línea:** El repositorio está en el estado posterior al commit `d2e9cbe` (2026-07-20): Sprints 1.1–5.4 y Sprint 6.1 están implementados; Sprint 6.1 dispone de informe OpenSpec PASS, pero su archivo no contiene `archive-report.md`, por lo que esa evidencia no equivale a una nueva verificación independiente. La Fase 6.2–6.4 y varios cambios OpenSpec activos siguen pendientes o con evidencia incompleta.
 
 ---
 
@@ -235,11 +235,35 @@ Sprint 4.2 cubrió la capa interna de monetización que faltaba entre facturaci�
 - Object storage S3/MinIO habilitado para assets; la integración real con CDN queda diferida.
 - Cursor pagination queda diferida a un sprint futuro.
 
+### Sprint 6.1 — Backoffice de Plataforma ✅
+
+- Implementado en el repositorio y archivado en `openspec/changes/archive/2026-07-16-sprint-6-1-backoffice/`.
+- Incluye aislamiento global con `team_id: 0`, matriz `super_admin`/`platform_admin`, ciclo de usuarios con suspensión/restauración, moderación reversible de eventos, ajustes de plataforma con optimistic locking, fallback e historial de comisiones, API admin y UI Volt.
+- Según el informe OpenSpec: 41/41 requisitos, 72/72 escenarios, 18/18 tareas, 928 tests, PHPStan/Pint/Rector limpios.
+- Caveat formal: el informe declara “ready to archive”, pero el cambio archivado carece de `archive-report.md`; los resultados se documentan como evidencia reportada, no como verificación independiente rerun en esta actualización.
+
+## Ciclo de vida y evidencia OpenSpec
+
+| Estado | Cambios | Evidencia y caveat |
+|---|---|---|
+| Archivados/implementados | 13 cambios archivados, incluido Sprint 6.1 | El inventario confirma el archivo; algunos cambios históricos no tienen `verify-report.md` o `archive-report.md`. Sprint 4.3 conserva tareas incompletas; 4.2 y 5.1 tienen árboles anidados duplicados. |
+| Activos con verificación | `mini-sprint-account-ux` | Informe PASS WITH WARNINGS, listo para archivar; 18/19 escenarios conformes y un caso parcialmente cubierto. |
+| Activos con validación pendiente | `mini-sprint-responsive-ux` | Informe PASS, pero la validación visual/manual en navegador sigue sin marcarse como completada. |
+| Activos con implementación sin cierre | `mini-sprint-email-verification-gate` | Tareas 15/15 marcadas; no hay `verify-report.md` ni `archive-report.md`. |
+| Exploración solamente | `sprint-1-2-organizadores-y-equipos` | Solo existe `exploration.md`; no representa trabajo activo implementado. |
+
+La configuración OpenSpec mantiene `testing.strict_tdd: true`; el informe de Sprint 6.1 declara, en cambio, modo Standard y strict TDD inactivo. Se conserva como caveat de proceso, no como resolución implícita.
+
 **Con este Sprint, la Fase 5 queda oficialmente CERRADA.**
 
 ## Qué NO está hecho
 
-- Fase 6: Backoffice de Plataforma, Auditoría, Ajustes Finales (Admin de Discovery, Pulido, Moderación).
+- Sprint 6.2: auditoría, GDPR y MFA.
+- Sprint 6.3: webhooks outbound y documentación completa de API.
+- Sprint 6.4: deployment, CI/CD, backups, Sentry, load testing y documentación final.
+- Integración real con CDN y cursor pagination.
+- Validación responsive manual en navegador y decisiones UX pendientes sobre notificaciones, feedback e iconos.
+- Stripe Connect/KYC/transferencias reales, que permanecen fuera del alcance del tracking interno de comisiones.
 
 El roadmap completo está en [`01-producto/PLAN_IMPLEMENTACION.md`](../01-producto/PLAN_IMPLEMENTACION.md).
 
@@ -247,10 +271,10 @@ El roadmap completo está en [`01-producto/PLAN_IMPLEMENTACION.md`](../01-produc
 
 ## Bloqueos actuales
 
-Limitaciones conocidas a cierre de la Fase 5 (Sprint 5.4): integración real con CDN y cursor pagination quedan diferidas a futuros sprints.
+Limitaciones conocidas: CDN real y cursor pagination quedan diferidas; siguen pendientes la auditoría/GDPR/MFA, webhooks/documentación API, despliegue y cierre operativo. La validación responsive manual y las decisiones de notificaciones/iconos requieren trabajo explícito.
 
 ---
 
 ## Próximo paso
 
-- Iniciar Fase 6 (Sprint 6.1: Backoffice de Plataforma).
+- Cerrar el ciclo de los cambios OpenSpec activos que ya tienen evidencia suficiente y abordar Sprint 6.2, manteniendo visibles los caveats antes de iniciar 6.3 y 6.4.

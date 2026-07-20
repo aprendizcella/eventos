@@ -1,6 +1,8 @@
 # Platform Admin Backoffice Architecture
 
-This document describes the design, authorization model, and lifecycle management for the platform backoffice implemented in Sprint 6.1.
+This document describes the implemented Sprint 6.1 platform backoffice as evidenced by the repository and its OpenSpec artifacts.
+
+> **Estado de evidencia:** el informe OpenSpec declara PASS (41/41 requisitos, 72/72 escenarios, 18/18 tareas y 928 tests), pero el cambio archivado no contiene `archive-report.md`. Es evidencia reportada, no una verificación independiente rerun en esta actualización.
 
 ## Quick Overview
 
@@ -27,6 +29,8 @@ User moderation is handled via a reversible suspension mechanism rather than har
 - **Restore**: Clears the `suspended_at` timestamp.
 - **Protection**: The last active `super_admin` cannot be suspended or deleted.
 - **GDPR Deferral**: Full GDPR deletion and anonymization are explicitly deferred/out of scope for Sprint 6.1. No API endpoints or actions exist for hard deletion, ensuring data retention policies can be properly designed in future sprints.
+
+The admin UI and API expose lifecycle operations through the implemented user-management surface: listing and viewing users, suspension/restoration, password-reset dispatch, and global-role assignment/revocation subject to the role matrix. Hard deletion remains intentionally absent.
 
 ## Reversible Event Moderation
 
@@ -57,6 +61,8 @@ When a payout is created, the commission rate is resolved in this exact order:
 ### Historical Immutability
 Payouts take a snapshot of the commission rate at creation time. Updating the platform settings only affects **future** payouts. Existing historical payouts remain immutable.
 
+The settings surface is available through the admin Volt UI and the admin API resource. Writes carry the expected lock version and reject stale concurrent updates; activity logging preserves the change history.
+
 ## Admin API Scope
 
 The Admin API (`/api/v1/admin/*`) is a Sanctum-authenticated, rate-limited (`60,1`) JSON API.
@@ -69,5 +75,7 @@ The Admin API (`/api/v1/admin/*`) is a Sanctum-authenticated, rate-limited (`60,
   - `GET /events` (paginated list across all organizers)
   - `POST /events/{event}/suspend`
   - `POST /events/{event}/restore`
+
+The API is paired with the admin Volt UI for dashboard, users, events, and platform settings. Both surfaces use the global admin context and the `super_admin`/`platform_admin` boundary described above.
 
 *Dedicated audit log viewing and MFA management are deferred to future iterations.*

@@ -10,7 +10,7 @@
 
 | Quiero saber… | Lee este documento |
 |---|---|
-| En qué punto está el proyecto (Sprint 4.2 cerrado, Sprint 4.3 en planificacion) | [`00-estado/ESTADO_EJECUCION.md`](./00-estado/ESTADO_EJECUCION.md) |
+| En qué punto está el proyecto (Sprint 6.1 implementado; pendientes y caveats OpenSpec) | [`00-estado/ESTADO_EJECUCION.md`](./00-estado/ESTADO_EJECUCION.md) |
 | Qué se va a construir, fases y sprints | [`01-producto/PLAN_IMPLEMENTACION.md`](./01-producto/PLAN_IMPLEMENTACION.md) |
 | Cómo está montado el backend (capas, flujos, convenciones) | [`02-arquitectura/ESPECIFICACION_TECNICA_BOILERPLATE_EVENTOS.md`](./02-arquitectura/ESPECIFICACION_TECNICA_BOILERPLATE_EVENTOS.md) |
 | Cómo encaja la propuesta DDD en el boilerplate | [`02-arquitectura/MAPING_PROPUESTA_DDD_A_BOILERPLATE.md`](./02-arquitectura/MAPING_PROPUESTA_DDD_A_BOILERPLATE.md) |
@@ -64,8 +64,12 @@ docs/
 - **Enlaces internos:** se usan rutas relativas para que el árbol sea navegable desde GitHub, GitLab o el editor.
 - **Código y rutas:** en inglés, tal como aparecen en el repositorio.
 
+## Estado de referencia
+
+La documentación refleja el repositorio tras el commit `d2e9cbe` (`feat(admin): add platform backoffice management`, 2026-07-20). Sprint 6.1 está implementado y archivado en el árbol OpenSpec, con las salvedades de ciclo de vida y evidencia descritas en el estado de ejecución. La Fase 6 restante continúa pendiente.
+
 ## Siguiente paso recomendado
 
 1. Leer [`00-estado/ESTADO_EJECUCION.md`](./00-estado/ESTADO_EJECUCION.md) para situarte.
-2. Elegir el siguiente sprint en [`01-producto/PLAN_IMPLEMENTACION.md`](./01-producto/PLAN_IMPLEMENTACION.md).
+2. Revisar los cambios OpenSpec activos y los sprints 6.2-6.4 pendientes en [`01-producto/PLAN_IMPLEMENTACION.md`](./01-producto/PLAN_IMPLEMENTACION.md).
 3. Revisar arquitectura y UX antes de implementar.

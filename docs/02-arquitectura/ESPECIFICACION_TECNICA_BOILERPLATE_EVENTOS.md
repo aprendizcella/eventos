@@ -5,7 +5,9 @@
 **Fecha:** 22/06/2026  
 **Estado:** Base técnica inicial implementada (Sprint 1.1 completado)
 
-> **Estado de ejecución (post Sprint 1.1):** La base técnica del boilerplate está operativa sobre Laravel 12 / PHP 8.4 / Sail. El módulo de autenticación y usuarios (sección 7.1) está implementado: registro, login, logout, reset de password, verificación de email (vía `MustVerifyEmail`), roles y permisos con Spatie Permission, y trazabilidad con Spatie Activitylog. Stack de Fase 1 instalado: Sanctum, Spatie Permission, Spatie Activitylog, Mews/Purifier, Livewire + Volt. Tests en verde y QA pipeline (`composer qa`) limpio. Los módulos 7.2–7.7 siguen como propuesta pendiente de implementar en los sprints siguientes.
+> **Documento histórico / estado de referencia:** redactado el 22/06/2026 para describir la base inicial. El repositorio ya contiene los sprints posteriores, incluido Sprint 6.1; las secciones de propuesta y roadmap no sustituyen al estado actual de [`ESTADO_EJECUCION.md`](../00-estado/ESTADO_EJECUCION.md).
+
+> **Estado de ejecución (referencia post Sprint 1.1):** La base técnica y el módulo de autenticación descritos aquí siguen implementados. Los módulos 7.2–7.7 dejaron de ser únicamente propuesta durante los sprints posteriores; para su estado vigente debe consultarse el índice de ejecución.
 
 ## 1. Objetivo del documento
 
@@ -364,7 +366,7 @@ Este documento se considerará suficiente como base inicial si:
 
 ## 14. Próximo paso recomendado
 
-El siguiente paso es convertir esta especificación en un **desglose técnico por módulos**, con:
+Como documento histórico, el siguiente paso original era convertir esta especificación en un **desglose técnico por módulos**, con:
 
 - entidades;
 - relaciones;
@@ -375,3 +377,4 @@ El siguiente paso es convertir esta especificación en un **desglose técnico po
 - vistas;
 - pruebas.
 
+Ese desglose se materializó progresivamente en los sprints y artefactos OpenSpec posteriores; no representa una tarea pendiente actual.

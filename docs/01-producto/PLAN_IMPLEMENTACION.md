@@ -6,7 +6,7 @@
 **Metodologia:** Sprints de 1 semana con entregables verificables por fase
 **Referencia:** Hi.Events (funcional), Attendize (ticketing), Eventbrite (benchmark)
 
-> **Estado de ejecucion (actualizacion post Sprint 4.4):** Todos los sprints de la Fase 1 (1.1-1.4), Fase 2 (2.1-2.4), Fase 3 (3.1-3.4), Sprint T0 (Multitenancy Foundation) y Fase 4 (4.1 Facturación, 4.2 Comisiones y Payouts, 4.3 Reportes Avanzados, 4.4 Retro y Ajustes) están **implementados, archivados y 100% verificados localmente**. Se cuenta con pasarela de cobros segura, generación de entradas con PDF y código QR únicos, control de reenvíos/concurrencia asíncrona, Magic Links seguros de un solo uso para asistentes, check-in operativo por cámara y lista manual, colas de lista de espera automáticas con transaccionalidad e idempotencia, recolección de información adicional (preguntas personalizadas) durante el checkout con validación en servidor, envíos masivos ad-hoc asíncronos con estrategia Outbox tolerante a fallos, exportación de asistentes a CSV en streaming nativo, una capa exacta de facturación, una capa interna de comisiones/payouts ya cerradas, un bloque de reportes avanzados ya operativo, y monitorización de colas con Horizon protegido por roles. El siguiente bloque planificado es la **Fase 5 (Discovery y Escalabilidad)**.
+> **Estado de ejecucion (post Sprint 6.1):** El repositorio contiene implementados los sprints 1.1–5.4 y Sprint 6.1. El informe OpenSpec de Sprint 6.1 reporta 41/41 requisitos, 72/72 escenarios, 18/18 tareas, 928 tests y PHPStan/Pint/Rector limpios; esta documentación no lo presenta como QA independiente rerun. Sprint 6.1 está en el archivo OpenSpec, aunque falta `archive-report.md`. Permanecen pendientes Sprint 6.2 (auditoría/GDPR/MFA), 6.3 (webhooks outbound/documentación API) y 6.4 (deploy, CI/CD, backups, Sentry, load testing y documentación final).
 
 ---
 
@@ -843,7 +843,7 @@ Stack y artefactos entregados en el repositorio:
 
 ---
 
-### Sprint 5.2: Busqueda con Meilisearch (Semana 18) — COMPLETADO ✅
+### Sprint 5.2: Busqueda con Meilisearch (Semana 18) — IMPLEMENTADO Y ARCHIVADO ✅
 
 **Objetivo UX:** convertir el catálogo público en una experiencia de discovery más sólida, con búsqueda textual visible, filtros reutilizables y mejor feedback visual (chips, resumen de resultados y estados de carga), manteniendo el catálogo raíz/tenant ya implementado.
 
@@ -868,11 +868,11 @@ Stack y artefactos entregados en el repositorio:
 
 **Dependencias:** Sprint 5.1 (Catalogo), Meilisearch disponible en Sail.
 
-**Estado final:** Sprint implementado con Scout + Meilisearch (y fallback Eloquent), verificado exhaustivamente y archivado en OpenSpec (`openspec/changes/archive/2026-07-14-sprint-5-2-search-and-ux/`).
+**Estado final:** Sprint implementado con Scout + Meilisearch (y fallback Eloquent), con verificación reportada por OpenSpec y archivado en `openspec/changes/archive/2026-07-14-sprint-5-2-search-and-ux/`. Esta documentación no presenta esa evidencia como QA independiente rerun.
 
 ---
 
-### Sprint 5.3: SEO y Widget (Semana 19) — COMPLETADO ✅
+### Sprint 5.3: SEO y Widget (Semana 19) — IMPLEMENTADO Y ARCHIVADO ✅
 
 | Tarea | Detalle                | Entregable                      |
 | ----- | ---------------------- | ------------------------------- |
@@ -891,13 +891,13 @@ Stack y artefactos entregados en el repositorio:
 - [x] Widget embebible funcional, listando eventos publicados por organizador.
 
 **Estado final:** Implementado sin dependencias externas agresivas (solución nativa con Controllers/JS ligero). SDD archivado en `openspec/changes/archive/2026-07-14-sprint-5-3-seo-and-widget/`.
-- [ ] QA pipeline pasa limpio
+- [x] QA pipeline pasa limpio según la evidencia del cambio archivado.
 
 **Dependencias:** Sprint 5.2 (Busqueda).
 
 ---
 
-### Sprint 5.4: Optimizacion de Rendimiento (Semana 20) — COMPLETADO ✅
+### Sprint 5.4: Optimizacion de Rendimiento (Semana 20) — IMPLEMENTADO; CIERRE CON CAVEAT ✅
 
 | Tarea | Detalle                 | Entregable                   |
 | ----- | ----------------------- | ---------------------------- |
@@ -918,12 +918,12 @@ Stack y artefactos entregados en el repositorio:
 - [x] Comando de benchmark creado y operando.
 - [ ] Integración real con CDN (diferida a futuro).
 - [ ] Cursor pagination (diferida a futuro).
-- [x] QA pipeline pasa limpio.
+- [x] QA pipeline pasa limpio según el informe OpenSpec.
 - [x] Fase 5 completa: Catalogo + Busqueda + SEO + Rendimiento.
 
 **Dependencias:** Sprints 5.1, 5.2, 5.3.
 
-**Estado final:** Implementado con TDD estricto y archivado en `openspec/changes/archive/2026-07-16-sprint-5-4-rendimiento/`.
+**Estado final:** Implementado y archivado en `openspec/changes/archive/2026-07-16-sprint-5-4-rendimiento/`. El cambio solicita fresh verification; no se infiere una nueva ejecución independiente en esta actualización. CDN real y cursor pagination siguen diferidos.
 
 ---
 
@@ -931,7 +931,7 @@ Stack y artefactos entregados en el repositorio:
 
 **Objetivo:** Backoffice de plataforma, auditoria, GDPR, MFA, webhooks outbound, deploy en produccion.
 
-### Sprint 6.1: Backoffice de Plataforma (Semana 21)
+### Sprint 6.1: Backoffice de Plataforma (Semana 21) — IMPLEMENTADO Y ARCHIVADO EN OPENSPEC ✅
 
 | Tarea | Detalle                        | Entregable                 |
 | ----- | ------------------------------ | -------------------------- |
@@ -945,17 +945,19 @@ Stack y artefactos entregados en el repositorio:
 
 **Criterios de aceptacion:**
 
-- [ ] Admin puede gestionar usuarios
-- [ ] Admin puede moderar eventos
-- [ ] Configuracion de comisiones global
-- [ ] Metricas globales visibles
-- [ ] QA pipeline pasa limpio
+- [x] Admin puede gestionar usuarios con suspensión/restauración y protección del último `super_admin`.
+- [x] Admin puede moderar eventos de forma reversible, conservando el estado anterior.
+- [x] Configuración global de plataforma y fallback de comisiones con historial inmutable.
+- [x] Backoffice Volt y API admin implementados.
+- [x] Verificación reportada por OpenSpec: 928 tests, 41 requisitos y 72 escenarios conformes.
 
 **Dependencias:** Sprint 1.1 (User, Permission).
 
+**Caveat de evidencia:** el informe declara PASS y listo para archivar, pero el cambio archivado no incluye `archive-report.md`; los resultados son evidencia reportada, no una QA independiente ejecutada durante esta actualización.
+
 ---
 
-### Sprint 6.2: Audit, GDPR y MFA (Semana 22)
+### Sprint 6.2: Audit, GDPR y MFA (Semana 22) — PENDIENTE / DIFERIDO
 
 | Tarea | Detalle                    | Entregable                             |
 | ----- | -------------------------- | -------------------------------------- |
@@ -979,7 +981,7 @@ Stack y artefactos entregados en el repositorio:
 
 ---
 
-### Sprint 6.3: Webhooks Outbound y Documentacion (Semana 23)
+### Sprint 6.3: Webhooks Outbound y Documentacion (Semana 23) — PENDIENTE / DIFERIDO
 
 | Tarea | Detalle                      | Entregable                         |
 | ----- | ---------------------------- | ---------------------------------- |
@@ -1003,7 +1005,7 @@ Stack y artefactos entregados en el repositorio:
 
 ---
 
-### Sprint 6.4: Deploy y Cierre (Semana 24)
+### Sprint 6.4: Deploy y Cierre (Semana 24) — PENDIENTE / DIFERIDO
 
 | Tarea | Detalle                     | Entregable                          |
 | ----- | --------------------------- | ----------------------------------- |

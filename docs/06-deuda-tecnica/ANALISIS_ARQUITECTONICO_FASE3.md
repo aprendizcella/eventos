@@ -1,8 +1,10 @@
 # Análisis Arquitectónico — Post Sprint 3.2
 
+> **Documento histórico / estado de referencia:** este análisis fue redactado el 2026-07-02 antes de Sprint 3.3. Conserva el diagnóstico y las prioridades de aquel corte; no debe leerse como un estado actual ni como una lista vigente de bloqueos. El estado actual está en [`ESTADO_EJECUCION.md`](../00-estado/ESTADO_EJECUCION.md).
+
 > **Fecha de análisis:** 2026-07-02
 > **Sprint de referencia:** 3.2 (Waitlist completado)
-> **Sprint siguiente:** 3.3 (Exportación y Mensajería Masiva)
+> **Sprint siguiente en el corte histórico:** 3.3 (Exportación y Mensajería Masiva)
 > **Estado del pipeline QA:** ✅ 531 tests, PHPStan OK, Pint OK
 
 Este documento recoge el análisis de arquitectura y código generado al terminar el Sprint 3.2, antes de iniciar el Sprint 3.3. Su objetivo es dejar constancia de la deuda técnica identificada, con la prioridad de cada ítem y la acción recomendada.
@@ -154,9 +156,9 @@ La convención del proyecto es `final` por defecto. El comando extiende `Command
 
 ---
 
-## 4. Plan de Acción Inmediata
+## 4. Plan de Acción Inmediata (histórico)
 
-Antes de iniciar el Sprint 3.3, se recomienda un **micro-refactor** (estimación: 1-2 horas) que aborde únicamente los puntos 2.1 y 2.2:
+Antes de iniciar el Sprint 3.3, se recomendaba un **micro-refactor** (estimación: 1-2 horas) que abordara únicamente los puntos 2.1 y 2.2. Este texto conserva la recomendación original; no certifica aquí si cada punto fue resuelto.
 
 ### Pasos concretos
 

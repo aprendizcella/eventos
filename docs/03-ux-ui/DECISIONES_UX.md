@@ -17,6 +17,8 @@ Registro de decisiones de experiencia de usuario, diseño visual y organización
 | Referencia visual principal | TailAdmin Laravel |
 | Referencia secundaria | Materio, solo para inspiración puntual |
 
+> **Estado de ejecución:** account/topbar UX, email-verification gate, layout admin, navegación responsive y tablas por dominio están implementados según los cambios OpenSpec correspondientes. `mini-sprint-account-ux` está verificado y listo para archivar; la validación manual responsive sigue pendiente. Las decisiones de notificaciones/feedback e iconos no están cerradas.
+
 ---
 
 ## 1. Problema
@@ -136,22 +138,20 @@ No se crearán carpetas vacías “por si acaso”. Las carpetas se crean cuando
 | ~~Modo claro/oscuro~~ | ✅ Resuelto: `light`, `dark`, `system` con persistencia en `localStorage`. |
 | ~~Layout admin~~ | ✅ Resuelto: sidebar fijo en desktop, oculto en mobile con toggle. Topbar con theme toggle. |
 | ~~Interactividad JS~~ | ✅ Resuelto: Alpine.js para estado reactivo en theme toggle y mobile sidebar. Vanilla JS reemplazado. |
-| Navegación | ¿Topbar con usuario/tema/notificaciones desde el inicio? (theme ya incluido, usuario/notificaciones pendientes) |
+| Navegación | Topbar con usuario y tema implementado; notificaciones siguen pendientes de decisión. |
 | ~~Tablas~~ | ✅ Resuelto: patrón TailAdmin implementado con componentes Livewire Volt por dominio. |
 | ~~Feedback UI~~ | ✅ Parcialmente resuelto: `x-ui.modal` existe; alertas/toasts siguen pendientes. |
-| Iconos | ¿SVG inline, Heroicons, Lucide u otra fuente? |
+| Iconos | Decisión pendiente: SVG inline, Heroicons, Lucide u otra fuente. |
 
 ---
 
 ## 8. Próximo paso operativo
 
-Seguir el orden descrito en [`PLAN_UX_FOUNDATION.md`](./PLAN_UX_FOUNDATION.md):
+La foundation ya está aplicada y las superficies de cuenta, topbar y layout se han integrado en el producto. El siguiente trabajo UX es cerrar la validación manual responsive y las decisiones pendientes, no iniciar Sprint 1.2.
 
-1. commit limpio del estado actual;
-2. migrar componentes genéricos a `form/` y `ui/`;
-3. decidir dark/light mode real;
-4. crear layout base de panel admin;
-5. comenzar Sprint 1.2 sobre esa base.
+1. Validar manualmente las rutas principales en móvil, tablet y desktop.
+2. Resolver la estrategia de notificaciones, feedback y fuente de iconos.
+3. Mantener [`PLAN_UX_FOUNDATION.md`](./PLAN_UX_FOUNDATION.md) como referencia de la foundation ya implementada.
 
 ---
 

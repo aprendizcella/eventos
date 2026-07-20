@@ -1,6 +1,6 @@
 # Plan de Mejora Responsive y UX — TailAdmin
 
-> **Estado de ejecución:** Implementado con QA automatizado aprobado; validación visual manual pendiente  
+> **Estado de ejecución:** Implementado con verificación OpenSpec reportada; validación visual manual en navegador pendiente
 > **Fecha de creación:** 28/06/2026  
 > **Referencia visual:** TailAdmin Laravel  
 > **Decisión actual:** tablas interactivas por dominio con Livewire Volt, no `<x-ui.table>` genérico.
@@ -10,6 +10,8 @@
 ## 1. Resultado Actual
 
 La mejora responsive se resolvió con una estrategia distinta al plan inicial: en lugar de crear una tabla Blade genérica, se implementaron tablas Livewire Volt específicas por dominio.
+
+El informe OpenSpec de `mini-sprint-responsive-ux` marca 9/9 tareas y 448/448 tests, pero el cierre manual en móvil, tablet y desktop sigue sin estar marcado. Por tanto, el estado es implementación verificada automáticamente con validación visual pendiente.
 
 | Área | Estado | Implementación |
 |---|---|---|
@@ -102,8 +104,8 @@ Responsabilidades específicas:
 | Tablas soportan paginación | Implementado |
 | Events soporta filtros desplegables | Implementado |
 | Acciones Livewire de escritura autorizan en servidor | Implementado |
-| QA completo actual | Aprobado: `vendor/bin/sail composer qa` |
-| Build frontend | Aprobado: `vendor/bin/sail npm run build` |
+| QA completo actual | Aprobado según el informe OpenSpec |
+| Build frontend | Aprobado según el informe OpenSpec |
 | Tests específicos Livewire/Volt | Implementados en `tests/Feature/LivewireOrganizerTablesTest.php` |
 | Validación visual manual | Pendiente |
 
@@ -113,7 +115,7 @@ Responsabilidades específicas:
 
 Antes de cerrar el mini-sprint queda pendiente:
 
-1. Validar manualmente las rutas principales en móvil, tablet y desktop.
+1. Validar manualmente las rutas principales en móvil, tablet y desktop; esta comprobación continúa pendiente.
 2. Ejecutar Sonar con `./sonar.sh` si se quiere cerrar la iteración con gate externo actualizado.
 
 ---

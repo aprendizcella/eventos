@@ -2,7 +2,7 @@
 
 Este documento define el orden de trabajo para consolidar la base UX/UI del proyecto antes de seguir con nuevas pantallas de dominio.
 
-> **Decisión actual:** antes de iniciar Sprint 1.2 de Organizadores/Eventos, se realizará un bloque corto de cimentación UX para evitar duplicación visual, componentes dispersos y deuda de interfaz.
+> **Estado actual:** la foundation UX se implementó antes de las pantallas posteriores de dominio y continúa siendo la base de auth, cuenta, organizadores y backoffice. El trabajo pendiente es de validación manual y decisiones de producto, no de secuenciación previa a Sprint 1.2.
 
 ---
 
@@ -18,13 +18,13 @@ Esto permitirá que las próximas pantallas de administración y organizadores s
 
 | Orden | Trabajo | Resultado esperado |
 |---|---|---|
-| 1 | Commit limpio del estado actual | Punto de restauración antes de nuevos refactors. |
+| 1 | ~~Commit limpio del estado actual~~ | ✅ El repositorio tiene entregas posteriores; conservar el historial como referencia. |
 | 2 | ~~Mover componentes genéricos fuera de `components/auth/`~~ | ✅ Hecho. `components/form/` y `components/ui/` como base reutilizable. |
-| 3 | Formalizar decisiones UX | `DECISIONES_UX.md`, `COMPONENTES_UI.md` y este plan actualizados. |
+| 3 | ~~Formalizar decisiones UX~~ | ✅ Documentado en `DECISIONES_UX.md`, `COMPONENTES_UI.md` y este plan. |
 | 4 | ~~Implementar dark/light mode real~~ | ✅ Hecho. Toggle reutilizable con `light`, `dark` y `system`, persistencia en `localStorage`, clase `dark` en `documentElement`. |
 | 5 | ~~Crear layout base de panel admin~~ | ✅ Hecho. Sidebar, topbar, main content slot, responsive. |
-| 6 | Crear componentes mínimos de panel | Cards, page header, table shell, empty state, action buttons. |
-| 7 | Empezar Sprint 1.2 | Organizadores/Eventos ya sobre la base UX. |
+| 6 | Completar decisiones y validación UX | Notificaciones, feedback, iconos y comprobación manual responsive. |
+| 7 | ~~Empezar Sprint 1.2~~ | ✅ Los sprints posteriores ya se han construido sobre esta base. |
 
 ---
 
@@ -228,12 +228,14 @@ No se adopta como base por ahora porque introducir Bootstrap junto a Tailwind au
 
 ## 10. Regla de avance
 
-No empezar Sprint 1.2 de dominio hasta completar, como mínimo:
+La regla histórica de entrada a Sprint 1.2 queda satisfecha por la implementación existente. Para el estado actual, el cierre UX requiere:
 
-- [ ] commit limpio del estado actual;
+- [x] commit de referencia del estado base;
 - [x] componentes movidos a `form/` y `ui/`;
 - [x] decisión de dark/light mode;
-- [x] layout admin base definido o implementado.
+- [x] layout admin base definido e implementado.
+- [ ] validación visual manual responsive.
+- [ ] decisión de notificaciones, feedback completo e iconos.
 
 ---
 
@@ -245,4 +247,4 @@ No empezar Sprint 1.2 de dominio hasta completar, como mínimo:
 components/auth/ → components/form/ + components/ui/
 ```
 
-Después, crear el primer slice UX del panel admin.
+El siguiente slice UX debe centrarse en esas validaciones y decisiones pendientes, no en recrear la foundation.

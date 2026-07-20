@@ -2,9 +2,11 @@
 
 ## Documento de adaptacion tecnica
 
+> **Documento histórico / estado de referencia:** este mapeo conserva la propuesta y sus decisiones de adaptación iniciales. El repositorio ya materializó gran parte del mapa hasta Sprint 6.1; para el estado vigente y los pendientes debe consultarse [`ESTADO_EJECUCION.md`](../00-estado/ESTADO_EJECUCION.md). Las listas de clases y carpetas de este documento son referencias de diseño, no un inventario actual exhaustivo.
+
 **Proposito:** Mostrar como la propuesta tecnica DDD (`PROPUESTA_TECNICA_DDD_LARAVEL12.md`) encaja en el boilerplate Laravel 12 existente, respetando sus convenciones, stack y flujo de trabajo.
 
-> **Estado de ejecucion (post Sprint 1.1):** El mapeo de la propuesta DDD al boilerplate esta **parcialmente materializado**. La capa de Identity & Access (Auth + Roles) ya existe en el codigo: `app/Actions/Auth/` (con sufijo `Action`), `app/Models/User.php` con los traits `HasApiTokens`, `HasRoles` y `LogsActivity`, componentes Volt en `resources/views/livewire/auth/`, migraciones `permission_tables` / `activity_log` / `personal_access_tokens`, y `RoleSeeder` con los seis roles. El resto de la estructura (Event, Organizer, Product, Order, etc.) sigue siendo el mapa objetivo para los sprints 1.2+.
+> **Estado de ejecucion (referencia post Sprint 1.1):** El mapeo se materializó progresivamente en los sprints posteriores: identidad, eventos, organizadores, ticketing, operación, monetización, discovery y backoffice tienen implementación en el repositorio. Las partes no implementadas o diferidas deben leerse en el plan vigente; este documento no debe interpretarse como que todo el mapa sigue pendiente.
 
 ---
 
@@ -754,9 +756,8 @@ Sprint 5.4 habilita object storage S3-compatible con MinIO local y S3 en producc
 
 ## 10. Siguiente paso concreto
 
-> **Estado:** Sprint 1.1 (Setup y Auth) completado y archivado en `openspec/changes/archive/2026-06-25-sprint-1-1-setup-auth`. La capa Identity & Access del mapeo ya esta implementada.
+> **Referencia histórica:** Sprint 1.1 (Setup y Auth) completado y archivado. El estado actual posterior incluye Sprint 6.1 implementado; esta sección conserva la secuencia original y no prescribe reiniciar por Sprint 1.2.
 
-1. Continuar Fase 1 con **Sprint 1.2: Organizadores y Equipos** via `sdd-explore` sobre el modulo Organizer.
-2. Crear las migraciones `organizer` y `organizer_user` siguiendo las convenciones del boilerplate (singular, PK `{model}_id`, SoftDeletes).
-3. Aplicar el patron `FormRequest -> toDto() -> Controller -> Action` ya validado en `app/Actions/Auth/` (con sufijo `Action`).
-4. Mantener la trazabilidad con `LogsActivity` en el modelo `Organizer`, igual que en `User`.
+1. Consultar el plan vigente antes de abrir un nuevo cambio OpenSpec.
+2. Mantener el patron `FormRequest -> toDto() -> Controller -> Action` ya validado en el repositorio.
+3. Usar este mapeo como referencia arquitectónica, no como checklist de trabajo pendiente.
