@@ -20,6 +20,7 @@ final readonly class LoginUserAction
         $succeeded = $this->guard->attempt([
             'email' => $dto->email,
             'password' => $dto->password,
+            fn ($query) => $query->whereNull('suspended_at'),
         ], $dto->remember);
 
         if (!$succeeded) {

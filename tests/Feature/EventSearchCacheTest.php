@@ -72,12 +72,12 @@ it('serves repeated searches from cache when scout fallback is used', function (
     config(['scout.driver' => 'mock']);
 
     Cache::tags(['catalog'])->flush();
-    expect(Cache::tags(['catalog'])->get('catalog:search:'.md5('testa:1:{s:4:"date";s:10:"2026-08-15";}|page=1|perPage=12')))->toBeNull();
+    expect(Cache::tags(['catalog'])->get('catalog:search:'.hash('sha256', 'testa:1:{s:4:"date";s:10:"2026-08-15";}|page=1|perPage=12')))->toBeNull();
 
     $results1 = $service->search('testa', ['date' => '2026-08-15']);
 
     // The query should be cached now
-    $cached = Cache::tags(['catalog'])->get('catalog:search:'.md5('testa'.serialize(['date' => '2026-08-15']).'|page=1|perPage=12'));
+    $cached = Cache::tags(['catalog'])->get('catalog:search:'.hash('sha256', 'testa'.serialize(['date' => '2026-08-15']).'|page=1|perPage=12'));
     expect($cached)->not->toBeNull();
 
     $results2 = $service->search('testa', ['date' => '2026-08-15']);

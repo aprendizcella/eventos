@@ -56,7 +56,7 @@ final class EventSearchService
         $baseQuery->oldest('starts_at');
 
         $page = Paginator::resolveCurrentPage();
-        $key = 'catalog:list:'.md5(serialize($filters)."|page={$page}|perPage={$perPage}");
+        $key = 'catalog:list:'.hash('sha256', serialize($filters)."|page={$page}|perPage={$perPage}");
 
         /** @var LengthAwarePaginator<int, Event> */
         return Cache::tags(['catalog'])->remember($key, 3600, fn () => $baseQuery->paginate($perPage));
@@ -145,7 +145,7 @@ final class EventSearchService
             $baseQuery->oldest('starts_at');
 
             $page = Paginator::resolveCurrentPage();
-            $key = 'catalog:search:'.md5($query.serialize($filters)."|page={$page}|perPage={$perPage}");
+            $key = 'catalog:search:'.hash('sha256', $query.serialize($filters)."|page={$page}|perPage={$perPage}");
 
             /** @var LengthAwarePaginator<int, Event> */
             return Cache::tags(['catalog'])->remember($key, 3600, fn () => $baseQuery->paginate($perPage));

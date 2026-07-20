@@ -1,5 +1,9 @@
 <div x-data="{ sidebarOpen: false }" class="flex min-h-screen bg-gray-50 dark:bg-gray-950">
-    <x-navigation.sidebar />
+    @if(isset($sidebar))
+        {{ $sidebar }}
+    @else
+        <x-navigation.sidebar />
+    @endif
 
     <div class="flex flex-1 flex-col">
         <x-navigation.topbar />

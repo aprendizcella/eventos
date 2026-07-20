@@ -26,6 +26,8 @@ use Spatie\Activitylog\Support\LogOptions;
  * @property EventStatus $status
  * @property EventVisibility $visibility
  * @property array<mixed>|null $custom_questions
+ * @property string|null $previous_status
+ * @property CarbonInterface|null $suspended_at
  */
 final class Event extends Model
 {
@@ -220,6 +222,7 @@ final class Event extends Model
             'visibility' => EventVisibility::class,
             'custom_questions' => 'array',
             'settings' => 'array',
+            'suspended_at' => 'datetime',
         ];
     }
 }

@@ -86,6 +86,10 @@ Route::middleware(['auth'])->group(function () {
         Volt::route('/dashboard', 'dashboard')->name('dashboard');
 
         Route::prefix('admin')->name('admin.')->middleware(['role:super_admin|platform_admin'])->group(function () {
+            Volt::route('/', 'admin.dashboard')->name('dashboard');
+            Volt::route('/users', 'admin.users')->name('users');
+            Volt::route('/events', 'admin.events')->name('events');
+            Volt::route('/settings', 'admin.settings')->name('settings');
             Volt::route('/reports', 'admin.reports.platform-hub')->name('reports.index');
         });
 

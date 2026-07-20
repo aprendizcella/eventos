@@ -15,6 +15,7 @@
 | Cómo está montado el backend (capas, flujos, convenciones) | [`02-arquitectura/ESPECIFICACION_TECNICA_BOILERPLATE_EVENTOS.md`](./02-arquitectura/ESPECIFICACION_TECNICA_BOILERPLATE_EVENTOS.md) |
 | Cómo encaja la propuesta DDD en el boilerplate | [`02-arquitectura/MAPING_PROPUESTA_DDD_A_BOILERPLATE.md`](./02-arquitectura/MAPING_PROPUESTA_DDD_A_BOILERPLATE.md) |
 | Qué decisiones de arquitectura se han tomado y por qué | [`02-arquitectura/DECISIONES_ARQUITECTURA.md`](./02-arquitectura/DECISIONES_ARQUITECTURA.md) |
+| Arquitectura del backoffice de plataforma (Sprint 6.1) | [`02-arquitectura/04-admin-platform.md`](./02-arquitectura/04-admin-platform.md) |
 | Criterios UX/UI, referencia TailAdmin y filosofía de componentes | [`03-ux-ui/DECISIONES_UX.md`](./03-ux-ui/DECISIONES_UX.md) |
 | Qué hacer antes de iniciar nuevas pantallas de dominio | [`03-ux-ui/PLAN_UX_FOUNDATION.md`](./03-ux-ui/PLAN_UX_FOUNDATION.md) |
 | Estructura actual de componentes y objetivo (`form/` + `ui/`) | [`03-ux-ui/COMPONENTES_UI.md`](./03-ux-ui/COMPONENTES_UI.md) |
@@ -38,7 +39,8 @@ docs/
 ├── 02-arquitectura/           ← decisiones técnicas y estructurales
 │   ├── ESPECIFICACION_TECNICA_BOILERPLATE_EVENTOS.md
 │   ├── MAPING_PROPUESTA_DDD_A_BOILERPLATE.md
-│   └── DECISIONES_ARQUITECTURA.md
+│   ├── DECISIONES_ARQUITECTURA.md
+│   └── 04-admin-platform.md
 ├── 03-ux-ui/                  ← decisiones de UI/UX y componentes
 │   ├── DECISIONES_UX.md
 │   ├── PLAN_UX_FOUNDATION.md

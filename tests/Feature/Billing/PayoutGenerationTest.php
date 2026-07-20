@@ -60,7 +60,8 @@ it('does not create a payout when no fee is configured', function (): void {
     $action = resolve(CreatePayoutAction::class);
     $payout = $action($invoice);
 
-    expect($payout)->toBeNull();
+    expect($payout)->toBeInstanceOf(Payout::class)
+        ->and($payout->commission_amount)->toBe(550); // 5% + 0.50 of 10000 by default config fallback
 });
 
 it('is idempotent — does not create a second payout for the same invoice', function (): void {
@@ -97,7 +98,8 @@ it('skips payout creation when organizer has no fee settings', function (): void
     $action = resolve(CreatePayoutAction::class);
     $payout = $action($invoice);
 
-    expect($payout)->toBeNull();
+    expect($payout)->toBeInstanceOf(Payout::class)
+        ->and($payout->commission_amount)->toBe(550); // 5% + 0.50 of 10000 by default config fallback
 });
 
 it('listener creates payout on PaymentCompleted when billing is configured', function (): void {

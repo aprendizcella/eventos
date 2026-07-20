@@ -38,6 +38,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => PermissionMiddleware::class,
             'role_or_permission' => RoleOrPermissionMiddleware::class,
             'organizer.detect' => App\Http\Middleware\DetectCurrentOrganizer::class,
+            'global.admin' => App\Http\Middleware\EnsureGlobalAdminContext::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

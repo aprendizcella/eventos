@@ -85,3 +85,19 @@ it('authenticates with remember me when checkbox is checked', function (): void 
 
     $this->assertAuthenticated();
 });
+
+it('rejects authentication for suspended users', function (): void {
+    $user = User::factory()->create([
+        'email' => 'suspended@example.com',
+        'password' => 'Sup3rSecret!',
+        'suspended_at' => now(),
+    ]);
+
+    $this->post('/login', [
+        'email' => 'suspended@example.com',
+        'password' => 'Sup3rSecret!',
+    ])
+        ->assertSessionHasErrors(['email']);
+
+    $this->assertGuest();
+});

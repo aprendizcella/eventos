@@ -12,4 +12,5 @@ enum EventStatus: string
     case Paused = 'paused';
     case Completed = 'completed';
     case Cancelled = 'cancelled';
+    case Suspended = 'suspended';
 }

@@ -8,6 +8,7 @@ use App\DataTransferObjects\Organizers\BillingSettings;
 use App\Enums\PayoutStatus;
 use App\Models\Invoice;
 use App\Models\Payout;
+use App\Models\PlatformSetting;
 use App\Services\Payments\CommissionCalculator;
 
 final readonly class CreatePayoutAction
@@ -63,6 +64,15 @@ final readonly class CreatePayoutAction
 
         /** @var array<string, mixed> $billingData */
         $billingData = is_array($settings['billing'] ?? null) ? $settings['billing'] : [];
+
+        // Fallback chain for commissions
+        $platformSettings = PlatformSetting::current()->setting('commission');
+
+        $billingData['platform_fee_percentage'] ??= $platformSettings['platform_fee_percentage']
+        ?? config('tickets.commission_default.platform_fee_percentage');
+
+        $billingData['platform_fee_fixed'] ??= $platformSettings['platform_fee_fixed']
+        ?? config('tickets.commission_default.platform_fee_fixed');
 
         $billingSettings = BillingSettings::fromArray($billingData);
 
