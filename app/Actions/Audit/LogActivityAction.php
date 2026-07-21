@@ -6,6 +6,7 @@ namespace App\Actions\Audit;
 
 use App\Models\Organizer;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use Override;
 use Spatie\Activitylog\Actions\LogActivityAction as SpatieLogActivityAction;
@@ -15,11 +16,29 @@ class LogActivityAction extends SpatieLogActivityAction
     #[Override]
     public function execute(Model $activity, string $description): Model
     {
-        // 1. Check explicit properties in JSON payload
+        [$explicitGlobal, $explicitOrganizerId] = $this->extractScopeProperties($activity);
+        $this->applyScope($activity, $explicitGlobal, $explicitOrganizerId);
+        $this->ensureDefaultColumns($activity);
+
+        return parent::execute($activity, $description);
+    }
+
+    /**
+     * @return array{?bool, ?int}
+     */
+    private function extractScopeProperties(Model $activity): array
+    {
         $activityProperties = $activity->getAttribute('properties');
-        $properties = ($activityProperties instanceof \Illuminate\Support\Collection)
-            ? $activityProperties->toArray()
-            : (is_array($activityProperties) ? $activityProperties : []);
+        $properties = [];
+
+        if ($activityProperties instanceof Collection) {
+            $properties = $activityProperties->toArray();
+        }
+
+        if (is_array($activityProperties)) {
+            $properties = $activityProperties;
+        }
+
         $explicitGlobal = null;
         $explicitOrganizerId = null;
 
@@ -29,18 +48,20 @@ class LogActivityAction extends SpatieLogActivityAction
         }
 
         if (array_key_exists('organizer_id', $properties)) {
-            $explicitOrganizerId = $properties['organizer_id'] !== null ? (int) $properties['organizer_id'] : null;
+            $explicitOrganizerId = $properties['organizer_id'] === null
+                ? null
+                : (int) $properties['organizer_id'];
             unset($properties['organizer_id']);
         }
 
-        // Put cleaned properties back
         $activity->setAttribute('properties', collect($properties));
 
-        // 2. Resolve Current Tenant
-        $currentTenant = Organizer::current();
-        $currentTenantId = $currentTenant?->id;
+        return [$explicitGlobal, $explicitOrganizerId];
+    }
 
-        // 3. Apply validation invariants
+    private function applyScope(Model $activity, ?bool $explicitGlobal, ?int $explicitOrganizerId): void
+    {
+        $currentTenantId = Organizer::current()?->id;
         $resolvedOrganizerId = null;
         $resolvedGlobal = false;
 
@@ -48,28 +69,28 @@ class LogActivityAction extends SpatieLogActivityAction
             if ($explicitOrganizerId !== null) {
                 throw new InvalidArgumentException('is_global=true implies organizer_id IS NULL');
             }
+
             $resolvedGlobal = true;
-        } elseif ($explicitOrganizerId !== null) {
+        }
+
+        if ($explicitGlobal !== true && $explicitOrganizerId !== null) {
             if ($currentTenantId !== null && $explicitOrganizerId !== $currentTenantId) {
                 throw new InvalidArgumentException('Explicit organizer_id conflicts with current tenant context');
             }
+
             $resolvedOrganizerId = $explicitOrganizerId;
-            $resolvedGlobal = false;
-        } elseif ($currentTenantId !== null) {
-            // No explicit markers
-            $resolvedOrganizerId = $currentTenantId;
-            $resolvedGlobal = false;
-        } else {
-            $resolvedOrganizerId = null;
-            $resolvedGlobal = false; // No tenant context implies unclassified legacy event
         }
 
-        // Assign columns to model
+        if ($explicitGlobal !== true && $explicitOrganizerId === null && $currentTenantId !== null) {
+            $resolvedOrganizerId = $currentTenantId;
+        }
+
         $activity->setAttribute('organizer_id', $resolvedOrganizerId);
         $activity->setAttribute('is_global', $resolvedGlobal);
+    }
 
-        // Ensure all possible database columns exist on the model attribute array
-        // to prevent mismatch keys in bulk inserts when buffering is enabled.
+    private function ensureDefaultColumns(Model $activity): void
+    {
         $defaultColumns = [
             'subject_type' => null,
             'subject_id' => null,
@@ -87,7 +108,5 @@ class LogActivityAction extends SpatieLogActivityAction
                 $activity->setAttribute($column, $default);
             }
         }
-
-        return parent::execute($activity, $description);
     }
 }

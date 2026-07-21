@@ -2,11 +2,11 @@
 
 ## 🚨 CONTEXTO CRÍTICO DEL REPOSITORIO
 
-Este repositorio es un boilerplate de Laravel moderno y está configurado para seguir un flujo de trabajo de desarrollo guiado por especificaciones (SDD/TDD). La clave para trabajar aquí es entender que la calidad del código es un **requisito operacional**, no opcional.
+Este repositorio es un boilerplate de Laravel moderno y admite un flujo de trabajo de desarrollo guiado por especificaciones (SDD/TDD). La calidad del código es un **requisito operacional**, no opcional; SDD es una herramienta flexible y nunca debe bloquear la implementación.
 
 ### ⚙️ Flujo de Trabajo de Desarrollo (Workflow)
 
-Todo cambio debe completarse en las siguientes fases estrictas:
+Para funcionalidades nuevas, cambios arquitectónicos o trabajos de alcance amplio, se recomienda completar las siguientes fases:
 1. **SDD Planning:** Definir la especificación de dominio (`sdd-spec`) o explorar requisitos (`sdd-explore`).
 2. **Design:** Crear el diseño técnico (`sdd-design`).
 3. **Tasks:** Desglosar en tareas de implementación (`sdd-tasks`).
@@ -14,7 +14,7 @@ Todo cambio debe completarse en las siguientes fases estrictas:
 5. **Verification:** Pasar la verificación final(`sdd-verify`).
 6. **Archive:** Archivar el cambio completado (`sdd-archive`).
 
-**¡IMPORTANTE!** Nunca implementar código sin haber pasado por las etapas SDD/TDD.
+**¡IMPORTANTE!** SDD es opcional para correcciones acotadas, refactorizaciones, mantenimiento, resolución de issues de SonarQube y cambios urgentes. La ausencia de artefactos o fases SDD **nunca puede bloquear la implementación de código**. Cuando se omita SDD, deben mantenerse las pruebas y los controles de calidad aplicables.
 
 ### 💾 Setup y Dependencias (¡CRÍTICO!)
 
@@ -35,7 +35,7 @@ Antes de cualquier commit de implementación, debe pasar el siguiente pipeline:
 
 ### 📚 Tools & Shortcuts
 
-- **OpenSpec/SDD:** Use la tool `sdd-` para cualquier mejora funcional.
+- **OpenSpec/SDD:** Use la tool `sdd-` cuando el alcance o el riesgo del cambio lo justifique; no es un requisito para implementar cambios.
 - **Documentación de Procesos:** Use el skill `cognitive-doc-design` para crear documentación que no sea código.
 - **Consultar el proceso SDD:** Ejecutar `sdd-onboard` para recordatorios del workflow.
 - **Mapa de documentación:** ver [`docs/README.md`](docs/README.md) para el índice completo (estado, producto, arquitectura, UX/UI, librerías).
