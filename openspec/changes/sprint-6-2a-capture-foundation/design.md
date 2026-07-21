@@ -68,6 +68,10 @@ The `LogActivityAction` will enforce this exact truth table:
 | `null`/`false`           | `null`                    | `7`              | `7`, `false`                            |
 | `null`/`false`           | `null`                    | `null`           | `NULL`, `false` (Unclassified)          |
 
+## Debt Note
+
+If later documentation references the read side, keep the global visibility filter explicit (`organizer_id IS NULL AND is_global = true`) and do not claim archive-level closure until the 6.2a verification trail is complete.
+
 ## Testing Strategy
 
 | Layer | What to Test | Approach |

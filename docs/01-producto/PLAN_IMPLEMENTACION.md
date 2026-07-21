@@ -6,7 +6,7 @@
 **Metodologia:** Sprints de 1 semana con entregables verificables por fase
 **Referencia:** Hi.Events (funcional), Attendize (ticketing), Eventbrite (benchmark)
 
-> **Estado de ejecucion (post Sprint 6.1):** El repositorio contiene implementados los sprints 1.1–5.4 y Sprint 6.1. El informe OpenSpec de Sprint 6.1 reporta 41/41 requisitos, 72/72 escenarios, 18/18 tareas, 928 tests y PHPStan/Pint/Rector limpios; esta documentación no lo presenta como QA independiente rerun. Sprint 6.1 está en el archivo OpenSpec, aunque falta `archive-report.md`. El slice Sprint 6.2a (visibilidad global de auditoría, solo lectura) está definido y pendiente; GDPR, MFA y el trabajo de captura/esquema/backfill quedan fuera de este slice y se mantienen como trabajo futuro separado. También permanecen pendientes Sprint 6.3 (webhooks outbound/documentación API) y 6.4 (deploy, CI/CD, backups, Sentry, load testing y documentación final).
+> **Estado de ejecucion (post Sprint 6.1):** El repositorio contiene implementados los sprints 1.1–5.4 y Sprint 6.1. El informe OpenSpec de Sprint 6.1 reporta 41/41 requisitos, 72/72 escenarios, 18/18 tareas, 928 tests y PHPStan/Pint/Rector limpios; esta documentación no lo presenta como QA independiente rerun. Sprint 6.1 está en el archivo OpenSpec, aunque falta `archive-report.md`. El slice Sprint 6.2a (visibilidad global de auditoría, solo lectura) está definido y pendiente; además, existe una deuda conocida en el contrato de visibilidad global: el filtro debe ser explícitamente `organizer_id IS NULL AND is_global = true`, y la evidencia/documentación todavía no está cerrada. GDPR, MFA y el trabajo de captura/esquema/backfill quedan fuera de este slice y se mantienen como trabajo futuro separado. También permanecen pendientes Sprint 6.3 (webhooks outbound/documentación API) y 6.4 (deploy, CI/CD, backups, Sentry, load testing y documentación final).
 
 ---
 
@@ -989,6 +989,8 @@ Las consultas de lectura usan siempre esta clasificación persistida y nunca inf
 **Dependencias:** Sprint 6.1 (Admin), Sprint 1.1 (User).
 
 **Fuera de alcance:** cambios de esquema, cambios en el capture seam, backfill histórico, auditoría tenant, datos no clasificados, export GDPR, derecho al olvido, MFA y cualquier mutación de actividad. Estos temas requieren cambios futuros separados.
+
+**Deuda conocida:** la documentación y la evidencia de Sprint 6.2a aún no están totalmente alineadas; el contrato correcto de lectura global sigue siendo `organizer_id IS NULL AND is_global = true`.
 
 ### Trabajo futuro separado de Sprint 6.2a
 

@@ -6,6 +6,10 @@ We will implement a read-only global Audit Log interface using Livewire Volt, st
 
 This slice does not introduce any schema migrations, capture-seam modifications, or historical backfill operations. It enforces a strict read/query boundary where only rows matching the canonical global classification (`organizer_id IS NULL AND is_global = true`) are returned.
 
+## Technical Debt Note
+
+Keep the filter contract explicit (`organizer_id IS NULL AND is_global = true`) until the remaining verification/archive evidence is completed. Do not describe this slice as fully verified or archived yet.
+
 ## Architecture Decisions
 
 ### Decision: Canonical Global State Query

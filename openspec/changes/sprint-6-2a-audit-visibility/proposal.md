@@ -4,6 +4,12 @@
 
 Implement a read-only global audit visibility UI for super administrators, built entirely on the existing `activity_log` foundation. This slice exclusively surfaces global system events by querying persisted schema classifications. It deliberately avoids creating new migrations, capture-seam modifications, or historical backfill operations.
 
+## Technical Debt
+
+- Sprint 6.2 still has a visibility-contract inconsistency between implementation, tests, and docs.
+- The intended rule is explicit global rows only: `organizer_id IS NULL AND is_global = true`.
+- Status and verification evidence still need final reconciliation before this slice can be treated as fully closed.
+
 ## Scope
 
 ### In Scope

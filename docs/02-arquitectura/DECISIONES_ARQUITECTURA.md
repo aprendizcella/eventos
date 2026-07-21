@@ -34,6 +34,8 @@
 | A22 | Sprint 4.2 = tracking interno de comisiones y payouts | El bloque de monetizacion registra comisiones y payouts sin mover dinero real; Stripe Connect queda diferido para una fase posterior. | `docs/01-producto/PLAN_IMPLEMENTACION.md` §Sprint 4.2 |
 | A23 | Auditoría global = lectura segura y clasificación persistida | Sprint 6.2a usa una frontera `ViewModel/DTO` de solo lectura con proyección segura, excluye payloads sensibles, ordena de forma determinista, pagina con límite y falla cerrando sin filtrar detalles. Solo `super_admin` accede a esta regla sensible; la observabilidad es redacted. | [`04-admin-platform.md`](./04-admin-platform.md) §Global Audit Visibility; SDD `sprint-6-2a-audit-visibility` |
 
+> **Nota de deuda:** la entrada A23 describe el contrato objetivo, pero el trail de verificación de Sprint 6.2a todavía debe cerrarse. Mantener explícito el filtro `organizer_id IS NULL AND is_global = true` y no dar por completada la evidencia hasta el archive final.
+
 ---
 
 ## Decisiones pendientes de formalizar

@@ -24,6 +24,8 @@ Only authenticated users with the exact `super_admin` role MUST access the page.
 
 The UI MUST return only rows where `organizer_id IS NULL AND is_global = true`. Tenant rows and unclassified rows (`organizer_id IS NULL AND is_global = false`) MUST be excluded. Ownership MUST NOT be inferred from the current request tenant, and excluded classifications MUST produce redacted structured observability.
 
+> Note: this is the intended contract, but the Sprint 6.2 evidence trail still needs final alignment in docs and archive artifacts.
+
 #### Scenario: Tenant-context mismatch does not broaden access
 - GIVEN a super-admin request carrying an active tenant context
 - WHEN the global audit query runs

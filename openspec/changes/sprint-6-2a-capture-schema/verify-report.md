@@ -33,3 +33,7 @@ All tasks are complete, and validation has passed successfully under the Sail Do
 ## Spec Compliance Matrix
 
 All scenarios, including migrations on populated databases, legacy classifications, invalid combination triggers, restrictOnDelete FK rules, and indexes have been verified and pass successfully.
+
+## Notes
+
+- This report does not close the Sprint 6.2a global audit visibility debt. The visibility contract remains `organizer_id IS NULL AND is_global = true`, and its archive evidence is tracked separately.

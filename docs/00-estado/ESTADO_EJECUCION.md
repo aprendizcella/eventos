@@ -1,6 +1,6 @@
 # Estado de ejecución
 
-> **Resumen en una línea:** El repositorio está en el estado posterior al commit `d2e9cbe` (2026-07-20): Sprints 1.1–5.4 y Sprint 6.1 están implementados; Sprint 6.1 dispone de informe OpenSpec PASS, pero su archivo no contiene `archive-report.md`, por lo que esa evidencia no equivale a una nueva verificación independiente. La Fase 6.2–6.4 y varios cambios OpenSpec activos siguen pendientes o con evidencia incompleta.
+> **Resumen en una línea:** El repositorio está en el estado posterior al commit `d2e9cbe` (2026-07-20): Sprints 1.1–5.4 y Sprint 6.1 están implementados; Sprint 6.1 dispone de informe OpenSpec PASS, pero su archivo no contiene `archive-report.md`, por lo que esa evidencia no equivale a una nueva verificación independiente. La Fase 6.2–6.4 y varios cambios OpenSpec activos siguen pendientes o con evidencia incompleta. En Sprint 6.2a existe una deuda conocida: el filtro global debe seguir siendo `organizer_id IS NULL AND is_global = true`, pero la documentación/evidencia aún no está completamente reconciliada.
 
 ---
 
@@ -258,7 +258,7 @@ La configuración OpenSpec mantiene `testing.strict_tdd: true`; el informe de Sp
 
 ## Qué NO está hecho
 
-- Sprint 6.2a: visibilidad global de auditoría de solo lectura, definida en OpenSpec y pendiente de implementación. GDPR, MFA, captura, esquema y backfill histórico permanecen fuera de este slice y requieren trabajo futuro separado.
+- Sprint 6.2a: visibilidad global de auditoría de solo lectura, definida en OpenSpec y pendiente de implementación completa/verificación. La deuda conocida es la alineación del filtro global (`organizer_id IS NULL AND is_global = true`) con la documentación y la evidencia. GDPR, MFA, captura, esquema y backfill histórico permanecen fuera de este slice y requieren trabajo futuro separado.
 - Sprint 6.3: webhooks outbound y documentación completa de API.
 - Sprint 6.4: deployment, CI/CD, backups, Sentry, load testing y documentación final.
 - Integración real con CDN y cursor pagination.

@@ -13,6 +13,8 @@
 
 Below the 800-line review budget; the policy conflict is resolved by excluding unclassifiable rows from every query result and UI, including for `super_admin`.
 
+> Technical debt: the implementation/test/documentation trail is still not fully reconciled with the final global-audit contract. Treat `organizer_id IS NULL AND is_global = true` as the only accepted filter until verification/archive evidence is completed.
+
 ### Suggested Work Units
 
 | Unit | Goal | Likely PR | Focused test command | Runtime harness | Rollback boundary |

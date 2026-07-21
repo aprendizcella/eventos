@@ -40,6 +40,8 @@ The global audit page is a read-only audit surface over the existing `activity_l
 - `platform_admin` and every other role are denied for this page, even though `platform_admin` retains the unrelated platform permissions shown in the matrix above.
 - The route must use the existing `global.admin` contract, backed by `EnsureGlobalAdminContext`, and the global permission context uses `team_id: 0` according to the repository convention.
 
+> **Deuda conocida:** el contrato correcto sigue siendo `organizer_id IS NULL AND is_global = true`, pero el estado de evidencia/documentación de Sprint 6.2a aún no está completamente cerrado. No tratar esta sección como verificación final.
+
 The read model uses persisted classification and never infers ownership from the ambient request tenant:
 
 | Classification | Persisted condition | Global audit UI |
