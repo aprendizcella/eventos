@@ -110,6 +110,8 @@ No se crearán carpetas vacías “por si acaso”. Las carpetas se crean cuando
 | UX-008 | Tablas administrativas interactivas como componentes Livewire Volt por dominio. | ✅ Implementado para organizers, team, events y venues. Se descarta `<x-ui.table>` genérico por ahora porque cada tabla tiene permisos, filtros y acciones distintas. |
 | UX-009 | Alpine.js lo carga Livewire 4 cuando hay componentes Livewire en layout. | ✅ Implementado: `resources/js/app.js` no arranca Alpine manualmente; `resources/views/layouts/app.blade.php` incluye `@livewireStyles` y `@livewireScripts`. |
 | UX-010 | Selector de Contexto (Tenant Switcher) con búsqueda asíncrona y Migas de Pan. | ✅ Implementado: Componente `tenant-switcher` (Livewire Volt) y `breadcrumbs.blade.php` (Blade). Resuelve la navegación del Superadmin ocultando menús locales en modo Global y agilizando accesos con acciones directas en la tabla. |
+| UX-011 | Auditoría global como superficie de solo lectura visible solo para `super_admin`. | La navegación debe ubicar `Global Audit Log` dentro del área de plataforma y mostrarlo únicamente a `super_admin`; `platform_admin` conserva sus permisos no relacionados, pero no ve ni accede a esta página sensible. |
+| UX-012 | Estados y contrato visual de la tabla de auditoría. | La tabla debe contemplar loading, empty y error seguro; presentar la actividad más reciente primero con paginación acotada; ser accesible por teclado y lectores de pantalla, usable en móvil mediante adaptación responsive, y mantener contraste y legibilidad en light/dark mode. |
 
 ---
 
@@ -139,6 +141,7 @@ No se crearán carpetas vacías “por si acaso”. Las carpetas se crean cuando
 | ~~Layout admin~~ | ✅ Resuelto: sidebar fijo en desktop, oculto en mobile con toggle. Topbar con theme toggle. |
 | ~~Interactividad JS~~ | ✅ Resuelto: Alpine.js para estado reactivo en theme toggle y mobile sidebar. Vanilla JS reemplazado. |
 | Navegación | Topbar con usuario y tema implementado; notificaciones siguen pendientes de decisión. |
+| Auditoría global | `Global Audit Log` se ubica en navegación de plataforma, visible solo a `super_admin`; la tabla es read-only y debe mantener estados loading/empty/error, accesibilidad, responsive y dark mode. |
 | ~~Tablas~~ | ✅ Resuelto: patrón TailAdmin implementado con componentes Livewire Volt por dominio. |
 | ~~Feedback UI~~ | ✅ Parcialmente resuelto: `x-ui.modal` existe; alertas/toasts siguen pendientes. |
 | Iconos | Decisión pendiente: SVG inline, Heroicons, Lucide u otra fuente. |
@@ -152,6 +155,7 @@ La foundation ya está aplicada y las superficies de cuenta, topbar y layout se 
 1. Validar manualmente las rutas principales en móvil, tablet y desktop.
 2. Resolver la estrategia de notificaciones, feedback y fuente de iconos.
 3. Mantener [`PLAN_UX_FOUNDATION.md`](./PLAN_UX_FOUNDATION.md) como referencia de la foundation ya implementada.
+4. Para Sprint 6.2a, validar la navegación y los estados de la tabla global de auditoría sin acoplar la guía UX a una implementación concreta.
 
 ---
 

@@ -16,7 +16,7 @@ beforeEach(function (): void {
     $this->withoutMiddleware([ValidateCsrfToken::class]);
 
     // Ensure the guarded role exists so assignment is valid regardless of seed state.
-    // With Spatie teams enabled, global roles need team_id = null explicitly.
+    // With Spatie teams enabled, global roles need team_id = 0 explicitly.
     Role::query()->firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web']);
 });
 

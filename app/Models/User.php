@@ -66,6 +66,27 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->suspended_at !== null;
     }
 
+    public function isGlobalSuperAdmin(): bool
+    {
+        return $this->hasGlobalRole('super_admin');
+    }
+
+    /**
+     * @param  array<string>|string  $roles
+     */
+    public function hasGlobalRole(array|string $roles): bool
+    {
+        $roles = (array) $roles;
+
+        return \Illuminate\Support\Facades\DB::table('model_has_roles')
+            ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+            ->where('model_has_roles.model_id', $this->id)
+            ->where('model_has_roles.model_type', $this->getMorphClass())
+            ->whereIn('roles.name', $roles)
+            ->where('model_has_roles.organizer_id', 0)
+            ->exists();
+    }
+
     /**
      * @return BelongsToMany<Organizer, $this, \Illuminate\Database\Eloquent\Relations\Pivot>
      */

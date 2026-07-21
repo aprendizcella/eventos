@@ -32,6 +32,7 @@
 | A20 | Numeración de factura = organizador + año | La serie de facturación debe ser estable por `organizer_id` y año natural para evitar colisiones entre organizers y facilitar auditoría. | `openspec/changes/sprint-4-1-facturacion/design.md` |
 | A21 | Base de facturación 4.1a = precisión exacta antes de automatizar facturas | La primera entrega de Sprint 4.1 debe resolver los importes exactos y el almacenamiento mínimo de invoice/settings antes de listeners, PDF o UX. | `docs/01-producto/PLAN_IMPLEMENTACION.md` §Sprint 4.1a |
 | A22 | Sprint 4.2 = tracking interno de comisiones y payouts | El bloque de monetizacion registra comisiones y payouts sin mover dinero real; Stripe Connect queda diferido para una fase posterior. | `docs/01-producto/PLAN_IMPLEMENTACION.md` §Sprint 4.2 |
+| A23 | Auditoría global = lectura segura y clasificación persistida | Sprint 6.2a usa una frontera `ViewModel/DTO` de solo lectura con proyección segura, excluye payloads sensibles, ordena de forma determinista, pagina con límite y falla cerrando sin filtrar detalles. Solo `super_admin` accede a esta regla sensible; la observabilidad es redacted. | [`04-admin-platform.md`](./04-admin-platform.md) §Global Audit Visibility; SDD `sprint-6-2a-audit-visibility` |
 
 ---
 
@@ -53,3 +54,10 @@
 2. Contexto en una línea.
 3. Enlace al documento donde se justifica (spec, design, o una nota en este mismo archivo si es menor).
 4. Si la decisión reemplaza a una anterior, dejar la fila antigua marcándola como **superseded** y apuntar a la nueva.
+
+### A23 — Detalle de la frontera de lectura de auditoría
+
+- El ViewModel consulta únicamente filas con `organizer_id IS NULL AND is_global = true`; no infiere clasificación desde el tenant de la request.
+- La frontera ViewModel/DTO proyecta solo identificadores, metadatos del evento, descripción, identidades y timestamp; no transporta `properties`, `attribute_changes` ni payloads sin redacción.
+- La navegación es read-only, latest-first, con `created_at DESC, id DESC` y paginación positiva acotada.
+- Denegaciones, exclusiones y errores producen observabilidad estructurada redacted; los errores de consulta no muestran filas parciales ni detalles de excepción.

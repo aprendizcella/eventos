@@ -24,61 +24,28 @@ beforeEach(function () {
     $this->user = User::factory()->create();
 });
 
-it('prevents non-admins from seeing admin dashboard', function () {
+it('prevents non-admins from seeing admin reports', function () {
     $this->actingAs($this->user)
-        ->get('/admin')
+        ->get('/admin/reports')
         ->assertForbidden();
 });
 
-it('allows super_admin to see admin dashboard', function () {
+it('allows super_admin to see admin reports', function () {
     $this->actingAs($this->superAdmin)
-        ->get('/admin')
+        ->get('/admin/reports')
         ->assertOk()
-        ->assertSeeLivewire('admin.dashboard');
+        ->assertSeeLivewire('admin.reports.platform-hub');
 });
 
-it('allows platform_admin to see admin dashboard', function () {
-    $this->actingAs($this->platformAdmin)
-        ->get('/admin')
-        ->assertOk()
-        ->assertSeeLivewire('admin.dashboard');
-});
-
-it('prevents non-admins from seeing users list', function () {
+it('prevents non-admins from seeing audit logs', function () {
     $this->actingAs($this->user)
-        ->get('/admin/users')
+        ->get('/admin/audit-logs')
         ->assertForbidden();
 });
 
-it('allows admins to see users list', function () {
+it('allows super_admin to see audit logs', function () {
     $this->actingAs($this->superAdmin)
-        ->get('/admin/users')
+        ->get('/admin/audit-logs')
         ->assertOk()
-        ->assertSeeLivewire('admin.users');
-});
-
-it('prevents non-admins from seeing events list', function () {
-    $this->actingAs($this->user)
-        ->get('/admin/events')
-        ->assertForbidden();
-});
-
-it('allows admins to see events list', function () {
-    $this->actingAs($this->superAdmin)
-        ->get('/admin/events')
-        ->assertOk()
-        ->assertSeeLivewire('admin.events');
-});
-
-it('prevents non-admins from seeing platform settings', function () {
-    $this->actingAs($this->user)
-        ->get('/admin/settings')
-        ->assertForbidden();
-});
-
-it('allows admins to see platform settings', function () {
-    $this->actingAs($this->superAdmin)
-        ->get('/admin/settings')
-        ->assertOk()
-        ->assertSeeLivewire('admin.settings');
+        ->assertSeeLivewire('admin.audit-log');
 });

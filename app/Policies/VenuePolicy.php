@@ -13,7 +13,7 @@ class VenuePolicy
 {
     public function viewAny(User $user, Organizer $organizer): bool
     {
-        if ($user->hasRole(['super_admin', 'platform_admin'])) {
+        if ($user->hasGlobalRole(['super_admin', 'platform_admin'])) {
             return true;
         }
 
@@ -22,7 +22,7 @@ class VenuePolicy
 
     public function view(User $user, Venue $venue): bool
     {
-        if ($user->hasRole(['super_admin', 'platform_admin'])) {
+        if ($user->hasGlobalRole(['super_admin', 'platform_admin'])) {
             return true;
         }
 
@@ -31,7 +31,7 @@ class VenuePolicy
 
     public function create(User $user, Organizer $organizer): bool
     {
-        if ($user->hasRole(['super_admin', 'platform_admin'])) {
+        if ($user->hasGlobalRole(['super_admin', 'platform_admin'])) {
             return true;
         }
 
@@ -43,7 +43,7 @@ class VenuePolicy
 
     public function update(User $user, Venue $venue): bool
     {
-        if ($user->hasRole(['super_admin', 'platform_admin'])) {
+        if ($user->hasGlobalRole(['super_admin', 'platform_admin'])) {
             return true;
         }
 
@@ -55,7 +55,7 @@ class VenuePolicy
 
     public function delete(User $user, Venue $venue): bool
     {
-        if ($user->hasRole(['super_admin', 'platform_admin'])) {
+        if ($user->hasGlobalRole(['super_admin', 'platform_admin'])) {
             return true;
         }
 

@@ -45,7 +45,7 @@ it('does not duplicate roles when the seeder runs repeatedly (idempotent)', func
 });
 
 it('leaves existing roles untouched and only fills missing ones on reseed', function (): void {
-    Role::query()->firstOrCreate(['name' => 'attendee', 'guard_name' => 'web']);
+    Role::query()->firstOrCreate(['name' => 'attendee', 'guard_name' => 'web', 'organizer_id' => 0]);
 
     $this->seed(RoleSeeder::class);
 

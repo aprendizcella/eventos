@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use Spatie\Activitylog\Actions\CleanActivityLogAction;
-use Spatie\Activitylog\Actions\LogActivityAction;
 use Spatie\Activitylog\Models\Activity;
 
 return [
@@ -42,7 +41,7 @@ return [
      * It should implement the Spatie\Activitylog\Contracts\Activity interface
      * and extend Illuminate\Database\Eloquent\Model.
      */
-    'activity_model' => Activity::class,
+    'activity_model' => App\Models\Activity::class,
 
     /*
      * These attributes will be excluded from logging for all models.
@@ -69,7 +68,7 @@ return [
      * are logged and cleaned. Your custom classes must extend the originals.
      */
     'actions' => [
-        'log_activity' => LogActivityAction::class,
+        'log_activity' => App\Actions\Audit\LogActivityAction::class,
         'clean_log' => CleanActivityLogAction::class,
     ],
 ];

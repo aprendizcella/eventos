@@ -16,7 +16,7 @@ new class extends Component {
     public function with(): array
     {
         $user = auth()->user();
-        $isSuperAdmin = $user?->hasRole('super_admin') ?? false;
+        $isSuperAdmin = $user?->isGlobalSuperAdmin() ?? false;
         $currentOrganizer = request()->route('organizer') ?? $user?->currentOrganizer();
 
         if (!$user) {

@@ -37,6 +37,7 @@ final class RoleSeeder extends Seeder
             Role::query()->firstOrCreate([
                 'name' => $name,
                 'guard_name' => self::GUARD,
+                'organizer_id' => 0,
             ]);
         }
     }

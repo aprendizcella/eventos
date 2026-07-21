@@ -21,6 +21,16 @@ final class AccountContextResolver
     {
         $roles = $user->getRoleNames();
 
+        // Fallback: If no roles in current context, check if user has global roles
+        if ($roles->isEmpty() && getPermissionsTeamId() !== 0) {
+            $currentTeamId = getPermissionsTeamId();
+            setPermissionsTeamId(0);
+            $user->unsetRelation('roles');
+            $roles = $user->getRoleNames();
+            setPermissionsTeamId($currentTeamId);
+            $user->unsetRelation('roles');
+        }
+
         if ($roles->isEmpty()) {
             return __('No role assigned');
         }

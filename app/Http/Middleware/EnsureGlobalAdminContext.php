@@ -21,6 +21,11 @@ class EnsureGlobalAdminContext
 
         setPermissionsTeamId(0);
 
+        if ($request->user()) {
+            $request->user()->unsetRelation('roles');
+            $request->user()->unsetRelation('permissions');
+        }
+
         return $next($request);
     }
 

@@ -258,7 +258,7 @@ La configuración OpenSpec mantiene `testing.strict_tdd: true`; el informe de Sp
 
 ## Qué NO está hecho
 
-- Sprint 6.2: auditoría, GDPR y MFA.
+- Sprint 6.2a: visibilidad global de auditoría de solo lectura, definida en OpenSpec y pendiente de implementación. GDPR, MFA, captura, esquema y backfill histórico permanecen fuera de este slice y requieren trabajo futuro separado.
 - Sprint 6.3: webhooks outbound y documentación completa de API.
 - Sprint 6.4: deployment, CI/CD, backups, Sentry, load testing y documentación final.
 - Integración real con CDN y cursor pagination.
@@ -271,10 +271,10 @@ El roadmap completo está en [`01-producto/PLAN_IMPLEMENTACION.md`](../01-produc
 
 ## Bloqueos actuales
 
-Limitaciones conocidas: CDN real y cursor pagination quedan diferidas; siguen pendientes la auditoría/GDPR/MFA, webhooks/documentación API, despliegue y cierre operativo. La validación responsive manual y las decisiones de notificaciones/iconos requieren trabajo explícito.
+Limitaciones conocidas: CDN real y cursor pagination quedan diferidas; siguen pendientes Sprint 6.2a, GDPR/MFA, webhooks/documentación API, despliegue y cierre operativo. La validación responsive manual y las decisiones de notificaciones/iconos requieren trabajo explícito.
 
 ---
 
 ## Próximo paso
 
-- Cerrar el ciclo de los cambios OpenSpec activos que ya tienen evidencia suficiente y abordar Sprint 6.2, manteniendo visibles los caveats antes de iniciar 6.3 y 6.4.
+- Cerrar el ciclo de los cambios OpenSpec activos que ya tienen evidencia suficiente y abordar el slice read-only de Sprint 6.2a, manteniendo separado el trabajo futuro de GDPR/MFA/captura/esquema/backfill antes de iniciar 6.3 y 6.4.

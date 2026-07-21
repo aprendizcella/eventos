@@ -13,7 +13,7 @@ class OrganizerPolicy
     public function view(User $user, Organizer $organizer): bool
     {
         // Global admins can view any organizer
-        if ($user->hasRole(['super_admin', 'platform_admin'])) {
+        if ($user->hasGlobalRole(['super_admin', 'platform_admin'])) {
             return true;
         }
 
@@ -22,7 +22,7 @@ class OrganizerPolicy
 
     public function create(User $user): bool
     {
-        return $user->hasRole(['super_admin', 'platform_admin']);
+        return $user->hasGlobalRole(['super_admin', 'platform_admin']);
     }
 
     public function update(User $user, Organizer $organizer): bool
@@ -32,7 +32,7 @@ class OrganizerPolicy
 
     public function delete(User $user, Organizer $organizer): bool
     {
-        return $organizer->exists && $user->hasRole(['super_admin', 'platform_admin']);
+        return $organizer->exists && $user->hasGlobalRole(['super_admin', 'platform_admin']);
     }
 
     public function manageTeam(User $user, Organizer $organizer): bool
@@ -51,7 +51,7 @@ class OrganizerPolicy
 
     private function isGlobalAdmin(User $user): bool
     {
-        return $user->hasRole(['super_admin', 'platform_admin']);
+        return $user->hasGlobalRole(['super_admin', 'platform_admin']);
     }
 
     private function isOrganizerAdmin(User $user, Organizer $organizer): bool

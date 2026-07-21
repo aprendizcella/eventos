@@ -2,7 +2,7 @@
 
 Estado actual de la carpeta de componentes Blade, Livewire Volt y criterio de reutilización.
 
-> **En una línea:** las primitivas reutilizables viven en `components/form/` y `components/ui/`; las tablas interactivas de dominio viven como componentes Livewire Volt en `resources/views/livewire/organizers/`.
+> **En una línea:** las primitivas reutilizables viven en `components/form/` y `components/ui/`; las tablas interactivas de dominio viven como componentes Livewire Volt por dominio, incluida la futura tabla read-only de auditoría global.
 
 ---
 
@@ -67,6 +67,7 @@ resources/views/
 | `navigation/topbar.blade.php` | Topbar con theme toggle y menú de usuario. |
 | `livewire/organizers/tenant-switcher.blade.php` | Selector de contexto e inquilino (Tenant Switcher) con buscador reactivo integrado. |
 | `livewire/organizers/*-table.blade.php` | Tablas reactivas de dominio con búsqueda, ordenación, paginación, columnas visibles y acciones autorizadas. |
+| `livewire/audit/global-audit.blade.php` | Superficie read-only para actividad global; debe mostrar solo la proyección segura definida por el ViewModel/DTO y contemplar loading, empty y error. |
 
 ---
 
@@ -142,6 +143,7 @@ El proyecto usa **Alpine.js** para interacciones locales de UI (dropdowns, toggl
 | `ui/modal.blade.php` | Visibilidad, cierre por Escape/click exterior y transiciones. |
 | `livewire/organizers/tenant-switcher.blade.php` | Estado del selector desplegable de inquilinos con Alpine.js, búsqueda y transiciones de carga. |
 | `livewire/organizers/*-table.blade.php` | Dropdowns de columnas/filtros dentro de componentes Livewire. |
+| `livewire/audit/global-audit.blade.php` | Solo lectura; no expone `properties` ni `attribute_changes`, y conserva la paginación y ordenación deterministas del contrato de auditoría. |
 
 ### Convenciones
 
@@ -163,6 +165,7 @@ La estrategia vigente para tablas administrativas es **componente Volt por domin
 | `organizers.team-table` | Gestión de miembros del organizer. |
 | `organizers.events-table` | Listado de eventos con filtros por status, visibility y fechas. |
 | `organizers.venues-table` | Listado de venues del organizer. |
+| `audit.global-audit` | Tabla global de actividad para `super_admin`; no muestra registros tenant o no clasificados. |
 
 Reglas:
 
@@ -170,6 +173,8 @@ Reglas:
 - Los registros nested se resuelven desde el organizer montado antes de operar sobre ellos.
 - La visibilidad con `@can` mejora la UX, pero nunca reemplaza la autorización del método Livewire.
 - Reutilizar estilos TailAdmin, pero mantener la lógica de dominio explícita dentro de cada tabla.
+- La navegación de la tabla de auditoría debe ser usable con teclado y lector de pantalla, adaptarse a móvil sin perder el contexto de las columnas y conservar contraste/legibilidad en light y dark mode.
+- Los estados loading, empty y error seguro son parte del contrato visual; no se muestran detalles de excepciones ni payloads.
 
 ---
 

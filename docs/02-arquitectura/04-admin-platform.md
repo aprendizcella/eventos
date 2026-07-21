@@ -6,7 +6,7 @@ This document describes the implemented Sprint 6.1 platform backoffice as eviden
 
 ## Quick Overview
 
-The platform backoffice provides global visibility and moderation capabilities for `super_admin` and `platform_admin` roles. It ensures strict isolation from tenant-level operations through a dedicated middleware and a hierarchical role matrix.
+The platform backoffice provides global visibility and moderation capabilities for `super_admin` and `platform_admin` roles. It ensures strict isolation from tenant-level operations through a dedicated middleware and a hierarchical role matrix. The global audit UI is a separate sensitive read-only surface and is restricted to the exact `super_admin` role.
 
 ## Authorization and Global Context
 
@@ -16,7 +16,7 @@ The platform backoffice provides global visibility and moderation capabilities f
 | `platform_admin` | ❌ 403 Forbidden | ✅ (via existing team mgmt) | ✅ |
 
 ### The `team_id: 0` Strategy
-Spatie Laravel Permission is scoped by `team_id` (mapped to `organizer_id` in this project). To prevent ambient tenant leakage into admin actions:
+
 - Global roles are assigned to `team_id: 0`.
 - The `EnsureGlobalAdminContext` middleware (aliased as `global.admin`) intercepts admin requests, calls `setPermissionsTeamId(0)`, and restores the previous context in the `terminate()` phase.
 - **Rule**: All `/admin` web routes and `/api/v1/admin` API routes must use this middleware.
@@ -31,6 +31,24 @@ User moderation is handled via a reversible suspension mechanism rather than har
 - **GDPR Deferral**: Full GDPR deletion and anonymization are explicitly deferred/out of scope for Sprint 6.1. No API endpoints or actions exist for hard deletion, ensuring data retention policies can be properly designed in future sprints.
 
 The admin UI and API expose lifecycle operations through the implemented user-management surface: listing and viewing users, suspension/restoration, password-reset dispatch, and global-role assignment/revocation subject to the role matrix. Hard deletion remains intentionally absent.
+
+## Global Audit Visibility (Sprint 6.2a)
+
+The global audit page is a read-only audit surface over the existing `activity_log` classification. Access is an explicit sensitive global-audit rule:
+
+- Only an authenticated user with the exact `super_admin` role may access the page or its component updates.
+- `platform_admin` and every other role are denied for this page, even though `platform_admin` retains the unrelated platform permissions shown in the matrix above.
+- The route must use the existing `global.admin` contract, backed by `EnsureGlobalAdminContext`, and the global permission context uses `team_id: 0` according to the repository convention.
+
+The read model uses persisted classification and never infers ownership from the ambient request tenant:
+
+| Classification | Persisted condition | Global audit UI |
+|---|---|---|
+| Global | `organizer_id IS NULL AND is_global = true` | Included |
+| Tenant | `organizer_id IS NOT NULL AND is_global = false` | Excluded |
+| Unclassified | `organizer_id IS NULL AND is_global = false` | Excluded |
+
+The UI exposes only a safe projection of identifiers, event metadata, description, subject/causer identity, and timestamp. `properties` and `attribute_changes` are never exposed. Results are read-only, latest-first with deterministic ordering, and bounded by pagination. Loading, empty, and safe error states are explicit; authorization denials, exclusions, and failures use redacted observability.
 
 ## Reversible Event Moderation
 
@@ -76,6 +94,6 @@ The Admin API (`/api/v1/admin/*`) is a Sanctum-authenticated, rate-limited (`60,
   - `POST /events/{event}/suspend`
   - `POST /events/{event}/restore`
 
-The API is paired with the admin Volt UI for dashboard, users, events, and platform settings. Both surfaces use the global admin context and the `super_admin`/`platform_admin` boundary described above.
+The API is paired with the admin Volt UI for dashboard, users, events, and platform settings. Both surfaces use the global admin context and the `super_admin`/`platform_admin` boundary described above. The audit page is an additional `super_admin`-only exception for sensitive global activity data.
 
-*Dedicated audit log viewing and MFA management are deferred to future iterations.*
+*Tenant audit views, GDPR workflows, MFA, activity capture changes, schema changes, and historical backfill remain separate future work.*

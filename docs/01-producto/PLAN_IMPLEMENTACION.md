@@ -6,7 +6,7 @@
 **Metodologia:** Sprints de 1 semana con entregables verificables por fase
 **Referencia:** Hi.Events (funcional), Attendize (ticketing), Eventbrite (benchmark)
 
-> **Estado de ejecucion (post Sprint 6.1):** El repositorio contiene implementados los sprints 1.1–5.4 y Sprint 6.1. El informe OpenSpec de Sprint 6.1 reporta 41/41 requisitos, 72/72 escenarios, 18/18 tareas, 928 tests y PHPStan/Pint/Rector limpios; esta documentación no lo presenta como QA independiente rerun. Sprint 6.1 está en el archivo OpenSpec, aunque falta `archive-report.md`. Permanecen pendientes Sprint 6.2 (auditoría/GDPR/MFA), 6.3 (webhooks outbound/documentación API) y 6.4 (deploy, CI/CD, backups, Sentry, load testing y documentación final).
+> **Estado de ejecucion (post Sprint 6.1):** El repositorio contiene implementados los sprints 1.1–5.4 y Sprint 6.1. El informe OpenSpec de Sprint 6.1 reporta 41/41 requisitos, 72/72 escenarios, 18/18 tareas, 928 tests y PHPStan/Pint/Rector limpios; esta documentación no lo presenta como QA independiente rerun. Sprint 6.1 está en el archivo OpenSpec, aunque falta `archive-report.md`. El slice Sprint 6.2a (visibilidad global de auditoría, solo lectura) está definido y pendiente; GDPR, MFA y el trabajo de captura/esquema/backfill quedan fuera de este slice y se mantienen como trabajo futuro separado. También permanecen pendientes Sprint 6.3 (webhooks outbound/documentación API) y 6.4 (deploy, CI/CD, backups, Sentry, load testing y documentación final).
 
 ---
 
@@ -101,7 +101,7 @@ Fase 6: Admin/Pulido       ░░░░░░░░░░░░░░░░░�
 | 3. Operacion        | 9-12    | 4       | Check-in, waitlist, preguntas, mensajes masivos, export | —                                                          |
 | 4. Monetizacion     | 13-16   | 4       | Facturas, reembolsos, comisiones, payouts, reportes     | Horizon / Redis queues                                     |
 | 5. Discovery        | 17-20   | 4       | Catalogo publico, busqueda, SEO, widget, object storage | Scout                                                      |
-| 6. Admin/Pulido     | 21-24   | 4       | Backoffice, audit, GDPR, MFA, webhooks, deploy          | Deptrac (opcional)                                         |
+| 6. Admin/Pulido     | 21-24   | 4       | Backoffice, audit visibility, GDPR, MFA, webhooks, deploy | Deptrac (opcional)                                         |
 
 ---
 
@@ -957,27 +957,42 @@ Stack y artefactos entregados en el repositorio:
 
 ---
 
-### Sprint 6.2: Audit, GDPR y MFA (Semana 22) — PENDIENTE / DIFERIDO
+### Sprint 6.2a: Visibilidad global de auditoría (Semana 22) — PENDIENTE / DEFINIDO
+
+**Objetivo:** entregar una superficie global de auditoría de solo lectura para `super_admin`, basada exclusivamente en la clasificación persistida existente de `activity_log`.
+
+Este slice usa el contrato existente `global.admin` / `EnsureGlobalAdminContext` y el contexto global `team_id: 0` cuando corresponda al acceso de plataforma. La autorización de esta página es una regla sensible específica: solo coincide exactamente `super_admin`; `platform_admin` y otros roles son denegados para esta superficie, sin modificar sus permisos de plataforma no relacionados.
+
+| Clasificacion | Condicion persistida | Visibilidad |
+| ------------- | -------------------- | ----------- |
+| Global | `organizer_id IS NULL AND is_global = true` | Incluida |
+| Tenant | `organizer_id IS NOT NULL AND is_global = false` | Excluida |
+| No clasificada | `organizer_id IS NULL AND is_global = false` | Excluida |
+
+Las consultas de lectura usan siempre esta clasificación persistida y nunca infieren ownership desde el tenant de la request.
 
 | Tarea | Detalle                    | Entregable                             |
 | ----- | -------------------------- | -------------------------------------- |
-| 6.2.1 | Panel de actividad         | Visualizacion de `activity_log`        |
-| 6.2.2 | Export de datos personales | GDPR: descargar datos del usuario      |
-| 6.2.3 | Derecho al olvido          | GDPR: anonymize + soft delete          |
-| 6.2.4 | MFA TOTP                   | RFC 6238, QR setup                     |
-| 6.2.5 | Acciones de MFA            | `EnableMfa`, `DisableMfa`, `VerifyMfa` |
-| 6.2.6 | Tests de GDPR              | Export, delete, anonymize              |
-| 6.2.7 | Tests de MFA               | Setup, verify, disable                 |
+| 6.2a.1 | Ruta y acceso global      | Ruta protegida por `global.admin` y `super_admin` exacto |
+| 6.2a.2 | ViewModel/DTO de lectura | Proyección segura sin `properties` ni `attribute_changes` |
+| 6.2a.3 | Tabla global              | Estados loading/empty/error, orden determinista y paginación acotada |
+| 6.2a.4 | Observabilidad y tests    | Denegaciones, exclusiones y fallos con datos redacted; cobertura de límites |
 
 **Criterios de aceptacion:**
 
-- [ ] Audit log visible en admin
-- [ ] Usuario puede exportar sus datos
-- [ ] Usuario puede solicitar eliminacion
-- [ ] MFA funcional para organizadores
+- [ ] `super_admin` puede consultar el audit log global en modo solo lectura
+- [ ] `platform_admin` y otros roles reciben denegacion para esta superficie
+- [ ] Solo se muestran filas globales clasificadas persistentemente
+- [ ] `properties` y `attribute_changes` no se exponen
 - [ ] QA pipeline pasa limpio
 
 **Dependencias:** Sprint 6.1 (Admin), Sprint 1.1 (User).
+
+**Fuera de alcance:** cambios de esquema, cambios en el capture seam, backfill histórico, auditoría tenant, datos no clasificados, export GDPR, derecho al olvido, MFA y cualquier mutación de actividad. Estos temas requieren cambios futuros separados.
+
+### Trabajo futuro separado de Sprint 6.2a
+
+GDPR (exportación, anonimización y derecho al olvido), MFA TOTP, modificaciones de captura, cambios de esquema y backfill histórico no forman parte de la entrega de visibilidad global. Se planificarán y documentarán como unidades independientes.
 
 ---
 

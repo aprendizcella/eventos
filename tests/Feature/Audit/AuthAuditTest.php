@@ -6,7 +6,6 @@ use App\Actions\Auth\RecordAuthActivityAction;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-use Spatie\Activitylog\Actions\LogActivityAction;
 use Spatie\Activitylog\Models\Activity;
 use Tests\TestCase;
 
@@ -102,8 +101,9 @@ it('keeps the auth flow response safe when activity logging fails, exposing no i
     $user = User::factory()->create();
 
     // Force the Activitylog persistence action to throw, simulating a logging failure.
-    $this->app->bind(LogActivityAction::class, fn () => new class extends LogActivityAction
+    $this->app->bind(App\Actions\Audit\LogActivityAction::class, fn () => new class extends App\Actions\Audit\LogActivityAction
     {
+        #[Override]
         public function execute(Model $activity, string $description): Model
         {
             throw new RuntimeException('DB connection lost during audit insert; payload contained token=SUPER-SECRET');
