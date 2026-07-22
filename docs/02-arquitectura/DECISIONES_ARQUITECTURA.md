@@ -33,8 +33,9 @@
 | A21 | Base de facturación 4.1a = precisión exacta antes de automatizar facturas | La primera entrega de Sprint 4.1 debe resolver los importes exactos y el almacenamiento mínimo de invoice/settings antes de listeners, PDF o UX. | `docs/01-producto/PLAN_IMPLEMENTACION.md` §Sprint 4.1a |
 | A22 | Sprint 4.2 = tracking interno de comisiones y payouts | El bloque de monetizacion registra comisiones y payouts sin mover dinero real; Stripe Connect queda diferido para una fase posterior. | `docs/01-producto/PLAN_IMPLEMENTACION.md` §Sprint 4.2 |
 | A23 | Auditoría global = lectura segura y clasificación persistida | Sprint 6.2a usa una frontera `ViewModel/DTO` de solo lectura con proyección segura, excluye payloads sensibles, ordena de forma determinista, pagina con límite y falla cerrando sin filtrar detalles. Solo `super_admin` accede a esta regla sensible; la observabilidad es redacted. | [`04-admin-platform.md`](./04-admin-platform.md) §Global Audit Visibility; SDD `sprint-6-2a-audit-visibility` |
+| A24 | UX de auditoría global = integrada, responsive y basada en patrones existentes | Dirección aprobada para Sprint 6.2: auditoría dentro de reporting/control de plataforma, sin copiar la identidad o navegación de HI.EVENTS ni crear una superficie paralela. La presentación depende de reconciliar antes el contrato `organizer_id IS NULL AND is_global = true`. | [`04-admin-platform.md`](./04-admin-platform.md) §Dirección UX aprobada para Sprint 6.2 |
 
-> **Nota de deuda:** la entrada A23 describe el contrato objetivo, pero el trail de verificación de Sprint 6.2a todavía debe cerrarse. Mantener explícito el filtro `organizer_id IS NULL AND is_global = true` y no dar por completada la evidencia hasta el archive final.
+> **Nota de cierre:** Sprint 6.2a verificó y archivó el contrato `organizer_id IS NULL AND is_global = true` el 2026-07-22.
 
 ---
 
@@ -63,3 +64,10 @@
 - La frontera ViewModel/DTO proyecta solo identificadores, metadatos del evento, descripción, identidades y timestamp; no transporta `properties`, `attribute_changes` ni payloads sin redacción.
 - La navegación es read-only, latest-first, con `created_at DESC, id DESC` y paginación positiva acotada.
 - Denegaciones, exclusiones y errores producen observabilidad estructurada redacted; los errores de consulta no muestran filas parciales ni detalles de excepción.
+
+### A24 — Dirección UX de auditoría global
+
+- Se adapta la claridad operativa de HI.EVENTS, sin reutilizar su marca, tipografía, iconografía, taxonomía de navegación ni layouts solo de escritorio.
+- Se reutilizan los patrones de reportes, dashboard y tablas de Eventos; no se crea un framework genérico de tablas ni gráficos sin datos significativos.
+- La vista prevista incluye cabecera contextual, estado explícito de inmutabilidad y solo lectura, contador de resultados, filtros en servidor con chips y reinicio, filas semánticas escaneables, presentación móvil apilada y estados seguros de carga, vacío y error.
+- Esta decisión conserva el acceso exacto de `super_admin` y la proyección segura. Antes de mostrar agregados o filtros, se debe reconciliar la clasificación global con `organizer_id IS NULL AND is_global = true`.

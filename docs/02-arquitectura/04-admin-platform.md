@@ -6,7 +6,18 @@ This document describes the implemented Sprint 6.1 platform backoffice as eviden
 
 ## Quick Overview
 
-The platform backoffice provides global visibility and moderation capabilities for `super_admin` and `platform_admin` roles. It ensures strict isolation from tenant-level operations through a dedicated middleware and a hierarchical role matrix. The global audit UI is a separate sensitive read-only surface and is restricted to the exact `super_admin` role.
+The platform backoffice provides global visibility and moderation capabilities for `super_admin` and `platform_admin` roles. It ensures strict isolation from tenant-level operations through a dedicated middleware and a hierarchical role matrix. The audit area should be understood as part of the same platform reporting/control surface, not as an isolated technical screen.
+
+## Dirección UX aprobada para Sprint 6.2
+
+Esta es una dirección UX/técnica aprobada para trabajo futuro; no describe funcionalidad implementada.
+
+- Adaptar la claridad operativa de HI.EVENTS sin copiar su marca, tipografía, iconografía, taxonomía de navegación ni layouts solo de escritorio.
+- Integrar la auditoría global en el recorrido actual de reporting/control de plataforma; no crear un área paralela aislada.
+- Reutilizar los patrones existentes de reportes, dashboard y tablas de Eventos. No introducir un framework genérico de tablas ni gráficos sin datos significativos.
+- Presentar cabecera contextual, estado explícito de inmutabilidad y solo lectura, contador de resultados, filtros acotados en servidor con chips y reinicio, y filas semánticas escaneables.
+- Resolver la presentación en móvil mediante disposición apilada y ofrecer estados seguros de carga, vacío y error.
+- Mantener acceso exacto de `super_admin` y la proyección segura de datos.
 
 ## Authorization and Global Context
 
@@ -40,7 +51,9 @@ The global audit page is a read-only audit surface over the existing `activity_l
 - `platform_admin` and every other role are denied for this page, even though `platform_admin` retains the unrelated platform permissions shown in the matrix above.
 - The route must use the existing `global.admin` contract, backed by `EnsureGlobalAdminContext`, and the global permission context uses `team_id: 0` according to the repository convention.
 
-> **Deuda conocida:** el contrato correcto sigue siendo `organizer_id IS NULL AND is_global = true`, pero el estado de evidencia/documentación de Sprint 6.2a aún no está completamente cerrado. No tratar esta sección como verificación final.
+> **Verificación:** Sprint 6.2a fue verificado y archivado el 2026-07-22. El contrato aplicado es `organizer_id IS NULL AND is_global = true`.
+
+Antes de presentar contadores agregados o filtros, debe reconciliarse el contrato de clasificación global: `organizer_id IS NULL AND is_global = true`.
 
 The read model uses persisted classification and never infers ownership from the ambient request tenant:
 

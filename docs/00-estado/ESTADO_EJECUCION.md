@@ -1,6 +1,6 @@
 # Estado de ejecución
 
-> **Resumen en una línea:** El repositorio está en el estado posterior al commit `d2e9cbe` (2026-07-20): Sprints 1.1–5.4 y Sprint 6.1 están implementados; Sprint 6.1 dispone de informe OpenSpec PASS, pero su archivo no contiene `archive-report.md`, por lo que esa evidencia no equivale a una nueva verificación independiente. La Fase 6.2–6.4 y varios cambios OpenSpec activos siguen pendientes o con evidencia incompleta. En Sprint 6.2a existe una deuda conocida: el filtro global debe seguir siendo `organizer_id IS NULL AND is_global = true`, pero la documentación/evidencia aún no está completamente reconciliada.
+> **Resumen en una línea:** El repositorio está en el estado posterior al commit `d2e9cbe` (2026-07-20): Sprints 1.1–5.4, Sprint 6.1, Sprint 6.2a y Sprint 6.2b están implementados, verificados y archivados. Sprint 6.3–6.4 siguen pendientes.
 
 ---
 
@@ -246,7 +246,7 @@ Sprint 4.2 cubrió la capa interna de monetización que faltaba entre facturaci�
 
 | Estado | Cambios | Evidencia y caveat |
 |---|---|---|
-| Archivados/implementados | 13 cambios archivados, incluido Sprint 6.1 | El inventario confirma el archivo; algunos cambios históricos no tienen `verify-report.md` o `archive-report.md`. Sprint 4.3 conserva tareas incompletas; 4.2 y 5.1 tienen árboles anidados duplicados. |
+| Archivados/implementados | 15 cambios archivados, incluidos Sprint 6.1, Sprint 6.2a y Sprint 6.2b | Sprint 6.2b conserva advertencias aceptadas sobre trazas RED históricas y ausencia de E2E; no hay bloqueadores funcionales. Algunos cambios históricos no tienen `verify-report.md` o `archive-report.md`. |
 | Activos con verificación | `mini-sprint-account-ux` | Informe PASS WITH WARNINGS, listo para archivar; 18/19 escenarios conformes y un caso parcialmente cubierto. |
 | Activos con validación pendiente | `mini-sprint-responsive-ux` | Informe PASS, pero la validación visual/manual en navegador sigue sin marcarse como completada. |
 | Activos con implementación sin cierre | `mini-sprint-email-verification-gate` | Tareas 15/15 marcadas; no hay `verify-report.md` ni `archive-report.md`. |
@@ -258,7 +258,6 @@ La configuración OpenSpec mantiene `testing.strict_tdd: true`; el informe de Sp
 
 ## Qué NO está hecho
 
-- Sprint 6.2a: visibilidad global de auditoría de solo lectura, definida en OpenSpec y pendiente de implementación completa/verificación. La deuda conocida es la alineación del filtro global (`organizer_id IS NULL AND is_global = true`) con la documentación y la evidencia. GDPR, MFA, captura, esquema y backfill histórico permanecen fuera de este slice y requieren trabajo futuro separado.
 - Sprint 6.3: webhooks outbound y documentación completa de API.
 - Sprint 6.4: deployment, CI/CD, backups, Sentry, load testing y documentación final.
 - Integración real con CDN y cursor pagination.
@@ -271,10 +270,10 @@ El roadmap completo está en [`01-producto/PLAN_IMPLEMENTACION.md`](../01-produc
 
 ## Bloqueos actuales
 
-Limitaciones conocidas: CDN real y cursor pagination quedan diferidas; siguen pendientes Sprint 6.2a, GDPR/MFA, webhooks/documentación API, despliegue y cierre operativo. La validación responsive manual y las decisiones de notificaciones/iconos requieren trabajo explícito.
+Limitaciones conocidas: CDN real y cursor pagination quedan diferidas; siguen pendientes Sprint 6.3, GDPR/MFA, webhooks/documentación API, despliegue y cierre operativo. La validación responsive manual y las decisiones de notificaciones/iconos requieren trabajo explícito.
 
 ---
 
 ## Próximo paso
 
-- Cerrar el ciclo de los cambios OpenSpec activos que ya tienen evidencia suficiente y abordar el slice read-only de Sprint 6.2a, manteniendo separado el trabajo futuro de GDPR/MFA/captura/esquema/backfill antes de iniciar 6.3 y 6.4.
+- Mantener Sprint 6.3 pendiente hasta recibir autorización explícita para iniciar su implementación.

@@ -6,7 +6,7 @@
 **Metodologia:** Sprints de 1 semana con entregables verificables por fase
 **Referencia:** Hi.Events (funcional), Attendize (ticketing), Eventbrite (benchmark)
 
-> **Estado de ejecucion (post Sprint 6.1):** El repositorio contiene implementados los sprints 1.1–5.4 y Sprint 6.1. El informe OpenSpec de Sprint 6.1 reporta 41/41 requisitos, 72/72 escenarios, 18/18 tareas, 928 tests y PHPStan/Pint/Rector limpios; esta documentación no lo presenta como QA independiente rerun. Sprint 6.1 está en el archivo OpenSpec, aunque falta `archive-report.md`. El slice Sprint 6.2a (visibilidad global de auditoría, solo lectura) está definido y pendiente; además, existe una deuda conocida en el contrato de visibilidad global: el filtro debe ser explícitamente `organizer_id IS NULL AND is_global = true`, y la evidencia/documentación todavía no está cerrada. GDPR, MFA y el trabajo de captura/esquema/backfill quedan fuera de este slice y se mantienen como trabajo futuro separado. También permanecen pendientes Sprint 6.3 (webhooks outbound/documentación API) y 6.4 (deploy, CI/CD, backups, Sentry, load testing y documentación final).
+> **Estado de ejecucion (post Sprint 6.2b):** El repositorio contiene implementados los sprints 1.1–5.4, Sprint 6.1, Sprint 6.2a y Sprint 6.2b. Sprint 6.2b está verificado y archivado en `openspec/changes/archive/2026-07-22-sprint-6-2b-audit-ux-integration/`: 13/13 tareas, 6/6 requisitos y 13/13 escenarios conformes. Las advertencias aceptadas de TDD histórico y ausencia de E2E están documentadas en su `archive-report.md`. Sprint 6.3 y 6.4 permanecen pendientes.
 
 ---
 
@@ -957,9 +957,13 @@ Stack y artefactos entregados en el repositorio:
 
 ---
 
-### Sprint 6.2a: Visibilidad global de auditoría (Semana 22) — PENDIENTE / DEFINIDO
+### Sprint 6.2a: Visibilidad global de auditoría (Semana 22) — IMPLEMENTADO Y VERIFICADO
 
 **Objetivo:** entregar una superficie global de auditoría de solo lectura para `super_admin`, basada exclusivamente en la clasificación persistida existente de `activity_log`.
+
+**Dirección UX aprobada (futura, no implementada):** integrar auditoría en el recorrido actual de reporting/control de plataforma, sin crear un área paralela. Se adapta la claridad operativa de HI.EVENTS sin copiar su marca, tipografía, iconografía, taxonomía de navegación ni layouts solo de escritorio. Se reutilizan los patrones existentes de reportes, dashboard y tablas de Eventos; no se introduce un framework genérico de tablas ni gráficos sin datos significativos.
+
+**Objetivo de presentación:** cabecera contextual, estado explícito de inmutabilidad y solo lectura, contador de resultados, filtros acotados en servidor con chips y reinicio, filas semánticas escaneables, presentación móvil apilada y estados seguros de carga, vacío y error. Antes de presentar contadores agregados o filtros, debe reconciliarse el contrato `organizer_id IS NULL AND is_global = true`. Se mantienen el acceso exacto de `super_admin` y la proyección segura.
 
 Este slice usa el contrato existente `global.admin` / `EnsureGlobalAdminContext` y el contexto global `team_id: 0` cuando corresponda al acceso de plataforma. La autorización de esta página es una regla sensible específica: solo coincide exactamente `super_admin`; `platform_admin` y otros roles son denegados para esta superficie, sin modificar sus permisos de plataforma no relacionados.
 
@@ -980,17 +984,17 @@ Las consultas de lectura usan siempre esta clasificación persistida y nunca inf
 
 **Criterios de aceptacion:**
 
-- [ ] `super_admin` puede consultar el audit log global en modo solo lectura
-- [ ] `platform_admin` y otros roles reciben denegacion para esta superficie
-- [ ] Solo se muestran filas globales clasificadas persistentemente
-- [ ] `properties` y `attribute_changes` no se exponen
-- [ ] QA pipeline pasa limpio
+- [x] `super_admin` puede consultar el audit log global en modo solo lectura
+- [x] `platform_admin` y otros roles reciben denegacion para esta superficie
+- [x] Solo se muestran filas globales clasificadas persistentemente
+- [x] `properties` y `attribute_changes` no se exponen
+- [x] QA pipeline pasa limpio
 
 **Dependencias:** Sprint 6.1 (Admin), Sprint 1.1 (User).
 
 **Fuera de alcance:** cambios de esquema, cambios en el capture seam, backfill histórico, auditoría tenant, datos no clasificados, export GDPR, derecho al olvido, MFA y cualquier mutación de actividad. Estos temas requieren cambios futuros separados.
 
-**Deuda conocida:** la documentación y la evidencia de Sprint 6.2a aún no están totalmente alineadas; el contrato correcto de lectura global sigue siendo `organizer_id IS NULL AND is_global = true`.
+**Cierre:** la evidencia de Sprint 6.2a fue actualizada tras la ejecución del 2026-07-22. El contrato verificado es `organizer_id IS NULL AND is_global = true`. El cambio está archivado en `openspec/changes/archive/2026-07-22-sprint-6-2a-audit-classification-fix/`.
 
 ### Trabajo futuro separado de Sprint 6.2a
 

@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\ViewModels\Admin;
 
+use App\DataTransferObjects\Admin\AuditLogFilterDto;
 use App\Exceptions\AuditLogQueryException;
 use App\Models\Activity;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
+use InvalidArgumentException;
 use Throwable;
 
 class AuditLogViewModel
@@ -19,13 +21,17 @@ class AuditLogViewModel
      *
      * @return LengthAwarePaginator<int, AuditLogEntryDto>
      */
-    public function getLogs(int $perPage = 10): LengthAwarePaginator
+    public function getLogs(AuditLogFilterDto $filter, int $perPage = 10): LengthAwarePaginator
     {
         // Enforce maximum bounded page size
         $boundedPerPage = min(max(1, $perPage), 50);
 
         try {
-            $paginator = $this->queryActivities()->paginate($boundedPerPage);
+            if (!$filter->isSafe()) {
+                throw new InvalidArgumentException('Unsafe audit log filter.');
+            }
+
+            $paginator = $this->queryActivities($filter)->paginate($boundedPerPage);
             $this->logExcludedActivities($paginator->items());
 
             return $this->mapPaginator($paginator);
@@ -43,12 +49,18 @@ class AuditLogViewModel
     /**
      * @return Builder<Activity>
      */
-    private function queryActivities(): Builder
+    private function queryActivities(AuditLogFilterDto $filter): Builder
     {
         return Activity::query()
             ->with(['causer', 'subject'])
             ->select(['id', 'log_name', 'description', 'event', 'subject_id', 'subject_type', 'causer_id', 'causer_type', 'created_at', 'is_global', 'organizer_id'])
-            ->whereNull('organizer_id')->latest()
+            ->whereNull('organizer_id')
+            ->where('is_global', true)
+            ->when($filter->logName !== null, fn (Builder $query): Builder => $query->where('log_name', $filter->logName))
+            ->when($filter->event !== null, fn (Builder $query): Builder => $query->where('event', $filter->event))
+            ->when($filter->dateFrom instanceof \Carbon\CarbonInterface, fn (Builder $query): Builder => $query->where('created_at', '>=', $filter->dateFrom))
+            ->when($filter->dateTo instanceof \Carbon\CarbonInterface, fn (Builder $query): Builder => $query->where('created_at', '<=', $filter->dateTo))
+            ->latest()
             ->orderBy('id', 'desc');
     }
 

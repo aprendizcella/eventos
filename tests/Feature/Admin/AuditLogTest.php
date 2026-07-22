@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Models\Activity;
 use App\Models\Organizer;
 use App\Models\User;
+use App\ViewModels\Admin\AuditLogViewModel;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Log;
 use Livewire\Volt\Volt;
@@ -89,8 +90,8 @@ test('component excludes tenant rows, presenting only global rows', function () 
         'organizer_id' => $organizer->id,
     ]);
 
-    // 3. Global Legacy Activity (Should see - organizer_id is null and is_global is false now)
-    Activity::query()->create([
+    // 3. Unclassified legacy activity (Should NOT see)
+    $unclassifiedLegacyActivity = Activity::query()->create([
         'log_name' => 'system',
         'description' => 'Global legacy event',
         'event' => 'global-legacy-action',
@@ -101,7 +102,14 @@ test('component excludes tenant rows, presenting only global rows', function () 
     Volt::test('admin.audit-log')
         ->assertSee('Global event occurred')
         ->assertDontSee('Tenant event occurred')
-        ->assertSee('Global legacy event');
+        ->assertDontSee('Global legacy event');
+
+    $this->assertModelExists($unclassifiedLegacyActivity);
+
+    $unclassifiedLegacyActivity->refresh();
+
+    expect($unclassifiedLegacyActivity->organizer_id)->toBeNull()
+        ->and((bool) $unclassifiedLegacyActivity->is_global)->toBeFalse();
 });
 
 test('active tenant context does not leak tenant data in global audit query', function () {
@@ -192,7 +200,7 @@ test('audit log query failure shows safe error message and logs generic message'
         ->with('Global audit query failed with database exception.', ['error' => 'Database query failure']);
 
     // Mock the ViewModel itself to throw an exception from getLogs method
-    $this->mock(App\ViewModels\Admin\AuditLogViewModel::class, function ($mock) {
+    $this->mock(AuditLogViewModel::class, function ($mock) {
         $mock->shouldReceive('getLogs')->andReturnUsing(function () {
             // Emulate the actual catch block behavior of the VM
             Log::error('Global audit query failed with database exception.', ['error' => 'Database query failure']);
@@ -202,16 +210,17 @@ test('audit log query failure shows safe error message and logs generic message'
     });
 
     Volt::test('admin.audit-log')
-        ->assertSee('A database query failure occurred during audit presentation.');
+        ->assertSee('Audit records are temporarily unavailable.')
+        ->assertDontSee('Database query failure occurred');
 });
 
 test('pagination limits size to maximum bound', function () {
-    $viewModel = new App\ViewModels\Admin\AuditLogViewModel;
+    $viewModel = new AuditLogViewModel;
     // Verify min and max clamps are applied to page size parameters
-    $paginatorMin = $viewModel->getLogs(-10);
+    $paginatorMin = $viewModel->getLogs(App\DataTransferObjects\Admin\AuditLogFilterDto::empty(), -10);
     expect($paginatorMin->perPage())->toBe(1);
 
-    $paginatorMax = $viewModel->getLogs(100);
+    $paginatorMax = $viewModel->getLogs(App\DataTransferObjects\Admin\AuditLogFilterDto::empty(), 100);
     expect($paginatorMax->perPage())->toBe(50);
 });
 
@@ -249,8 +258,8 @@ test('pagination ordering with identical timestamps is stable', function () {
     ]);
 
     // Query ViewModel
-    $viewModel = new App\ViewModels\Admin\AuditLogViewModel;
-    $results = $viewModel->getLogs(10);
+    $viewModel = new AuditLogViewModel;
+    $results = $viewModel->getLogs(App\DataTransferObjects\Admin\AuditLogFilterDto::empty(), 10);
 
     // Assert sorting DESC by created_at, then DESC by ID
     $items = $results->items();
@@ -422,7 +431,8 @@ test('real database exception handling without mocking VM', function () {
     Log::shouldReceive('warning')->byDefault();
 
     Volt::test('admin.audit-log')
-        ->assertSee('A database query failure occurred during audit presentation.');
+        ->assertSee('Audit records are temporarily unavailable.')
+        ->assertDontSee('Simulated database breakdown');
 });
 
 test('excluded activities trigger warning logs in real execution flow', function () {
@@ -486,4 +496,313 @@ test('component includes loading skeleton', function () {
     Volt::test('admin.audit-log')
         ->assertSee('wire:loading', false)
         ->assertSee('audit-log-loading');
+});
+
+test('only explicit global activities participate in allowlisted filters and counts', function () {
+    $superAdmin = User::factory()->create();
+    $role = Role::query()->firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web', 'organizer_id' => 0]);
+    $superAdmin->assignRole($role);
+    $this->actingAs($superAdmin);
+
+    $matchingActivity = Activity::query()->create([
+        'log_name' => 'auth',
+        'description' => 'Matching global login',
+        'event' => 'login',
+        'is_global' => true,
+        'organizer_id' => null,
+        'created_at' => Illuminate\Support\Facades\Date::parse('2026-07-10 12:00:00'),
+    ]);
+
+    Activity::query()->create([
+        'log_name' => 'auth',
+        'description' => 'Unclassified login',
+        'event' => 'login',
+        'is_global' => false,
+        'organizer_id' => null,
+        'created_at' => Illuminate\Support\Facades\Date::parse('2026-07-10 12:00:00'),
+    ]);
+
+    Activity::query()->create([
+        'log_name' => 'auth',
+        'description' => 'Tenant login',
+        'event' => 'login',
+        'is_global' => false,
+        'organizer_id' => Organizer::factory()->create()->id,
+        'created_at' => Illuminate\Support\Facades\Date::parse('2026-07-10 12:00:00'),
+    ]);
+
+    $filter = new App\DataTransferObjects\Admin\AuditLogFilterDto(
+        logName: 'auth',
+        event: 'login',
+        dateFrom: Illuminate\Support\Facades\Date::parse('2026-07-10')->startOfDay(),
+        dateTo: Illuminate\Support\Facades\Date::parse('2026-07-10')->endOfDay(),
+    );
+
+    $logs = (new AuditLogViewModel)->getLogs($filter);
+
+    expect($logs->total())->toBe(1)
+        ->and($logs->first()->id)->toBe((int) $matchingActivity->id)
+        ->and($logs->first()->description)->toBe('Matching global login');
+});
+
+test('invalid draft filters retain the prior safe result without broadening the query', function () {
+    $superAdmin = User::factory()->create();
+    $role = Role::query()->firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web', 'organizer_id' => 0]);
+    $superAdmin->assignRole($role);
+    $this->actingAs($superAdmin);
+
+    Activity::query()->create([
+        'log_name' => 'auth',
+        'description' => 'Safe prior result',
+        'event' => 'login',
+        'is_global' => true,
+        'organizer_id' => null,
+    ]);
+
+    Activity::query()->create([
+        'log_name' => 'system',
+        'description' => 'Must not be broadened in',
+        'event' => 'created',
+        'is_global' => true,
+        'organizer_id' => null,
+    ]);
+
+    Volt::test('admin.audit-log')
+        ->set('draftLogName', 'auth')
+        ->set('draftEvent', 'login')
+        ->call('applyFilters')
+        ->assertSee('Safe prior result')
+        ->assertDontSee('Must not be broadened in')
+        ->set('draftLogName', 'auth OR 1=1')
+        ->call('applyFilters')
+        ->assertHasErrors('draftLogName')
+        ->assertSee('Safe prior result')
+        ->assertDontSee('Must not be broadened in');
+});
+
+test('partial, malformed, reversed, and overlong date drafts do not replace applied filters', function () {
+    $superAdmin = User::factory()->create();
+    $role = Role::query()->firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web', 'organizer_id' => 0]);
+    $superAdmin->assignRole($role);
+    $this->actingAs($superAdmin);
+
+    Activity::query()->create([
+        'log_name' => 'auth',
+        'description' => 'Bounded safe result',
+        'event' => 'login',
+        'is_global' => true,
+        'organizer_id' => null,
+    ]);
+
+    $component = Volt::test('admin.audit-log')
+        ->set('draftLogName', 'auth')
+        ->set('draftEvent', 'login')
+        ->call('applyFilters')
+        ->set('draftDateFrom', '2026-07-11')
+        ->call('applyFilters')
+        ->assertHasErrors('draftDateTo')
+        ->set('draftDateFrom', 'invalid-date')
+        ->set('draftDateTo', '2026-07-10')
+        ->call('applyFilters')
+        ->assertHasErrors('draftDateFrom');
+
+    $component
+        ->set('draftDateFrom', '2026-07-11')
+        ->set('draftDateTo', '2026-07-10')
+        ->call('applyFilters')
+        ->assertHasErrors('draftDateTo')
+        ->set('draftDateFrom', '2026-07-10')
+        ->set('draftDateTo', '2026-10-11')
+        ->call('applyFilters')
+        ->assertHasErrors('draftDateTo')
+        ->assertSee('Bounded safe result');
+});
+
+test('audit controls reset pagination and present filtered records responsively', function () {
+    $superAdmin = User::factory()->create();
+    $role = Role::query()->firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web', 'organizer_id' => 0]);
+    $superAdmin->assignRole($role);
+    $this->actingAs($superAdmin);
+
+    for ($index = 1; $index <= 11; $index++) {
+        Activity::query()->create([
+            'log_name' => $index === 11 ? 'auth' : 'system',
+            'description' => "Audit row {$index}",
+            'event' => $index === 11 ? 'login' : 'created',
+            'is_global' => true,
+            'organizer_id' => null,
+            'created_at' => Illuminate\Support\Facades\Date::parse('2026-07-10 12:00:00'),
+        ]);
+    }
+
+    Volt::test('admin.audit-log')
+        ->call('setPage', 2)
+        ->assertSee('Audit row 1')
+        ->set('draftLogName', 'auth')
+        ->set('draftEvent', 'login')
+        ->call('applyFilters')
+        ->assertSet('paginators.page', 1)
+        ->assertSee('Audit row 11')
+        ->assertSee('1 matching record')
+        ->assertSee('Read-only audit trail')
+        ->assertSee('audit-log-desktop-records')
+        ->assertSee('audit-log-mobile-records')
+        ->call('resetFilters')
+        ->assertSet('paginators.page', 1)
+        ->assertSee('Audit row 1');
+});
+
+test('audit presentation omits excluded controls and safe errors disclose no internals', function () {
+    $superAdmin = User::factory()->create();
+    $role = Role::query()->firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web', 'organizer_id' => 0]);
+    $superAdmin->assignRole($role);
+    $this->actingAs($superAdmin);
+
+    Activity::query()->create([
+        'log_name' => 'auth',
+        'description' => 'Visible audit row',
+        'event' => 'login',
+        'is_global' => true,
+        'organizer_id' => null,
+        'properties' => ['token' => 'secret-token'],
+    ]);
+
+    Volt::test('admin.audit-log')
+        ->assertSee('Visible audit row')
+        ->assertDontSee('secret-token')
+        ->assertDontSee('Export')
+        ->assertDontSee('Chart')
+        ->assertDontSee('Search payload')
+        ->assertDontSee('Create audit');
+});
+
+test('filtered result count remains visible when no rows match', function () {
+    $superAdmin = User::factory()->create();
+    $role = Role::query()->firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web', 'organizer_id' => 0]);
+    $superAdmin->assignRole($role);
+    $this->actingAs($superAdmin);
+
+    Activity::query()->create([
+        'log_name' => 'auth',
+        'description' => 'Non-matching global audit row',
+        'event' => 'login',
+        'is_global' => true,
+        'organizer_id' => null,
+    ]);
+
+    Volt::test('admin.audit-log')
+        ->set('draftLogName', 'system')
+        ->set('draftEvent', 'deleted')
+        ->call('applyFilters')
+        ->assertSee('0 matching records')
+        ->assertSee('No audit records found.');
+});
+
+test('injected and unknown event drafts preserve the prior safe result', function () {
+    $superAdmin = User::factory()->create();
+    $role = Role::query()->firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web', 'organizer_id' => 0]);
+    $superAdmin->assignRole($role);
+    $this->actingAs($superAdmin);
+
+    Activity::query()->create([
+        'log_name' => 'auth',
+        'description' => 'Safe login result',
+        'event' => 'login',
+        'is_global' => true,
+        'organizer_id' => null,
+    ]);
+
+    Activity::query()->create([
+        'log_name' => 'auth',
+        'description' => 'Unsafe event must remain absent',
+        'event' => 'deleted',
+        'is_global' => true,
+        'organizer_id' => null,
+    ]);
+
+    $component = Volt::test('admin.audit-log')
+        ->set('draftLogName', 'auth')
+        ->set('draftEvent', 'login')
+        ->call('applyFilters')
+        ->assertSee('Safe login result')
+        ->assertDontSee('Unsafe event must remain absent');
+
+    foreach (['login OR 1=1', 'unknown-event'] as $event) {
+        $component
+            ->set('draftEvent', $event)
+            ->call('applyFilters')
+            ->assertHasErrors('draftEvent')
+            ->assertSee('Safe login result')
+            ->assertDontSee('Unsafe event must remain absent');
+    }
+});
+
+test('inclusive ISO date bounds include both boundary rows and reject invalid ranges', function () {
+    $superAdmin = User::factory()->create();
+    $role = Role::query()->firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web', 'organizer_id' => 0]);
+    $superAdmin->assignRole($role);
+    $this->actingAs($superAdmin);
+
+    Activity::query()->create([
+        'log_name' => 'auth',
+        'description' => 'Start boundary audit row',
+        'event' => 'login',
+        'is_global' => true,
+        'organizer_id' => null,
+        'created_at' => Illuminate\Support\Facades\Date::parse('2026-07-10 00:00:00'),
+    ]);
+
+    Activity::query()->create([
+        'log_name' => 'auth',
+        'description' => 'End boundary audit row',
+        'event' => 'login',
+        'is_global' => true,
+        'organizer_id' => null,
+        'created_at' => Illuminate\Support\Facades\Date::parse('2026-07-10 23:59:59'),
+    ]);
+
+    Volt::test('admin.audit-log')
+        ->set('draftLogName', 'auth')
+        ->set('draftEvent', 'login')
+        ->set('draftDateFrom', '2026-07-10')
+        ->set('draftDateTo', '2026-07-10')
+        ->call('applyFilters')
+        ->assertSee('Start boundary audit row')
+        ->assertSee('End boundary audit row')
+        ->set('draftDateFrom', '2026/07/10')
+        ->call('applyFilters')
+        ->assertHasErrors('draftDateFrom')
+        ->assertSee('Start boundary audit row')
+        ->assertSee('End boundary audit row');
+});
+
+test('equal timestamps navigate deterministically across multiple pages without duplicates', function () {
+    $superAdmin = User::factory()->create();
+    $role = Role::query()->firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web', 'organizer_id' => 0]);
+    $superAdmin->assignRole($role);
+    $this->actingAs($superAdmin);
+
+    foreach (range(1, 21) as $index) {
+        Activity::query()->create([
+            'log_name' => 'system',
+            'description' => sprintf('Equal timestamp audit %02d', $index),
+            'event' => 'created',
+            'is_global' => true,
+            'organizer_id' => null,
+            'created_at' => Illuminate\Support\Facades\Date::parse('2026-07-10 12:00:00'),
+        ]);
+    }
+
+    Volt::test('admin.audit-log')
+        ->assertSee('Equal timestamp audit 21')
+        ->assertSee('Equal timestamp audit 12')
+        ->assertDontSee('Equal timestamp audit 11')
+        ->call('setPage', 2)
+        ->assertSee('Equal timestamp audit 11')
+        ->assertSee('Equal timestamp audit 02')
+        ->assertDontSee('Equal timestamp audit 12')
+        ->assertDontSee('Equal timestamp audit 01')
+        ->call('setPage', 3)
+        ->assertSee('Equal timestamp audit 01')
+        ->assertDontSee('Equal timestamp audit 02');
 });
