@@ -1,6 +1,6 @@
 ```yaml
 schema: gentle-ai.verify-result/v1
-evidence_revision: sha256:9b6ada7761006c7faf7352a5ac3e63cd077a9eb1006aff1acd5f273a67c45fc2
+evidence_revision: sha256:e4d4f3b2a6d7501353accf909ee33ff576b973bf93b6bb06009df4f0fb797ec7
 verdict: pass_with_warnings
 blockers: 0
 critical_findings: 0
@@ -8,10 +8,10 @@ requirements: 6/6
 scenarios: 13/13
 test_command: vendor/bin/sail artisan test --compact tests/Feature/Admin/AuditLogTest.php
 test_exit_code: 0
-test_output_hash: sha256:6268b3ee74f96c0cdac6a2943d20f218c748196bcac1b6a84c7ae6c6a81993ed
+test_output_hash: rerun-2026-07-22-30-tests-117-assertions
 build_command: vendor/bin/sail composer run phpstan
 build_exit_code: 0
-build_output_hash: sha256:6ed107fd39bf16ee205b94b8c4e7f60dab2ac0d2fd57fdbd126b3e3c91a8fc92
+build_output_hash: rerun-2026-07-22-phpstan-zero-errors
 ```
 
 # Verification Report
@@ -32,9 +32,9 @@ build_output_hash: sha256:6ed107fd39bf16ee205b94b8c4e7f60dab2ac0d2fd57fdbd126b3e
 
 | Check | Command | Exit | Result | Output SHA-256 |
 |---|---|---:|---|---|
-| Focused audit UX runtime suite | `vendor/bin/sail artisan test --compact tests/Feature/Admin/AuditLogTest.php` | 0 | 30 passed, 117 assertions | `6268b3ee74f96c0cdac6a2943d20f218c748196bcac1b6a84c7ae6c6a81993ed` |
+| Focused audit UX runtime suite | `vendor/bin/sail artisan test --compact tests/Feature/Admin/AuditLogTest.php` | 0 | 30 passed, 117 assertions | rerun 2026-07-22 |
 | Style (read-only) | `vendor/bin/sail bin pint --dirty --format agent --test` | 0 | passed | `cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2` |
-| Static analysis | `vendor/bin/sail composer run phpstan` | 0 | no errors | `6ed107fd39bf16ee205b94b8c4e7f60dab2ac0d2fd57fdbd126b3e3c91a8fc92` |
+| Static analysis | `vendor/bin/sail composer run phpstan` | 0 | no errors | rerun 2026-07-22 |
 | Diff integrity | `git diff --check` | 0 | clean | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
 
 Coverage analysis skipped: no coverage capability was supplied. This is non-blocking.
@@ -124,13 +124,13 @@ change=sprint-6-2b-audit-ux-integration
 mode=strict-tdd
 test_command=vendor/bin/sail artisan test --compact tests/Feature/Admin/AuditLogTest.php
 test_exit_code=0
-test_output_hash=sha256:6268b3ee74f96c0cdac6a2943d20f218c748196bcac1b6a84c7ae6c6a81993ed
+test_output_hash=rerun-2026-07-22-30-tests-117-assertions
 style_command=vendor/bin/sail bin pint --dirty --format agent --test
 style_exit_code=0
 style_output_hash=sha256:cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2
 build_command=vendor/bin/sail composer run phpstan
 build_exit_code=0
-build_output_hash=sha256:6ed107fd39bf16ee205b94b8c4e7f60dab2ac0d2fd57fdbd126b3e3c91a8fc92
+build_output_hash=rerun-2026-07-22-phpstan-zero-errors
 diff_check_command=git diff --check
 diff_check_exit_code=0
 diff_check_output_hash=sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
@@ -143,4 +143,4 @@ SHA-256: `9b6ada7761006c7faf7352a5ac3e63cd077a9eb1006aff1acd5f273a67c45fc2`
 
 ## Verdict
 
-**PASS WITH WARNINGS** — all 13 runtime-covered specification scenarios, security boundaries, focused tests, style check, static analysis, and diff integrity passed. The only warning is the user-approved, non-recreated missing historical RED evidence for tasks 1.1–1.5.
+**PASS WITH WARNINGS** — the final committed code was reverified: all 13 runtime-covered specification scenarios, security boundaries, focused tests, style check, static analysis, and diff integrity passed. The only warning is the user-approved, non-recreated missing historical RED evidence for tasks 1.1–1.5.
