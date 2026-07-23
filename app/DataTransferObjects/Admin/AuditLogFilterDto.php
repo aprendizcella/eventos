@@ -26,23 +26,14 @@ final readonly class AuditLogFilterDto
 
     public function isSafe(): bool
     {
-        if ($this->logName !== null && !in_array($this->logName, self::LOG_NAMES, true)) {
-            return false;
-        }
+        $hasValidLogName = $this->logName === null || in_array($this->logName, self::LOG_NAMES, true);
+        $hasValidEvent = $this->event === null || in_array($this->event, self::EVENTS, true);
+        $hasDatePair = ($this->dateFrom instanceof CarbonInterface) === ($this->dateTo instanceof CarbonInterface);
+        $hasValidDateRange = !$this->dateFrom instanceof CarbonInterface
+            || !$this->dateTo instanceof CarbonInterface
+            || ($this->dateFrom->lessThanOrEqualTo($this->dateTo)
+                && $this->dateFrom->diffInDays($this->dateTo) <= 90);
 
-        if ($this->event !== null && !in_array($this->event, self::EVENTS, true)) {
-            return false;
-        }
-
-        if ((!$this->dateFrom instanceof CarbonInterface) !== (!$this->dateTo instanceof CarbonInterface)) {
-            return false;
-        }
-
-        if (!$this->dateFrom instanceof CarbonInterface || !$this->dateTo instanceof CarbonInterface) {
-            return true;
-        }
-
-        return $this->dateFrom->lessThanOrEqualTo($this->dateTo)
-            && $this->dateFrom->diffInDays($this->dateTo) <= 90;
+        return $hasValidLogName && $hasValidEvent && $hasDatePair && $hasValidDateRange;
     }
 }
