@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\DataTransferObjects\Admin\AuditLogFilterDto;
 use App\Models\Activity;
 use App\ViewModels\Admin\AuditLogViewModel;
@@ -146,7 +148,7 @@ new #[Layout('layouts.app')] class extends Component {
 }; ?>
 
 <div class="space-y-6">
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
             <h1 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Global Audit Logs</h1>
             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Read-only audit trail for platform security and operational events.</p>
@@ -156,43 +158,25 @@ new #[Layout('layouts.app')] class extends Component {
 
     <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
         <form wire:submit="applyFilters" class="flex flex-wrap items-end gap-4">
-            <label class="grid gap-1 text-sm font-medium text-gray-700 dark:text-gray-300">
-                Log name
-                <select wire:model="draftLogName" class="rounded-lg border-gray-300 bg-white text-sm dark:border-gray-700 dark:bg-gray-950">
-                    <option value="">All logs</option>
-                    @foreach (AuditLogFilterDto::LOG_NAMES as $allowedLogName)
-                        <option value="{{ $allowedLogName }}">{{ $allowedLogName }}</option>
-                    @endforeach
-                </select>
-            </label>
-            <label class="grid gap-1 text-sm font-medium text-gray-700 dark:text-gray-300">
-                Event
-                <select wire:model="draftEvent" class="rounded-lg border-gray-300 bg-white text-sm dark:border-gray-700 dark:bg-gray-950">
-                    <option value="">All events</option>
-                    @foreach (AuditLogFilterDto::EVENTS as $allowedEvent)
-                        <option value="{{ $allowedEvent }}">{{ $allowedEvent }}</option>
-                    @endforeach
-                </select>
-            </label>
-            <label class="grid gap-1 text-sm font-medium text-gray-700 dark:text-gray-300">
-                From
-                <input wire:model="draftDateFrom" type="date" class="rounded-lg border-gray-300 bg-white text-sm dark:border-gray-700 dark:bg-gray-950">
-                @error('draftDateFrom') <span class="text-xs text-red-600 dark:text-red-400">{{ $message }}</span> @enderror
-            </label>
-            <label class="grid gap-1 text-sm font-medium text-gray-700 dark:text-gray-300">
-                To
-                <input wire:model="draftDateTo" type="date" class="rounded-lg border-gray-300 bg-white text-sm dark:border-gray-700 dark:bg-gray-950">
-                @error('draftDateTo') <span class="text-xs text-red-600 dark:text-red-400">{{ $message }}</span> @enderror
-            </label>
-            <div class="flex gap-2">
-                <button type="submit" class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500">Apply filters</button>
+            <div class="w-44 -mb-4">
+                <x-form.select id="draftLogName" name="draftLogName" label="Log name" :options="array_combine(AuditLogFilterDto::LOG_NAMES, AuditLogFilterDto::LOG_NAMES)" placeholder="All logs" wire:model="draftLogName" />
+            </div>
+            <div class="w-44 -mb-4">
+                <x-form.select id="draftEvent" name="draftEvent" label="Event" :options="array_combine(AuditLogFilterDto::EVENTS, AuditLogFilterDto::EVENTS)" placeholder="All events" wire:model="draftEvent" />
+            </div>
+            <div class="w-40 -mb-4">
+                <x-form.date id="draftDateFrom" name="draftDateFrom" label="From" :value="$draftDateFrom" wire:model="draftDateFrom" />
+            </div>
+            <div class="w-40 -mb-4">
+                <x-form.date id="draftDateTo" name="draftDateTo" label="To" :value="$draftDateTo" wire:model="draftDateTo" />
+            </div>
+            <div class="flex gap-2 pb-4">
+                <x-ui.button type="submit" class="!w-auto">Apply filters</x-ui.button>
                 @if ($activeFilters !== [])
-                    <button type="button" wire:click="resetFilters" class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800">Reset</button>
+                    <x-ui.button type="button" wire:click="resetFilters" class="!w-auto">Reset</x-ui.button>
                 @endif
             </div>
         </form>
-        @error('draftLogName') <p class="mt-2 text-xs text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
-        @error('draftEvent') <p class="mt-2 text-xs text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
         @if ($activeFilters !== [])
             <div class="mt-4 flex flex-wrap gap-2" aria-label="Active audit filters">
                 @foreach ($activeFilters as $label => $value)
@@ -208,7 +192,7 @@ new #[Layout('layouts.app')] class extends Component {
         <div class="h-10 w-full animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
     </div>
 
-    <div wire:loading.remove>
+    <div wire:loading.remove class="space-y-4">
         @if ($errorMessage !== null)
             <div class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800 dark:border-red-900/30 dark:bg-red-950/20 dark:text-red-300" role="alert" id="audit-log-error-container">{{ $errorMessage }}</div>
         @else

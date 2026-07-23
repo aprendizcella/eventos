@@ -806,3 +806,93 @@ test('equal timestamps navigate deterministically across multiple pages without 
         ->assertSee('Equal timestamp audit 01')
         ->assertDontSee('Equal timestamp audit 02');
 });
+
+test('audit filter renders the shared controls with stable bindings and compact actions', function () {
+    $superAdmin = User::factory()->create();
+    $role = Role::query()->firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web', 'organizer_id' => 0]);
+    $superAdmin->assignRole($role);
+    $this->actingAs($superAdmin);
+
+    $component = Volt::test('admin.audit-log')
+        ->assertSee('for="draftLogName"', false)
+        ->assertSee('id="draftLogName"', false)
+        ->assertSee('wire:model="draftLogName"', false)
+        ->assertSee('All logs')
+        ->assertSee('value="auth"', false)
+        ->assertSee('for="draftEvent"', false)
+        ->assertSee('id="draftEvent"', false)
+        ->assertSee('wire:model="draftEvent"', false)
+        ->assertSee('All events')
+        ->assertSee('value="login"', false)
+        ->assertSee('for="draftDateFrom"', false)
+        ->assertSee('id="draftDateFrom"', false)
+        ->assertSee('wire:model="draftDateFrom"', false)
+        ->assertSee('for="draftDateTo"', false)
+        ->assertSee('id="draftDateTo"', false)
+        ->assertSee('wire:model="draftDateTo"', false)
+        ->assertSee('Apply filters')
+        ->assertSee('!w-auto', false);
+
+    $component
+        ->set('draftLogName', 'auth')
+        ->set('draftEvent', 'login')
+        ->call('applyFilters')
+        ->assertSee('Reset')
+        ->assertSee('wire:click="resetFilters"', false)
+        ->assertSee('!w-auto', false);
+});
+
+test('audit presentation retains the report-aligned hierarchy and responsive records', function () {
+    $superAdmin = User::factory()->create();
+    $role = Role::query()->firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web', 'organizer_id' => 0]);
+    $superAdmin->assignRole($role);
+    $this->actingAs($superAdmin);
+
+    Activity::query()->create([
+        'log_name' => 'auth',
+        'description' => 'Report-aligned audit row',
+        'event' => 'login',
+        'is_global' => true,
+        'organizer_id' => null,
+    ]);
+
+    Volt::test('admin.audit-log')->assertSeeInOrder(['Global Audit Logs', 'Read-only audit trail', 'Immutable records', 'Log name', '1 matching record'])->assertSeeHtml('sm:items-center')->assertSeeHtml('rounded-xl border border-gray-200 bg-white p-4 shadow-sm')->assertSee('audit-log-desktop-records')->assertSeeHtml('id="audit-log-desktop-records" class="mt-4 hidden overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm md:block dark:border-gray-800 dark:bg-gray-900"')
+        ->assertSee('audit-log-mobile-records')
+        ->assertSee('Report-aligned audit row');
+});
+
+test('applying and resetting shared audit controls preserves chips, records, and pagination', function () {
+    $superAdmin = User::factory()->create();
+    $role = Role::query()->firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web', 'organizer_id' => 0]);
+    $superAdmin->assignRole($role);
+    $this->actingAs($superAdmin);
+
+    foreach (range(1, 11) as $index) {
+        Activity::query()->create([
+            'log_name' => $index === 11 ? 'auth' : 'system',
+            'description' => "Shared control audit row {$index}",
+            'event' => $index === 11 ? 'login' : 'created',
+            'is_global' => true,
+            'organizer_id' => null,
+        ]);
+    }
+
+    Volt::test('admin.audit-log')
+        ->call('setPage', 2)
+        ->set('draftLogName', 'auth')
+        ->set('draftEvent', 'login')
+        ->call('applyFilters')
+        ->assertSet('paginators.page', 1)
+        ->assertSee('aria-label="Active audit filters"', false)
+        ->assertSee('Log: auth')
+        ->assertSee('Event: login')
+        ->assertSee('1 matching record')
+        ->assertSee('Shared control audit row 11')
+        ->assertSee('!w-auto', false)
+        ->call('resetFilters')
+        ->assertSet('paginators.page', 1)
+        ->assertDontSee('aria-label="Active audit filters"', false)
+        ->assertDontSee('Log: auth')
+        ->assertDontSee('Event: login')
+        ->assertSee('Shared control audit row 1');
+});
