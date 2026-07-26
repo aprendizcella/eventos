@@ -1,6 +1,6 @@
 # Estado de ejecución
 
-> **Resumen en una línea:** El repositorio está en el estado posterior al commit `d2e9cbe` (2026-07-20): Sprints 1.1–5.4, Sprint 6.1, Sprint 6.2a y Sprint 6.2b están implementados, verificados y archivados. Sprint 6.3–6.4 siguen pendientes.
+> **Resumen en una línea:** Sprints 1.1–5.4, Sprint 6.1, Sprint 6.2a, Sprint 6.2b y la base contractual de Sprint 6.3 están implementados, verificados y archivados. Sprint 6.4 sigue pendiente.
 
 ---
 
@@ -246,10 +246,10 @@ Sprint 4.2 cubrió la capa interna de monetización que faltaba entre facturaci�
 
 | Estado | Cambios | Evidencia y caveat |
 |---|---|---|
-| Archivados/implementados | 15 cambios archivados, incluidos Sprint 6.1, Sprint 6.2a y Sprint 6.2b | Sprint 6.2b conserva advertencias aceptadas sobre trazas RED históricas y ausencia de E2E; no hay bloqueadores funcionales. Algunos cambios históricos no tienen `verify-report.md` o `archive-report.md`. |
-| Activos con verificación | `mini-sprint-account-ux` | Informe PASS WITH WARNINGS, listo para archivar; 18/19 escenarios conformes y un caso parcialmente cubierto. |
-| Activos con validación pendiente | `mini-sprint-responsive-ux` | Informe PASS, pero la validación visual/manual en navegador sigue sin marcarse como completada. |
-| Activos con implementación sin cierre | `mini-sprint-email-verification-gate` | Tareas 15/15 marcadas; no hay `verify-report.md` ni `archive-report.md`. |
+| Archivados/implementados | 20 cambios archivados, incluidos Sprint 6.1, Sprint 6.2a, Sprint 6.2b, Sprint 6.3 y tres mini-sprints UX/auth | Los tres mini-sprints se archivaron el 2026-07-26 con warnings explícitos sobre cobertura histórica y validación manual responsive. |
+| Activos con verificación | Ninguno de los tres mini-sprints UX/auth anteriores | Account UX, Responsive UX y Email Verification Gate ya tienen `verify-report.md` y `archive-report.md` en sus rutas de archivo. |
+| Activos con validación pendiente | `sprint-6-2a-capture-schema`, `sprint-6-2a-audit-visibility` y cambios de cumplimiento relacionados | Son deuda documental histórica separada y no bloquean el inicio de Sprint 6.4. |
+| Activos con implementación sin cierre | Ninguno de los tres mini-sprints cerrados en esta tanda | El backlog pendiente queda documentado para revisión posterior. |
 | Exploración solamente | `sprint-1-2-organizadores-y-equipos` | Solo existe `exploration.md`; no representa trabajo activo implementado. |
 
 La configuración OpenSpec mantiene `testing.strict_tdd: true`; el informe de Sprint 6.1 declara, en cambio, modo Standard y strict TDD inactivo. Se conserva como caveat de proceso, no como resolución implícita.
@@ -258,7 +258,7 @@ La configuración OpenSpec mantiene `testing.strict_tdd: true`; el informe de Sp
 
 ## Qué NO está hecho
 
-- Sprint 6.3: webhooks outbound y documentación completa de API.
+- UI de gestión de webhooks y generación OpenAPI completa, explícitamente diferidas fuera del slice contractual de Sprint 6.3.
 - Sprint 6.4: deployment, CI/CD, backups, Sentry, load testing y documentación final.
 - Integración real con CDN y cursor pagination.
 - Validación responsive manual en navegador y decisiones UX pendientes sobre notificaciones, feedback e iconos.
@@ -270,10 +270,10 @@ El roadmap completo está en [`01-producto/PLAN_IMPLEMENTACION.md`](../01-produc
 
 ## Bloqueos actuales
 
-Limitaciones conocidas: CDN real y cursor pagination quedan diferidas; siguen pendientes Sprint 6.3, GDPR/MFA, webhooks/documentación API, despliegue y cierre operativo. La validación responsive manual y las decisiones de notificaciones/iconos requieren trabajo explícito.
+Limitaciones conocidas: CDN real y cursor pagination quedan diferidas; siguen pendientes Sprint 6.4, GDPR/MFA, UI/OpenAPI de webhooks, despliegue y cierre operativo. La validación responsive manual y las decisiones de notificaciones/iconos requieren trabajo explícito.
 
 ---
 
 ## Próximo paso
 
-- Mantener Sprint 6.3 pendiente hasta recibir autorización explícita para iniciar su implementación.
+- Continuar con Sprint 6.4 cuando se autorice; mantener como backlog separado la UI/OpenAPI de webhooks.

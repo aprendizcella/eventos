@@ -6,7 +6,7 @@
 **Metodologia:** Sprints de 1 semana con entregables verificables por fase
 **Referencia:** Hi.Events (funcional), Attendize (ticketing), Eventbrite (benchmark)
 
-> **Estado de ejecucion (post Sprint 6.2b):** El repositorio contiene implementados los sprints 1.1–5.4, Sprint 6.1, Sprint 6.2a y Sprint 6.2b. Sprint 6.2b está verificado y archivado en `openspec/changes/archive/2026-07-22-sprint-6-2b-audit-ux-integration/`: 13/13 tareas, 6/6 requisitos y 13/13 escenarios conformes. Las advertencias aceptadas de TDD histórico y ausencia de E2E están documentadas en su `archive-report.md`. Sprint 6.3 y 6.4 permanecen pendientes.
+> **Estado de ejecucion (post Sprint 6.3):** El repositorio contiene implementados los sprints 1.1–5.4, Sprint 6.1, Sprint 6.2a, Sprint 6.2b y la base contractual de Sprint 6.3. Sprint 6.3 está verificado y archivado en `openspec/changes/archive/2026-07-26-sprint-6-3-outbound-webhooks/`: 10/10 tareas, 7/7 requisitos y 15/15 escenarios conformes. La UI de gestión y generación OpenAPI quedan explícitamente fuera de este slice y requieren trabajo posterior. Sprint 6.4 permanece pendiente.
 
 ---
 
@@ -1002,7 +1002,7 @@ GDPR (exportación, anonimización y derecho al olvido), MFA TOTP, modificacione
 
 ---
 
-### Sprint 6.3: Webhooks Outbound y Documentacion (Semana 23) — PENDIENTE / DIFERIDO
+### Sprint 6.3: Webhooks Outbound y Documentacion (Semana 23) — COMPLETADO (alcance contractual)
 
 | Tarea | Detalle                      | Entregable                         |
 | ----- | ---------------------------- | ---------------------------------- |
@@ -1016,11 +1016,13 @@ GDPR (exportación, anonimización y derecho al olvido), MFA TOTP, modificacione
 
 **Criterios de aceptacion:**
 
-- [ ] Organizador puede configurar webhooks
-- [ ] Webhooks se envian firmados con HMAC
-- [ ] Reintentos con backoff exponencial
-- [ ] Documentacion API completa
-- [ ] QA pipeline pasa limpio
+- [x] Organizador puede configurar webhooks mediante API v1
+- [x] Webhooks se envian firmados con HMAC
+- [x] Reintentos con backoff y estados terminales
+- [ ] Documentacion API completa (diferida fuera del slice contractual)
+- [x] QA pipeline pasa limpio y SonarQube Quality Gate OK
+
+**Estado OpenSpec:** verificado y archivado en `openspec/changes/archive/2026-07-26-sprint-6-3-outbound-webhooks/`. La UI de gestión y la generación OpenAPI siguen siendo trabajo posterior explícitamente fuera de alcance.
 
 **Dependencias:** Sprint 6.1 (Admin).
 

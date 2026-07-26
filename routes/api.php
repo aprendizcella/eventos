@@ -5,12 +5,17 @@ declare(strict_types=1);
 use App\Http\Controllers\Api\EventApiController;
 use App\Http\Controllers\Api\OrganizerApiController;
 use App\Http\Controllers\Api\V1\EventApiController as EventApiV1Controller;
+use App\Http\Controllers\Api\Webhooks\WebhookController;
 use App\Http\Controllers\Public\EventWidgetController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum', 'organizer.detect'])->prefix('v1')->group(function (): void {
     Route::get('/organizers/{organizer}', [OrganizerApiController::class, 'show'])->name('api.organizers.show');
     Route::get('/organizers/{organizer}/events', [EventApiController::class, 'index'])->name('api.events.index');
+    Route::get('/organizers/{organizer}/webhooks', [WebhookController::class, 'index'])->name('api.organizers.webhooks.index');
+    Route::post('/organizers/{organizer}/webhooks', [WebhookController::class, 'store'])->name('api.organizers.webhooks.store');
+    Route::delete('/organizers/{organizer}/webhooks/{webhook}', [WebhookController::class, 'destroy'])->name('api.organizers.webhooks.destroy');
+    Route::post('/organizers/{organizer}/webhooks/{webhook}/rotate', [WebhookController::class, 'rotate'])->name('api.organizers.webhooks.rotate');
 
     // Rutas operacionales del Evento con Throttling
     Route::middleware('throttle:api')->prefix('events/{event}')->group(function (): void {

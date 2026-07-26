@@ -78,6 +78,14 @@ class Organizer extends Model implements IsTenant
     }
 
     /**
+     * @return HasMany<Webhook, $this>
+     */
+    public function webhooks(): HasMany
+    {
+        return $this->hasMany(Webhook::class);
+    }
+
+    /**
      * Single-database mode: return the default connection database name.
      * Overrides `ImplementsTenant::getDatabaseName()` which expects a `database` column.
      */

@@ -75,6 +75,11 @@ class AppServiceProvider extends ServiceProvider
         );
 
         \Illuminate\Support\Facades\Event::listen(
+            \App\Events\Payments\PaymentCompleted::class,
+            [\App\Listeners\Payments\DispatchPaymentCompletedWebhooksListener::class, 'handlePaymentCompleted'],
+        );
+
+        \Illuminate\Support\Facades\Event::listen(
             \App\Events\Payments\RefundProcessed::class,
             \App\Listeners\Payments\IssueCreditNoteOnRefundProcessed::class,
         );
