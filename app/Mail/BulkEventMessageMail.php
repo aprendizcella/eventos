@@ -9,8 +9,9 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Spatie\Multitenancy\Jobs\NotTenantAware;
 
-final class BulkEventMessageMail extends Mailable
+final class BulkEventMessageMail extends Mailable implements NotTenantAware
 {
     use Queueable, SerializesModels;
 

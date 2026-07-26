@@ -12,12 +12,18 @@ use App\Mail\BulkEventMessageMail;
 use App\Models\Attendee;
 use App\Models\Event;
 use App\Models\NotificationLog;
+use App\Models\Organizer;
 use App\Models\TicketOrder;
 use App\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Illuminate\Mail\Events\MessageSending;
+use Illuminate\Mail\Transport\ArrayTransport;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event as EventFacade;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
+use Spatie\Multitenancy\Exceptions\CurrentTenantCouldNotBeDeterminedInTenantAwareJob;
 use Tests\TestCase;
 
 uses(TestCase::class, LazilyRefreshDatabase::class);
@@ -91,6 +97,59 @@ it('processes sending queue and parses placeholders correctly', function (): voi
         && str_contains((string) $mail->mailBody, 'Hola Juan Pérez')
         && str_contains((string) $mail->mailBody, 'tu ticket es TKT-12345')
         && str_contains((string) $mail->mailBody, 'para Concierto de Rock'));
+});
+
+it('processes the queued mailable through the transport without leaking tenant context', function (): void {
+    Config::set('queue.default', 'sync');
+    Config::set('mail.default', 'array');
+
+    $organizer = Organizer::factory()->create();
+    $organizer->makeCurrent();
+
+    $user = User::factory()->create();
+    $event = Event::factory()->create([
+        'organizer_id' => $organizer->getKey(),
+        'title' => 'Concierto de Rock',
+    ]);
+    $order = TicketOrder::factory()->create(['event_id' => $event->event_id]);
+    Attendee::factory()->create([
+        'ticket_order_id' => $order->ticket_order_id,
+        'first_name' => 'Juan',
+        'email' => 'juan@example.com',
+    ]);
+    $log = NotificationLog::query()->create([
+        'event_id' => $event->event_id,
+        'sent_by_user_id' => $user->id,
+        'subject' => 'Campaña test',
+        'body' => 'Hola {{first_name}}',
+        'recipient_count' => 1,
+        'status' => NotificationLogStatus::Pending,
+        'filter_criteria' => [],
+    ]);
+
+    /** @var ArrayTransport $transport */
+    $transport = Mail::mailer()->getSymfonyTransport();
+    $transport->flush();
+    $tenantDuringTransport = null;
+    EventFacade::listen(MessageSending::class, function () use (&$tenantDuringTransport): void {
+        $tenantDuringTransport = Organizer::checkCurrent();
+    });
+
+    expect(fn (): mixed => dispatch(new SendBulkEmailJob($log->notification_log_id)))
+        ->not->toThrow(CurrentTenantCouldNotBeDeterminedInTenantAwareJob::class);
+
+    $log->refresh();
+    $messages = $transport->messages();
+    $message = $messages->first()?->getOriginalMessage();
+
+    expect($log->status)->toBe(NotificationLogStatus::Completed)
+        ->and($messages)->toHaveCount(1)
+        ->and($message)->not->toBeNull()
+        ->and($message?->getTo()[0]->getAddress())->toBe('juan@example.com')
+        ->and($message?->getSubject())->toBe('Campaña test')
+        ->and($message?->getHtmlBody())->toContain('Hola Juan')
+        ->and($tenantDuringTransport)->toBeFalse()
+        ->and(Organizer::checkCurrent())->toBeFalse();
 });
 
 it('enforces strict idempotency and does not send duplicate emails on job retry', function (): void {
