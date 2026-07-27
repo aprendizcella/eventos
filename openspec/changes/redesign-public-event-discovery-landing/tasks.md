@@ -31,10 +31,10 @@ Chain strategy: stacked-to-main
 
 ## Phase 2: Public Shell and Docs
 
-- [ ] 2.1 **RED** — Create `tests/Feature/PublicNavigationTest.php`: guest/auth destinations, exact GitHub href/text/`target`/`rel`, Login/Dashboard exclusivity, footer parity, and theme markers. *(Navigation, Footer; guest/auth, GitHub, theme threats.)*
-- [ ] 2.2 **GREEN** — Modify `resources/views/layouts/public.blade.php` with semantic desktop/mobile navigation, retained theme component, auth action, safe external link, and footer.
-- [ ] 2.3 **RED** — Assert guest `/docs`, exactly the three named categories, non-linking cards/no guide URLs, and distinct Technical Reference scope. *(Docs landing/scope; `/docs` threat.)*
-- [ ] 2.4 **GREEN** — Add named `/docs` in `routes/web.php`; create `resources/views/public/docs/index.blade.php` with bounded category-overview copy.
+- [x] 2.1 **RED** — Create `tests/Feature/PublicNavigationTest.php`: guest/auth destinations, exact GitHub href/text/`target`/`rel`, Login/Dashboard exclusivity, footer parity, and theme markers. *(Navigation, Footer; guest/auth, GitHub, theme threats.)*
+- [x] 2.2 **GREEN** — Modify `resources/views/layouts/public.blade.php` with semantic desktop/mobile navigation, retained theme component, auth action, safe external link, and footer.
+- [x] 2.3 **RED** — Assert guest `/docs`, exactly the three named categories, non-linking cards/no guide URLs, and distinct Technical Reference scope. *(Docs landing/scope; `/docs` threat.)*
+- [x] 2.4 **GREEN** — Add named `/docs` in `routes/web.php`; create `resources/views/public/docs/index.blade.php` with bounded category-overview copy.
 
 ## Phase 3: Mobile Accessibility and Verification
 

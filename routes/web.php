@@ -24,6 +24,8 @@ Volt::mount();
 
 Volt::route('/', 'public.events.event-list-public')->name('public.events.catalog');
 
+Route::view('/docs', 'public.docs.index')->name('public.docs.index');
+
 // Numeric redirect route must come before slug route to avoid slug resolution of numeric IDs
 Route::get('/events/{id}', EventRedirectController::class)
     ->whereNumber('id')
