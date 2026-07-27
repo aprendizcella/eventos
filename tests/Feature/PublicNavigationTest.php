@@ -31,6 +31,9 @@ it('renders public navigation destinations for guests', function (): void {
         ->assertSee(anchor(FEATURES_URL), false)
         ->assertSee(anchor(DOCS_URL), false)
         ->assertSee(anchor(route('login')), false)
+        ->assertSee('aria-label="Log in"', false)
+        ->assertSee('title="Log in"', false)
+        ->assertSee('class="hidden sm:inline"', false)
         ->assertSee('Discover Events')
         ->assertSee('Features')
         ->assertSee('Docs')
@@ -63,6 +66,8 @@ it('exposes Dashboard but not Login for authenticated users', function (): void 
         ->assertSuccessful()
         ->assertSee('Dashboard')
         ->assertSee(anchor(route('dashboard')), false)
+        ->assertSee('aria-label="Dashboard"', false)
+        ->assertSee('class="hidden sm:inline"', false)
         ->assertDontSee('>Log in<')
         ->assertDontSee(anchor(route('login')), false);
 });
