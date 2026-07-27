@@ -107,6 +107,7 @@
                     {{-- Mobile menu control --}}
                     <button
                         type="button"
+                        x-ref="mobileMenuButton"
                         @click="open = !open"
                         :aria-expanded="open.toString()"
                         aria-controls="mobile-navigation"
@@ -125,7 +126,9 @@
             <nav
                 id="mobile-navigation"
                 x-show="open"
+                x-cloak
                 @click.outside="open = false"
+                @keydown.escape.window="open = false; $refs.mobileMenuButton?.focus()"
                 aria-label="{{ __('Mobile navigation') }}"
                 class="md:hidden border-t border-gray-200 bg-white px-4 pb-4 pt-2 dark:border-gray-800 dark:bg-gray-900"
             >

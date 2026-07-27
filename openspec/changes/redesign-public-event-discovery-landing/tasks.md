@@ -38,6 +38,6 @@ Chain strategy: stacked-to-main
 
 ## Phase 3: Mobile Accessibility and Verification
 
-- [ ] 3.1 **RED** — Confirm Pest Browser APIs; create `tests/Browser/PublicNavigationTest.php` for equivalent mobile destinations, `aria-expanded`, keyboard open, Escape close, focus return, and persisted theme if supported. *(Responsive Navigation; mobile/theme threats.)*
-- [ ] 3.2 **GREEN** — Refine `resources/views/layouts/public.blade.php` Alpine-compatible state, `x-cloak`, Escape, and menu-control focus restoration; retain theme persistence.
-- [ ] 3.3 Run the three focused suites, then `vendor/bin/sail composer run pint -- --test` and `vendor/bin/sail composer run phpstan`; record results with each direct commit.
+- [x] 3.1 **RED** — Confirm Pest Browser APIs; create `tests/Browser/PublicNavigationTest.php` for equivalent mobile destinations, `aria-expanded`, keyboard open, Escape close, focus return, and persisted theme if supported. *(Responsive Navigation; mobile/theme threats.)*
+- [x] 3.2 **GREEN** — Refine `resources/views/layouts/public.blade.php` Alpine-compatible state, `x-cloak`, Escape, and menu-control focus restoration; retain theme persistence.
+- [x] 3.3 Run the three focused suites, then `vendor/bin/sail composer run pint -- --test` and `vendor/bin/sail composer run phpstan`; record results with each direct commit.
