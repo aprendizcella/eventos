@@ -283,4 +283,33 @@ new #[Layout('layouts.public')] class extends Component {
             {{ $this->events->links() }}
         </div>
     @endif
+
+    <section id="features" class="mt-20 scroll-mt-8 border-t border-gray-200 pt-12 dark:border-gray-800" aria-labelledby="features-heading">
+        <div class="max-w-3xl">
+            <h2 id="features-heading" class="text-2xl font-bold text-gray-900 dark:text-white">{{ __('Features') }}</h2>
+            <p class="mt-3 text-sm leading-6 text-gray-600 dark:text-gray-400">
+                {{ __('Explore events, plan your visit, and manage event operations from one place.') }}
+            </p>
+        </div>
+
+        <div class="mt-8 grid gap-6 lg:grid-cols-2">
+            <section class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900" aria-labelledby="attendee-features-heading">
+                <h3 id="attendee-features-heading" class="text-lg font-semibold text-gray-900 dark:text-white">{{ __('Features for attendees') }}</h3>
+                <ul class="mt-4 space-y-3 text-sm leading-6 text-gray-600 dark:text-gray-400">
+                    <li>{{ __('Discover published public events and filter them by category, city, or date.') }}</li>
+                    <li>{{ __('Reserve tickets, join a waitlist when an event is full, and receive your order confirmation.') }}</li>
+                    <li>{{ __('Review your orders and add scheduled events to your calendar.') }}</li>
+                </ul>
+            </section>
+
+            <section class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900" aria-labelledby="organizer-features-heading">
+                <h3 id="organizer-features-heading" class="text-lg font-semibold text-gray-900 dark:text-white">{{ __('Features for organizers') }}</h3>
+                <ul class="mt-4 space-y-3 text-sm leading-6 text-gray-600 dark:text-gray-400">
+                    <li>{{ __('Create, publish, pause, and manage your events.') }}</li>
+                    <li>{{ __('Manage event venues and collaborate with your organizer team.') }}</li>
+                    <li>{{ __('Review event, billing, and payout reports.') }}</li>
+                </ul>
+            </section>
+        </div>
+    </section>
 </div>

@@ -26,8 +26,8 @@ Chain strategy: stacked-to-main
 
 ## Phase 1: Catalog Safety and Features
 
-- [ ] 1.1 **RED** — Extend `tests/Feature/Catalog/PublicCatalogTest.php`: guest `/`, catalog-first order, Discover→`/`, URL state, organizer-only published scope, and no marketplace/native-app/integration/deferred-doc claims. *(Public Catalog and Features; `/` and organizer threats.)*
-- [ ] 1.2 **GREEN** — Update `resources/views/livewire/public/events/event-list-public.blade.php`: append verified attendee/organizer `#features` after pagination; preserve catalog query behavior.
+- [x] 1.1 **RED** — Extend `tests/Feature/Catalog/PublicCatalogTest.php`: guest `/`, catalog-first order, Discover→`/`, URL state, organizer-only published scope, and no marketplace/native-app/integration/deferred-doc claims. *(Public Catalog and Features; `/` and organizer threats.)*
+- [x] 1.2 **GREEN** — Update `resources/views/livewire/public/events/event-list-public.blade.php`: append verified attendee/organizer `#features` after pagination; preserve catalog query behavior.
 
 ## Phase 2: Public Shell and Docs
 

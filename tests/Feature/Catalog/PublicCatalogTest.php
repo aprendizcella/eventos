@@ -111,3 +111,51 @@ it('hides unpublished events from the catalog', function (): void {
     Livewire::test('public.events.event-list-public')
         ->assertDontSee('Draft Event');
 });
+
+it('keeps discovery first before verified attendee and organizer features for guests', function (): void {
+    $this->get('/')
+        ->assertSuccessful()
+        ->assertSeeInOrder([
+            'Discover Events',
+            'Search events...',
+            'No events found',
+            'Features for attendees',
+            'Features for organizers',
+        ])
+        ->assertSee('id="features"', false)
+        ->assertDontSee('Marketplace')
+        ->assertDontSee('Native app')
+        ->assertDontSee('Integrations')
+        ->assertDontSee('Detailed guides');
+});
+
+it('preserves URL-synced discovery filters and organizer scope alongside features', function (): void {
+    $organizer1 = Organizer::factory()->create();
+    $organizer2 = Organizer::factory()->create();
+
+    Event::factory()->create([
+        'organizer_id' => $organizer1->id,
+        'category_id' => $this->category->category_id,
+        'status' => EventStatus::Published,
+        'visibility' => EventVisibility::Public,
+        'title' => 'Tenant Music Event',
+    ]);
+
+    Event::factory()->create([
+        'organizer_id' => $organizer2->id,
+        'category_id' => $this->category->category_id,
+        'status' => EventStatus::Published,
+        'visibility' => EventVisibility::Public,
+        'title' => 'Other Organizer Music Event',
+    ]);
+
+    $organizer1->makeCurrent();
+
+    Livewire::withQueryParams(['q' => 'Tenant Music'])
+        ->test('public.events.event-list-public')
+        ->assertSet('search', 'Tenant Music')
+        ->assertSeeInOrder(['Tenant Music Event', 'Features for attendees', 'Features for organizers'])
+        ->assertDontSee('Other Organizer Music Event');
+
+    Organizer::forgetCurrent();
+});
