@@ -14,6 +14,6 @@ final class VerifyEmailController extends Controller
     {
         $request->fulfill();
 
-        return redirect('/dashboard');
+        return redirect()->away('/dashboard');
     }
 }

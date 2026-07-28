@@ -23,7 +23,7 @@ it('registers and authenticates a new guest, leaving the email unverified', func
         'password_confirmation' => 'Sup3rSecret!',
     ]);
 
-    $response->assertRedirect(route('verification.notice'));
+    $response->assertRedirect(route('verification.notice', absolute: false));
 
     $this->assertAuthenticated();
 

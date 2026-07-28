@@ -218,10 +218,14 @@ it('keeps a successful login on the organizer custom domain', function (): void 
         'password' => 'Sup3rSecret!',
     ]);
 
-    $this->post('https://miseventos.example.test/login', [
+    $response = $this->post('https://miseventos.example.test/login', [
         'email' => $user->email,
         'password' => 'Sup3rSecret!',
-    ])->assertRedirect('/');
+    ]);
+
+    $response
+        ->assertRedirect('/')
+        ->assertHeader('Location', '/');
 
     $this->assertAuthenticatedAs($user);
 });

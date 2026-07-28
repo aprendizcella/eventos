@@ -30,6 +30,30 @@ it('renders the organizer dashboard view successfully for authorized users', fun
     $response->assertSee($organizer->name);
 });
 
+it('keeps organizer sidebar navigation on the custom domain', function (): void {
+    $organizer = Organizer::factory()->create(['domain' => 'miseventos.example.test']);
+    $user = User::factory()->create();
+    $organizer->users()->attach($user, ['role' => OrganizerRoles::Admin->value]);
+
+    $response = $this->actingAs($user)
+        ->get("https://{$organizer->domain}/organizers/{$organizer->id}/dashboard");
+
+    $sidebarRoutes = [
+        route('organizers.dashboard', $organizer, absolute: false),
+        route('organizers.events.index', $organizer, absolute: false),
+        route('organizers.team.index', $organizer, absolute: false),
+        route('organizers.venues.index', $organizer, absolute: false),
+        route('organizers.reports.index', $organizer, absolute: false),
+        route('organizers.settings', $organizer, absolute: false),
+    ];
+
+    $response->assertOk();
+
+    foreach ($sidebarRoutes as $sidebarRoute) {
+        $response->assertSee('href="'.$sidebarRoute.'"', false);
+    }
+});
+
 it('renders the dashboard Volt component with correct counters', function (): void {
     $user = User::factory()->create();
     $organizer = Organizer::factory()->create();

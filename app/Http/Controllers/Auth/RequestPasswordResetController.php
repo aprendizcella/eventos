@@ -19,12 +19,12 @@ final class RequestPasswordResetController extends Controller
         $status = ($this->requestPasswordReset)($request->toDto());
 
         if ($status === Password::RESET_LINK_SENT) {
-            return redirect('/')->with('status', $status);
+            return redirect()->away('/')->with('status', $status);
         }
 
         // Keep the user on the forgot-password form so the error surfaces there
         // (and the email input is preserved), instead of redirecting to "/".
-        return redirect('/forgot-password')
+        return redirect()->away('/forgot-password')
             ->withErrors(['email' => __($status)])
             ->withInput(['email' => $request->string('email')->toString()]);
     }

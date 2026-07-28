@@ -7,7 +7,7 @@ layout('layouts.auth');
 
 mount(function () {
     if (auth()->user()->hasVerifiedEmail()) {
-        return redirect('/dashboard');
+        return redirect()->away('/dashboard');
     }
 });
 ?>

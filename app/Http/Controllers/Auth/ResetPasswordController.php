@@ -19,13 +19,13 @@ final class ResetPasswordController extends Controller
         $status = ($this->resetPassword)($request->toDto());
 
         if ($status === Password::PASSWORD_RESET) {
-            return redirect('/')->with('status', $status);
+            return redirect()->away('/')->with('status', $status);
         }
 
         // Keep the user on the reset-password form so the error surfaces there
         // (and the email input + token are preserved), instead of redirecting
         // to "/". The token is replayed so the form can submit again.
-        return redirect(route('password.reset', ['token' => $request->string('token')->toString()], absolute: false))
+        return redirect()->away(route('password.reset', ['token' => $request->string('token')->toString()], absolute: false))
             ->withErrors(['email' => __($status)])
             ->withInput(['email' => $request->string('email')->toString()]);
     }

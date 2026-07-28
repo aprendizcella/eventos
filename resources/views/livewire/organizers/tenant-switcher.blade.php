@@ -10,7 +10,7 @@ new class extends Component {
 
     public function selectOrganizer(int $organizerId): void
     {
-        $this->redirect(route('organizers.events.index', $organizerId));
+        $this->redirect(route('organizers.events.index', $organizerId, absolute: false));
     }
 
     public function with(): array

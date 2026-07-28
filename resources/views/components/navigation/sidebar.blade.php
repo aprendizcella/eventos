@@ -59,7 +59,7 @@
 
             <!-- Organizer Dashboard Link -->
             <a
-                href="{{ route('organizers.dashboard', $sidebarOrganizer) }}"
+                href="{{ route('organizers.dashboard', $sidebarOrganizer, absolute: false) }}"
                 class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {{ request()->routeIs('organizers.dashboard') ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100' }}"
                 @if(request()->routeIs('organizers.dashboard')) aria-current="page" @endif
             >
@@ -71,7 +71,7 @@
 
             <!-- Events Link -->
             <a
-                href="{{ route('organizers.events.index', $sidebarOrganizer) }}"
+                href="{{ route('organizers.events.index', $sidebarOrganizer, absolute: false) }}"
                 class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {{ request()->routeIs('organizers.events.*') ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100' }}"
                 @if(request()->routeIs('organizers.events.*')) aria-current="page" @endif
             >
@@ -83,7 +83,7 @@
 
             <!-- Team Link -->
             <a
-                href="{{ route('organizers.team.index', $sidebarOrganizer) }}"
+                href="{{ route('organizers.team.index', $sidebarOrganizer, absolute: false) }}"
                 class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {{ request()->routeIs('organizers.team.*') ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100' }}"
                 @if(request()->routeIs('organizers.team.*')) aria-current="page" @endif
             >
@@ -95,7 +95,7 @@
 
             <!-- Venues Link -->
             <a
-                href="{{ route('organizers.venues.index', $sidebarOrganizer) }}"
+                href="{{ route('organizers.venues.index', $sidebarOrganizer, absolute: false) }}"
                 class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {{ request()->routeIs('organizers.venues.*') ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100' }}"
                 @if(request()->routeIs('organizers.venues.*')) aria-current="page" @endif
             >
@@ -108,7 +108,7 @@
 
             <!-- Reports Link -->
             <a
-                href="{{ route('organizers.reports.index', $sidebarOrganizer) }}"
+                href="{{ route('organizers.reports.index', $sidebarOrganizer, absolute: false) }}"
                 class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {{ request()->routeIs('organizers.reports.*') ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100' }}"
                 @if(request()->routeIs('organizers.reports.*')) aria-current="page" @endif
             >
@@ -120,7 +120,7 @@
 
             <!-- Settings Link -->
             <a
-                href="{{ route('organizers.settings', $sidebarOrganizer) }}"
+                href="{{ route('organizers.settings', $sidebarOrganizer, absolute: false) }}"
                 class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {{ request()->routeIs('organizers.settings') ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100' }}"
                 @if(request()->routeIs('organizers.settings')) aria-current="page" @endif
             >
@@ -140,7 +140,7 @@
 
             <!-- Organizers (Global list) -->
             <a
-                href="{{ route('organizers.index') }}"
+                href="{{ route('organizers.index', absolute: false) }}"
                 class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {{ request()->routeIs('organizers.index', 'organizers.create', 'organizers.show', 'organizers.edit') ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100' }}"
                 @if(request()->routeIs('organizers.index', 'organizers.create', 'organizers.show', 'organizers.edit')) aria-current="page" @endif
             >
@@ -152,7 +152,7 @@
 
             <!-- Platform Reports -->
             <a
-                href="{{ route('admin.reports.index') }}"
+                href="{{ route('admin.reports.index', absolute: false) }}"
                 class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {{ request()->routeIs('admin.reports.*') ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100' }}"
                 @if(request()->routeIs('admin.reports.*')) aria-current="page" @endif
             >
@@ -164,7 +164,7 @@
 
             <!-- Global Audit Log -->
             <a
-                href="{{ route('admin.audit-logs') }}"
+                href="{{ route('admin.audit-logs', absolute: false) }}"
                 class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {{ request()->routeIs('admin.audit-logs') ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100' }}"
                 @if(request()->routeIs('admin.audit-logs')) aria-current="page" @endif
             >
@@ -176,7 +176,7 @@
 
             <!-- Horizon (Queue Monitoring) -->
             <a
-                href="{{ url('/horizon') }}"
+                href="/horizon"
                 class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {{ request()->is('horizon*') ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100' }}"
                 @if(request()->is('horizon*')) aria-current="page" @endif
             >
