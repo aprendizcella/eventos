@@ -8,7 +8,7 @@
     if ($routeName !== 'dashboard') {
         $breadcrumbs[] = [
             'label' => __('Dashboard'),
-            'url' => route('dashboard'),
+            'url' => route('dashboard', absolute: false),
             'active' => false,
         ];
     }

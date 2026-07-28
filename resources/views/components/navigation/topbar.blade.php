@@ -48,20 +48,20 @@
                     </div>
 
                     <a
-                        href="{{ route('account.profile.edit') }}"
+                        href="{{ route('account.profile.edit', absolute: false) }}"
                         class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
                     >
                         Profile
                     </a>
 
                     <a
-                        href="{{ route('account.password.edit') }}"
+                        href="{{ route('account.password.edit', absolute: false) }}"
                         class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
                     >
                         Change password
                     </a>
 
-                    <form action="{{ route('logout') }}" method="POST">
+                    <form action="{{ route('logout', absolute: false) }}" method="POST">
                         @csrf
                         <button
                             type="submit"

@@ -91,5 +91,5 @@ it('requires authentication to download invoice', function (): void {
 
     $response = $this->get(route('organizers.invoices.download', [$organizer, $invoice]));
 
-    $response->assertRedirect(route('login'));
+    $response->assertRedirect(route('login', absolute: false));
 });

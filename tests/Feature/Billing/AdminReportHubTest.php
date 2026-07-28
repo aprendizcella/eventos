@@ -58,7 +58,7 @@ it('denies the platform report hub to authenticated non-admin users', function (
 
 it('denies the platform report hub to unauthenticated visitors', function (): void {
     $response = $this->get(route('admin.reports.index'));
-    $response->assertRedirect(route('login'));
+    $response->assertRedirect(route('login', absolute: false));
 });
 
 // ─── Default Filters (Task 3.1/3.2) ───────────────────────────────────────
@@ -252,7 +252,7 @@ it('shows platform reports link in the sidebar for admins', function (): void {
 
     $this->actingAs($user);
 
-    $response = $this->get(route('dashboard'));
+    $response = $this->get(route('dashboard', absolute: false));
     $response->assertOk();
     $response->assertSee('Platform Reports');
 });

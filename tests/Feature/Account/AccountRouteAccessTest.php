@@ -10,12 +10,12 @@ uses(TestCase::class, LazilyRefreshDatabase::class);
 
 it('redirects guest to login when accessing profile page', function (): void {
     $this->get(route('account.profile.edit'))
-        ->assertRedirect(route('login'));
+        ->assertRedirect(route('login', absolute: false));
 });
 
 it('redirects guest to login when accessing password page', function (): void {
     $this->get(route('account.password.edit'))
-        ->assertRedirect(route('login'));
+        ->assertRedirect(route('login', absolute: false));
 });
 
 it('renders profile page for authenticated user', function (): void {

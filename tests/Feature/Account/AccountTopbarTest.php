@@ -73,7 +73,7 @@ it('includes a logout form posting to the logout route', function (): void {
     $this->actingAs($user)
         ->get(route('dashboard'))
         ->assertOk()
-        ->assertSee('action="'.route('logout').'"', false);
+        ->assertSee('action="'.route('logout', absolute: false).'"', false);
 });
 
 it('includes a profile link to the account profile route', function (): void {
@@ -82,7 +82,7 @@ it('includes a profile link to the account profile route', function (): void {
     $this->actingAs($user)
         ->get(route('dashboard'))
         ->assertOk()
-        ->assertSee('href="'.route('account.profile.edit').'"', false);
+        ->assertSee('href="'.route('account.profile.edit', absolute: false).'"', false);
 });
 
 it('includes a change password link in the account dropdown', function (): void {
@@ -91,5 +91,5 @@ it('includes a change password link in the account dropdown', function (): void 
     $this->actingAs($user)
         ->get(route('dashboard'))
         ->assertOk()
-        ->assertSee('href="'.route('account.password.edit').'"', false);
+        ->assertSee('href="'.route('account.password.edit', absolute: false).'"', false);
 });

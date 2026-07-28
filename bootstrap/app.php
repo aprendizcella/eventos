@@ -33,6 +33,9 @@ return Application::configure(basePath: dirname(__DIR__))
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->redirectGuestsTo('/login');
+        $middleware->redirectUsersTo('/dashboard');
+
         $middleware->alias([
             'role' => RoleMiddleware::class,
             'permission' => PermissionMiddleware::class,

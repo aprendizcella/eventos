@@ -16,11 +16,11 @@ final class EmailVerificationNotificationController extends Controller
         $user = $request->user();
 
         if (!$user instanceof User) {
-            return to_route('login');
+            return redirect('/login');
         }
 
         if ($user->hasVerifiedEmail()) {
-            return to_route('dashboard');
+            return redirect('/dashboard');
         }
 
         $user->sendEmailVerificationNotification();

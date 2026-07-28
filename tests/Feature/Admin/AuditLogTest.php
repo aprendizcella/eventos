@@ -39,7 +39,7 @@ test('platform_admin role cannot access the audit log page', function () {
 });
 
 test('guests are redirected to login', function () {
-    $this->get(route('admin.audit-logs'))->assertRedirect(route('login'));
+    $this->get(route('admin.audit-logs'))->assertRedirect(route('login', absolute: false));
 });
 
 test('unauthorized direct Livewire request is denied and logs warning', function () {

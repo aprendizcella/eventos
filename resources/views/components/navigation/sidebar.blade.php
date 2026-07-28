@@ -25,7 +25,7 @@
 >
     <!-- Brand -->
     <div class="flex h-16 items-center border-b border-gray-200 px-6 dark:border-gray-700 shrink-0">
-        <a href="{{ route('dashboard') }}" class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+        <a href="{{ route('dashboard', absolute: false) }}" class="text-lg font-semibold text-gray-900 dark:text-gray-100">
             {{ $brand }}
         </a>
     </div>
@@ -41,7 +41,7 @@
     <nav class="flex-1 overflow-y-auto flex flex-col gap-1 p-4" aria-label="Main navigation">
         <!-- Section: General -->
         <a
-            href="{{ route('dashboard') }}"
+            href="{{ route('dashboard', absolute: false) }}"
             class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium {{ request()->routeIs('dashboard') ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100' }}"
             @if(request()->routeIs('dashboard')) aria-current="page" @endif
         >

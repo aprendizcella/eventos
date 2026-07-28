@@ -30,7 +30,7 @@ it('renders public navigation destinations for guests', function (): void {
         ->assertSee(anchor('/'), false)
         ->assertSee(anchor(FEATURES_URL), false)
         ->assertSee(anchor(DOCS_URL), false)
-        ->assertSee(anchor(route('login')), false)
+        ->assertSee(anchor(route('login', absolute: false)), false)
         ->assertSee('aria-label="Log in"', false)
         ->assertSee('title="Log in"', false)
         ->assertSee('class="hidden sm:inline"', false)
@@ -38,6 +38,13 @@ it('renders public navigation destinations for guests', function (): void {
         ->assertSee('Features')
         ->assertSee('Docs')
         ->assertSee('GitHub');
+});
+
+it('keeps public login navigation on an organizer custom domain', function (): void {
+    $this->get('https://miseventos.example.test/')
+        ->assertSuccessful()
+        ->assertSee(anchor(route('login', absolute: false)), false)
+        ->assertDontSee('https://events.saboreateruel.com/login', false);
 });
 
 it('links to GitHub with safe external anchor attributes', function (): void {
@@ -53,9 +60,9 @@ it('exposes Login but not Dashboard for guests', function (): void {
     $this->get('/')
         ->assertSuccessful()
         ->assertSee('Log in')
-        ->assertSee(anchor(route('login')), false)
+        ->assertSee(anchor(route('login', absolute: false)), false)
         ->assertDontSee('Dashboard')
-        ->assertDontSee(anchor(route('dashboard')), false);
+        ->assertDontSee(anchor(route('dashboard', absolute: false)), false);
 });
 
 it('exposes Dashboard but not Login for authenticated users', function (): void {
@@ -65,11 +72,11 @@ it('exposes Dashboard but not Login for authenticated users', function (): void 
         ->get('/')
         ->assertSuccessful()
         ->assertSee('Dashboard')
-        ->assertSee(anchor(route('dashboard')), false)
+        ->assertSee(anchor(route('dashboard', absolute: false)), false)
         ->assertSee('aria-label="Dashboard"', false)
         ->assertSee('class="hidden sm:inline"', false)
         ->assertDontSee('>Log in<')
-        ->assertDontSee(anchor(route('login')), false);
+        ->assertDontSee(anchor(route('login', absolute: false)), false);
 });
 
 it('mirrors the public destinations in the footer for guests', function (): void {
@@ -79,7 +86,7 @@ it('mirrors the public destinations in the footer for guests', function (): void
         ->assertSee('<footer', false)
         ->assertSee(anchor(FEATURES_URL), false)
         ->assertSee(anchor(DOCS_URL), false)
-        ->assertSee(anchor(route('login')), false)
+        ->assertSee(anchor(route('login', absolute: false)), false)
         ->assertSee(anchor(GITHUB_URL), false);
 
     $footer = extractFooter($response->getContent());
@@ -87,7 +94,7 @@ it('mirrors the public destinations in the footer for guests', function (): void
         ->toContain(anchor('/'))
         ->toContain(anchor(FEATURES_URL))
         ->toContain(anchor(DOCS_URL))
-        ->toContain(anchor(route('login')))
+        ->toContain(anchor(route('login', absolute: false)))
         ->toContain(anchor(GITHUB_URL))
         ->toContain('target="_blank"')
         ->toContain('rel="noopener noreferrer"');
@@ -102,8 +109,8 @@ it('mirrors the auth destination in the footer for authenticated users', functio
 
     $footer = extractFooter($response->getContent());
     expect($footer)
-        ->toContain(anchor(route('dashboard')))
-        ->not->toContain(anchor(route('login')));
+        ->toContain(anchor(route('dashboard', absolute: false)))
+        ->not->toContain(anchor(route('login', absolute: false)));
 });
 
 it('keeps the persisted theme control on the public shell', function (): void {

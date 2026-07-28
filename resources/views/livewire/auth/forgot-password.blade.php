@@ -5,7 +5,7 @@ use function Livewire\Volt\layout;
 layout('layouts.auth');
 ?>
 
-<form action="{{ route('forgot-password.post') }}" method="POST">
+<form action="{{ route('forgot-password.post', absolute: false) }}" method="POST">
     @csrf
 
     <h1 class="text-2xl font-semibold mb-6">Reset Password</h1>
@@ -23,6 +23,6 @@ layout('layouts.auth');
     <x-ui.button>Send Reset Link</x-ui.button>
 
     <p class="text-sm text-center mt-4">
-        <x-ui.link :href="route('login')">Back to sign in</x-ui.link>
+        <x-ui.link :href="route('login', absolute: false)">Back to sign in</x-ui.link>
     </p>
 </form>

@@ -35,8 +35,8 @@ it('renders the login page with a form posting to the backend', function (): voi
         ->assertSee('Email')
         ->assertSee('Password')
         ->assertSee('Forgot your password?')
-        ->assertSee('href="'.route('forgot-password').'"', false)
-        ->assertSee('action="'.route('login.post').'"', false);
+        ->assertSee('href="'.route('forgot-password', absolute: false).'"', false)
+        ->assertSee('action="'.route('login.post', absolute: false).'"', false);
 });
 
 it('renders a remember me checkbox that is unchecked by default on the login page', function (): void {
@@ -74,21 +74,21 @@ it('renders the registration page with a form posting to the backend', function 
         ->assertSee('name="password_confirmation"', false)
         ->assertSee('x-data="{ shown: false }"', false)
         ->assertSee(':type="shown ? \'text\' : \'password\'"', false)
-        ->assertSee('action="'.route('register.post').'"', false);
+        ->assertSee('action="'.route('register.post', absolute: false).'"', false);
 });
 
 it('renders the forgot-password page with a form posting to the backend', function (): void {
     $this->get('/forgot-password')
         ->assertOk()
         ->assertSee('Email')
-        ->assertSee('action="'.route('forgot-password.post').'"', false);
+        ->assertSee('action="'.route('forgot-password.post', absolute: false).'"', false);
 });
 
 it('renders the reset-password page with a form posting to the backend', function (): void {
     $this->get('/reset-password/test-token')
         ->assertOk()
         ->assertSee('Password')
-        ->assertSee('action="'.route('password.reset.post').'"', false);
+        ->assertSee('action="'.route('password.reset.post', absolute: false).'"', false);
 });
 
 it('renders the verification notice page for an authenticated unverified user', function (): void {
@@ -98,8 +98,8 @@ it('renders the verification notice page for an authenticated unverified user', 
         ->get(route('verification.notice'))
         ->assertOk()
         ->assertSee('Verify Your Email Address', false)
-        ->assertSee('action="'.route('verification.send').'"', false)
-        ->assertSee('action="'.route('logout').'"', false);
+        ->assertSee('action="'.route('verification.send', absolute: false).'"', false)
+        ->assertSee('action="'.route('logout', absolute: false).'"', false);
 });
 
 it('submits registration through the real backend route and authenticates', function (): void {
@@ -187,4 +187,41 @@ it('submits reset-password through the real backend route', function (): void {
     ])->assertRedirect('/');
 
     $this->assertDatabaseMissing('password_reset_tokens', ['email' => 'uireset@example.com']);
+});
+
+it('keeps authentication navigation on the organizer custom domain', function (): void {
+    $customDomain = 'miseventos.example.test';
+
+    $this->get("https://{$customDomain}/login")
+        ->assertOk()
+        ->assertSee('action="/login"', false)
+        ->assertSee('href="/register"', false)
+        ->assertSee('href="/forgot-password"', false);
+
+    $this->get("https://{$customDomain}/register")
+        ->assertOk()
+        ->assertSee('action="/register"', false)
+        ->assertSee('href="/login"', false);
+
+    $this->get("https://{$customDomain}/forgot-password")
+        ->assertOk()
+        ->assertSee('action="/forgot-password"', false)
+        ->assertSee('href="/login"', false);
+
+    $this->get("https://{$customDomain}/account/profile")
+        ->assertRedirect('/login');
+});
+
+it('keeps a successful login on the organizer custom domain', function (): void {
+    $user = User::factory()->create([
+        'email' => 'custom-domain-login@example.com',
+        'password' => 'Sup3rSecret!',
+    ]);
+
+    $this->post('https://miseventos.example.test/login', [
+        'email' => $user->email,
+        'password' => 'Sup3rSecret!',
+    ])->assertRedirect('/');
+
+    $this->assertAuthenticatedAs($user);
 });

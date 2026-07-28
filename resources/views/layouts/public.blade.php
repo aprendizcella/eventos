@@ -83,7 +83,7 @@
 
                     @auth
                         <a
-                            href="{{ route('dashboard') }}"
+                            href="{{ route('dashboard', absolute: false) }}"
                             aria-label="{{ __('Dashboard') }}"
                             class="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-4 py-1.5 text-sm font-medium text-gray-700 transition hover:bg-gray-200 hover:text-gray-900 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-white"
                             title="{{ __('Dashboard') }}"
@@ -95,7 +95,7 @@
                         </a>
                     @else
                         <a
-                            href="{{ route('login') }}"
+                            href="{{ route('login', absolute: false) }}"
                             aria-label="{{ __('Log in') }}"
                             title="{{ __('Log in') }}"
                             class="inline-flex items-center justify-center rounded-full border border-gray-300 bg-white px-4 py-1.5 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
@@ -162,14 +162,14 @@
                     <li class="pt-2 border-t border-gray-100 dark:border-gray-800">
                         @auth
                             <a
-                                href="{{ route('dashboard') }}"
+                                href="{{ route('dashboard', absolute: false) }}"
                                 class="block rounded-md px-3 py-2 text-base font-medium text-gray-700 transition hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
                             >
                                 {{ __('Dashboard') }}
                             </a>
                         @else
                             <a
-                                href="{{ route('login') }}"
+                                href="{{ route('login', absolute: false) }}"
                                 class="block rounded-md px-3 py-2 text-base font-medium text-gray-700 transition hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
                             >
                                 {{ __('Log in') }}
@@ -221,9 +221,9 @@
                             </span>
                         </a>
                         @auth
-                            <a href="{{ route('dashboard') }}" class="text-gray-600 transition hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">{{ __('Dashboard') }}</a>
+                            <a href="{{ route('dashboard', absolute: false) }}" class="text-gray-600 transition hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">{{ __('Dashboard') }}</a>
                         @else
-                            <a href="{{ route('login') }}" class="text-gray-600 transition hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">{{ __('Log in') }}</a>
+                            <a href="{{ route('login', absolute: false) }}" class="text-gray-600 transition hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">{{ __('Log in') }}</a>
                         @endauth
                     </nav>
                 </div>

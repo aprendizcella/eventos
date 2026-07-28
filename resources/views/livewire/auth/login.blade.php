@@ -5,7 +5,7 @@ use function Livewire\Volt\layout;
 layout('layouts.auth');
 ?>
 
-<form action="{{ route('login.post') }}" method="POST">
+<form action="{{ route('login.post', absolute: false) }}" method="POST">
     @csrf
 
     <h1 class="text-2xl font-semibold mb-6">Sign In</h1>
@@ -18,7 +18,7 @@ layout('layouts.auth');
     <x-ui.button>Sign In</x-ui.button>
 
     <p class="text-sm flex items-center justify-between gap-4 mt-4 px-4">
-        <x-ui.link :href="route('register')">Create an account</x-ui.link>
-        <x-ui.link :href="route('forgot-password')">Forgot your password?</x-ui.link>
+        <x-ui.link :href="route('register', absolute: false)">Create an account</x-ui.link>
+        <x-ui.link :href="route('forgot-password', absolute: false)">Forgot your password?</x-ui.link>
     </p>
 </form>

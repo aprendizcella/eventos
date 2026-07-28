@@ -5,7 +5,7 @@ use function Livewire\Volt\layout;
 layout('layouts.auth');
 ?>
 
-<form action="{{ route('password.reset.post') }}" method="POST">
+<form action="{{ route('password.reset.post', absolute: false) }}" method="POST">
     @csrf
 
     <input type="hidden" name="token" value="{{ request()->route('token') }}" />

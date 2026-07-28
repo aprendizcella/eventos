@@ -7,7 +7,7 @@ layout('layouts.auth');
 
 mount(function () {
     if (auth()->user()->hasVerifiedEmail()) {
-        return redirect()->route('dashboard');
+        return redirect('/dashboard');
     }
 });
 ?>
@@ -27,7 +27,7 @@ mount(function () {
     </p>
 
     <div class="flex items-center justify-between gap-4">
-        <form action="{{ route('verification.send') }}" method="POST">
+        <form action="{{ route('verification.send', absolute: false) }}" method="POST">
             @csrf
 
             <x-ui.button type="submit">
@@ -35,7 +35,7 @@ mount(function () {
             </x-ui.button>
         </form>
 
-        <form action="{{ route('logout') }}" method="POST">
+        <form action="{{ route('logout', absolute: false) }}" method="POST">
             @csrf
 
             <x-ui.button type="submit">

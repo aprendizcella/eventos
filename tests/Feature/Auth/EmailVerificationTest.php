@@ -30,12 +30,12 @@ it('redirects an already verified user away from the notice page', function (): 
 
     $this->actingAs($user)
         ->get(route('verification.notice'))
-        ->assertRedirect(route('dashboard'));
+        ->assertRedirect(route('dashboard', absolute: false));
 });
 
 it('redirects guest to login when accessing the verification notice', function (): void {
     $this->get(route('verification.notice'))
-        ->assertRedirect(route('login'));
+        ->assertRedirect(route('login', absolute: false));
 });
 
 // =============================================================================
@@ -46,7 +46,7 @@ it('redirects unverified user from dashboard to verification notice', function (
     $user = User::factory()->unverified()->create();
 
     $this->actingAs($user)
-        ->get(route('dashboard'))
+        ->get(route('dashboard', absolute: false))
         ->assertRedirect(route('verification.notice'));
 });
 
@@ -78,7 +78,7 @@ it('allows verified user to access the dashboard', function (): void {
     $user = User::factory()->create();
 
     $this->actingAs($user)
-        ->get(route('dashboard'))
+        ->get(route('dashboard', absolute: false))
         ->assertOk();
 });
 
@@ -98,7 +98,7 @@ it('allows the seeded user to access verified-only routes', function (): void {
     expect($user->hasVerifiedEmail())->toBeTrue();
 
     $this->actingAs($user)
-        ->get(route('dashboard'))
+        ->get(route('dashboard', absolute: false))
         ->assertOk();
 });
 
@@ -125,7 +125,7 @@ it('does not resend when user is already verified and redirects to dashboard', f
 
     $this->actingAs($user)
         ->post(route('verification.send'))
-        ->assertRedirect(route('dashboard'));
+        ->assertRedirect(route('dashboard', absolute: false));
 
     Notification::assertNothingSent();
 });
@@ -163,7 +163,7 @@ it('verifies the user email via a valid signed callback URL', function (): void 
 
     $this->actingAs($user)
         ->get($verificationUrl)
-        ->assertRedirect(route('dashboard'));
+        ->assertRedirect(route('dashboard', absolute: false));
 
     expect($user->fresh()->hasVerifiedEmail())->toBeTrue();
 });

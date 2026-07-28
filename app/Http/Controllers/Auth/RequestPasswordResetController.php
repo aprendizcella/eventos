@@ -24,7 +24,7 @@ final class RequestPasswordResetController extends Controller
 
         // Keep the user on the forgot-password form so the error surfaces there
         // (and the email input is preserved), instead of redirecting to "/".
-        return to_route('forgot-password')
+        return redirect('/forgot-password')
             ->withErrors(['email' => __($status)])
             ->withInput(['email' => $request->string('email')->toString()]);
     }
