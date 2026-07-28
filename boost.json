@@ -11,15 +11,19 @@
     "nightwatch": false,
     "packages": [
         "spatie/laravel-activitylog",
-        "spatie/laravel-permission"
+        "spatie/laravel-permission",
+        "spatie/laravel-multitenancy"
     ],
     "sail": true,
     "skills": [
         "laravel-best-practices",
+        "configuring-horizon",
+        "scout-development",
         "livewire-development",
         "volt-development",
         "pest-testing",
         "tailwindcss-development",
+        "laravel-multitenancy-development",
         "laravel-permission-development",
         "action",
         "controller",

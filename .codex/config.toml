@@ -1,7 +1,3 @@
-[mcp_servers.laravel-boost]
-command = "vendor/bin/sail"
-args = ["artisan", "boost:mcp"]
-
 
 [mcp_servers.sonarqube]
 command = "docker"
@@ -22,3 +18,7 @@ env_vars = ["SONARQUBE_TOKEN"]
 
 [mcp_servers.sonarqube.env]
 SONARQUBE_URL = "http://host.docker.internal:9001"
+
+[mcp_servers.laravel-boost]
+command = "vendor/bin/sail"
+args = ["artisan", "boost:mcp"]

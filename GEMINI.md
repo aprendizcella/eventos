@@ -179,8 +179,10 @@ This application is a Laravel application and its main Laravel ecosystems packag
 
 - php - 8.4
 - laravel/framework (LARAVEL) - v12
+- laravel/horizon (HORIZON) - v5
 - laravel/prompts (PROMPTS) - v0
 - laravel/sanctum (SANCTUM) - v4
+- laravel/scout (SCOUT) - v10
 - livewire/livewire (LIVEWIRE) - v4
 - livewire/volt (VOLT) - v1
 - larastan/larastan (LARASTAN) - v3
