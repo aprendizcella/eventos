@@ -27,3 +27,7 @@ testing
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# TFM presentation files — stored in private disk, not tracked
+/storage/app/private/tfm/slides/*.pptx
+/storage/app/private/tfm/slides/*.pdf

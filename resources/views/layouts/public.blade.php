@@ -18,6 +18,21 @@
             'aria_current' => request()->is('docs') ? 'page' : null,
         ],
     ];
+
+    $tfmLinks = [
+        [
+            'href' => '/tfm/slides',
+            'label' => __('Slides'),
+            'aria_current' => request()->is('tfm/slides') ? 'page' : null,
+        ],
+        [
+            'href' => '/tfm/videos',
+            'label' => __('Videos'),
+            'aria_current' => request()->is('tfm/videos') ? 'page' : null,
+        ],
+    ];
+
+    $isTfmPage = request()->is('tfm/slides') || request()->is('tfm/videos');
 @endphp
 
 <!DOCTYPE html>
@@ -61,6 +76,43 @@
                             {{ $link['label'] }}
                         </a>
                     @endforeach
+
+                    {{-- TFM dropdown --}}
+                    <div x-data="{ tfmOpen: false }" class="relative">
+                        <button
+                            type="button"
+                            @click="tfmOpen = !tfmOpen"
+                            @keydown.escape.window="tfmOpen = false"
+                            :aria-expanded="tfmOpen.toString()"
+                            class="inline-flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
+                            aria-haspopup="true"
+                        >
+                            <span>{{ __('TFM') }}</span>
+                            <svg class="size-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                            </svg>
+                        </button>
+
+                        <div
+                            x-show="tfmOpen"
+                            x-cloak
+                            @click.outside="tfmOpen = false"
+                            class="absolute right-0 mt-1 w-44 rounded-lg border border-gray-200 bg-white py-1 shadow-lg dark:border-gray-700 dark:bg-gray-800"
+                            role="menu"
+                        >
+                            @foreach ($tfmLinks as $tfmLink)
+                                <a
+                                    href="{{ $tfmLink['href'] }}"
+                                    @if (!empty($tfmLink['aria_current'])) aria-current="{{ $tfmLink['aria_current'] }}" @endif
+                                    @click="tfmOpen = false"
+                                    role="menuitem"
+                                    class="block px-4 py-2 text-sm text-gray-700 transition hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                                >
+                                    {{ $tfmLink['label'] }}
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
 
                     <a
                         href="{{ $githubUrl }}"
@@ -147,6 +199,23 @@
                             </a>
                         </li>
                     @endforeach
+
+                    {{-- TFM heading in mobile drawer --}}
+                    <li class="pt-3">
+                        <span class="block px-3 py-1 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">{{ __('TFM') }}</span>
+                    </li>
+                    @foreach ($tfmLinks as $tfmLink)
+                        <li>
+                            <a
+                                href="{{ $tfmLink['href'] }}"
+                                @if (!empty($tfmLink['aria_current'])) aria-current="{{ $tfmLink['aria_current'] }}" @endif
+                                class="block rounded-md px-3 py-2 text-base font-medium text-gray-700 transition hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
+                            >
+                                {{ $tfmLink['label'] }}
+                            </a>
+                        </li>
+                    @endforeach
+
                     <li>
                         <a
                             href="{{ $githubUrl }}"
@@ -204,10 +273,12 @@
                         </p>
                     </div>
 
-                    <nav aria-label="{{ __('Footer navigation') }}" class="grid grid-cols-2 gap-x-8 gap-y-2 text-sm sm:grid-cols-3">
+                    <nav aria-label="{{ __('Footer navigation') }}" class="grid grid-cols-2 gap-x-8 gap-y-2 text-sm sm:grid-cols-4">
                         <a href="/" class="text-gray-600 transition hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">{{ __('Discover Events') }}</a>
                         <a href="/#features" class="text-gray-600 transition hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">{{ __('Features') }}</a>
                         <a href="/docs" class="text-gray-600 transition hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">{{ __('Docs') }}</a>
+                        <a href="{{ route('tfm.slides', absolute: false) }}" class="text-gray-600 transition hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">{{ __('TFM Slides') }}</a>
+                        <a href="{{ route('tfm.videos', absolute: false) }}" class="text-gray-600 transition hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">{{ __('TFM Videos') }}</a>
                         <a
                             href="{{ $githubUrl }}"
                             target="_blank"

@@ -17,12 +17,21 @@ use App\Http\Controllers\Organizers\TeamController;
 use App\Http\Controllers\Organizers\VenueController;
 use App\Http\Controllers\Public\EventRedirectController;
 use App\Http\Controllers\Public\SitemapController;
+use App\Http\Controllers\Public\TfmSlideDownloadController;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
 Volt::mount();
 
 Volt::route('/', 'public.events.event-list-public')->name('public.events.catalog');
+
+// TFM public section — no auth required
+Volt::route('/tfm/slides', 'public.tfm.slide-list')->name('tfm.slides');
+Volt::route('/tfm/videos', 'public.tfm.video-list')->name('tfm.videos');
+// Download route must be registered before generic parameter routes to avoid collisions
+Route::get('/tfm/slides/{file}/download', TfmSlideDownloadController::class)
+    ->where('file', '[\w._-]+')
+    ->name('tfm.slides.download');
 
 Route::view('/docs', 'public.docs.index')->name('public.docs.index');
 

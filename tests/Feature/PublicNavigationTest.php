@@ -19,6 +19,8 @@ uses(TestCase::class, LazilyRefreshDatabase::class);
 const GITHUB_URL = 'https://github.com/aprendizcella/eventos';
 const FEATURES_URL = '/#features';
 const DOCS_URL = '/docs';
+const TFM_SLIDES_URL = '/tfm/slides';
+const TFM_VIDEOS_URL = '/tfm/videos';
 const GETTING_STARTED_HEADING = 'Getting Started';
 const HELP_CENTER_WORKFLOWS_HEADING = 'Help Center Workflows';
 const TECHNICAL_REFERENCE_HEADING = 'Technical Reference';
@@ -45,6 +47,49 @@ it('keeps public login navigation on an organizer custom domain', function (): v
         ->assertSuccessful()
         ->assertSee(anchor(route('login', absolute: false)), false)
         ->assertDontSee('https://events.saboreateruel.com/login', false);
+});
+
+it('renders TFM dropdown with Slides and Videos in desktop nav', function (): void {
+    $this->get('/')
+        ->assertSuccessful()
+        ->assertSee('TFM')
+        ->assertSee(anchor(TFM_SLIDES_URL), false)
+        ->assertSee(anchor(TFM_VIDEOS_URL), false);
+});
+
+it('renders TFM links in the footer', function (): void {
+    $response = $this->get('/');
+
+    $footer = extractFooter($response->getContent());
+    expect($footer)
+        ->toContain(anchor(TFM_SLIDES_URL))
+        ->toContain(anchor(TFM_VIDEOS_URL));
+});
+
+it('marks TFM Slides as current page when visiting slides', function (): void {
+    $this->get(TFM_SLIDES_URL)
+        ->assertSuccessful()
+        ->assertSee('TFM')
+        ->assertSee('Presentaciones TFM');
+});
+
+it('marks TFM Videos as current page when visiting videos', function (): void {
+    $this->get(TFM_VIDEOS_URL)
+        ->assertSuccessful()
+        ->assertSee('TFM')
+        ->assertSee('Vídeo Presentación TFM');
+});
+
+it('places TFM between Docs and GitHub in desktop nav', function (): void {
+    $body = $this->get('/')->assertSuccessful()->getContent();
+
+    // Docs should appear before TFM, and TFM before GitHub in the page
+    $docPos = strpos($body, 'Docs');
+    $tfmPos = strpos($body, 'TFM');
+    $gitPos = strpos($body, 'GitHub');
+
+    expect($docPos)->toBeLessThan($tfmPos);
+    expect($tfmPos)->toBeLessThan($gitPos);
 });
 
 it('links to GitHub with safe external anchor attributes', function (): void {

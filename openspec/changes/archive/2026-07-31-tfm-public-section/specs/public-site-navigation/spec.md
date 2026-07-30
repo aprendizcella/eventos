@@ -1,19 +1,16 @@
-# Public Site Navigation Specification
+# Delta for Public Site Navigation
 
-## Purpose
-
-Provide accessible public navigation that keeps event discovery primary and accurately introduces the platform.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: Public Navigation Destinations
 
 The system MUST expose the brand, Discover Events, Features, Docs, a TFM destination with Slides and Videos sub-items, an external GitHub link, theme control, and the appropriate guest or authenticated action in public navigation. Discover Events MUST return to `/`; GitHub MUST target `https://github.com/aprendizcella/eventos`; the TFM destination MUST appear between Docs and GitHub.
+(Previously: Public navigation exposed Docs followed directly by the external GitHub link, with no TFM destination.)
 
 #### Scenario: Guest navigates on a desktop viewport
 - GIVEN a guest viewing a public page on a desktop viewport
 - WHEN public navigation is rendered
-- THEN all public destinations and Login MUST be available
+- THEN all public destinations, TFM Slides, TFM Videos, and Login MUST be available
 - AND the GitHub destination MUST be identified as external
 
 #### Scenario: Authenticated user navigates
@@ -24,11 +21,12 @@ The system MUST expose the brand, Discover Events, Features, Docs, a TFM destina
 ### Requirement: Accessible Responsive Navigation
 
 The system MUST provide equivalent public destinations, including TFM Slides and TFM Videos, on desktop and mobile viewports. The mobile menu MUST be keyboard operable, expose its state, and manage focus without obscuring the existing persisted light, dark, or system theme behavior.
+(Previously: Equivalent destinations did not include the TFM sub-items.)
 
 #### Scenario: Keyboard user operates the mobile menu
 - GIVEN a keyboard user on a mobile viewport
 - WHEN the user opens and closes public navigation
-- THEN its destinations MUST be reachable while open
+- THEN its destinations, including TFM Slides and TFM Videos, MUST be reachable while open
 - AND focus MUST return to the menu control when closed
 
 #### Scenario: Visitor uses a persisted theme
@@ -36,21 +34,12 @@ The system MUST provide equivalent public destinations, including TFM Slides and
 - WHEN public navigation is rendered on either viewport
 - THEN the saved preference MUST remain effective
 
-### Requirement: Verified Feature Communication
-
-The system MUST provide Features content after discovery results, separated into attendee and organizer audiences. The content MUST describe only verified platform capabilities and MUST NOT imply marketplace positioning, native applications, integrations, or deferred documentation.
-
-#### Scenario: Visitor reviews Features
-- GIVEN a visitor reaches the Features destination
-- WHEN the anchored content is shown
-- THEN attendee and organizer capabilities MUST be distinguishable
-- AND event discovery MUST remain the first substantive home interaction
-
 ### Requirement: Public Footer
 
 The system MUST provide a public footer that offers access to the available public destinations, including TFM Slides and TFM Videos, without changing their behavior.
+(Previously: The footer did not offer TFM destination links.)
 
 #### Scenario: Visitor uses the footer
 - GIVEN a visitor reaches the end of a public page
 - WHEN the footer is rendered
-- THEN available public destinations MUST remain accessible
+- THEN available public destinations, including TFM Slides and TFM Videos, MUST remain accessible
