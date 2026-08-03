@@ -86,15 +86,23 @@ it('shows slide metadata for each card', function (): void {
         ->assertSee('Última modificación');
 });
 
-it('renders the videos page with YouTube nocookie embed', function (): void {
+it('renders the videos page with two YouTube nocookie embeds', function (): void {
     $this->get('/tfm/videos')
         ->assertOk()
-        ->assertSee('youtube-nocookie.com', false)
-        ->assertSee('embed', false);
+        ->assertSee('youtube-nocookie.com/embed/-NB4gIeLaKA', false)
+        ->assertSee('youtube-nocookie.com/embed/U8Cp2Z9iquE', false);
 });
 
-it('renders video page title and description', function (): void {
+it('renders video page titles and descriptions', function (): void {
     $this->get('/tfm/videos')
         ->assertOk()
-        ->assertSee('Video Presentación TFM');
+        ->assertSee('Vídeo Presentación TFM')
+        ->assertSee('Estado del Arte');
+});
+
+it('renders the videos page with responsive grid layout', function (): void {
+    $this->get('/tfm/videos')
+        ->assertOk()
+        ->assertSee('grid', false)
+        ->assertSee('aspect-video', false);
 });
