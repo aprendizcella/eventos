@@ -30,6 +30,14 @@ new #[Layout('layouts.public')] class extends Component {
                 'pptx' => 'Presentacion_TFM_Eventos_Multitenant.pptx',
                 'pdf' => 'Presentacion_TFM_Eventos_Multitenant.pdf',
             ],
+            [
+                'title' => 'Guion Visual — Recorrido de Demostración',
+                'description' => 'Presentación paso a paso del recorrido completo de la aplicación: login, dashboard, eventos, checkout simulado, QR, lista de espera, auditoría y materiales TFM. 36 diapositivas con capturas reales.',
+                'defense_date' => 'Agosto 2026',
+                'modified_date' => '3 agosto 2026',
+                'pptx' => 'Presentacion_Guion_Video_TFM_Eventos.pptx',
+                'pdf' => 'Presentacion_Guion_Video_TFM_Eventos.pdf',
+            ],
         ];
     }
 };

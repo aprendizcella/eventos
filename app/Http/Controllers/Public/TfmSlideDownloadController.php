@@ -13,8 +13,10 @@ final class TfmSlideDownloadController
     private const ALLOWED_FILES = [
         'Presentacion_Demo_TFM_Eventos.pptx',
         'Presentacion_TFM_Eventos_Multitenant.pptx',
+        'Presentacion_Guion_Video_TFM_Eventos.pptx',
         'Presentacion_Demo_TFM_Eventos.pdf',
         'Presentacion_TFM_Eventos_Multitenant.pdf',
+        'Presentacion_Guion_Video_TFM_Eventos.pdf',
     ];
 
     private const MIME_MAP = [

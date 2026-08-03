@@ -17,6 +17,8 @@ beforeEach(function (): void {
     Storage::disk('local')->put('tfm/slides/Presentacion_Demo_TFM_Eventos.pdf', 'fake demo pdf content');
     Storage::disk('local')->put('tfm/slides/Presentacion_TFM_Eventos_Multitenant.pptx', 'fake multitenant pptx content');
     Storage::disk('local')->put('tfm/slides/Presentacion_TFM_Eventos_Multitenant.pdf', 'fake multitenant pdf content');
+    Storage::disk('local')->put('tfm/slides/Presentacion_Guion_Video_TFM_Eventos.pptx', 'fake guion pptx content');
+    Storage::disk('local')->put('tfm/slides/Presentacion_Guion_Video_TFM_Eventos.pdf', 'fake guion pdf content');
 });
 
 it('downloads an approved demo PPTX file', function (): void {
@@ -28,6 +30,12 @@ it('downloads an approved demo PPTX file', function (): void {
 
 it('downloads an approved multitenant PPTX file', function (): void {
     $this->get('/tfm/slides/Presentacion_TFM_Eventos_Multitenant.pptx/download')
+        ->assertOk()
+        ->assertHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.presentationml.presentation');
+});
+
+it('downloads an approved guion PPTX file', function (): void {
+    $this->get('/tfm/slides/Presentacion_Guion_Video_TFM_Eventos.pptx/download')
         ->assertOk()
         ->assertHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.presentationml.presentation');
 });
@@ -54,11 +62,12 @@ it('serves an approved PDF inline for preview', function (): void {
 
 // Page-level tests ----------------------------------------------------
 
-it('renders the slides page with two presentation cards', function (): void {
+it('renders the slides page with three presentation cards', function (): void {
     $this->get('/tfm/slides')
         ->assertOk()
         ->assertSee('Presentación Demo TFM Eventos')
         ->assertSee('Presentación TFM Eventos Multitenant')
+        ->assertSee('Guion Visual')
         ->assertSee('iframe', false);
 });
 
@@ -66,7 +75,8 @@ it('renders a PPTX download link for each slide', function (): void {
     $this->get('/tfm/slides')
         ->assertOk()
         ->assertSee(route('tfm.slides.download', 'Presentacion_Demo_TFM_Eventos.pptx'), false)
-        ->assertSee(route('tfm.slides.download', 'Presentacion_TFM_Eventos_Multitenant.pptx'), false);
+        ->assertSee(route('tfm.slides.download', 'Presentacion_TFM_Eventos_Multitenant.pptx'), false)
+        ->assertSee(route('tfm.slides.download', 'Presentacion_Guion_Video_TFM_Eventos.pptx'), false);
 });
 
 it('shows slide metadata for each card', function (): void {
