@@ -100,6 +100,15 @@ it('renders video page titles and descriptions', function (): void {
         ->assertSee('Estado del Arte');
 });
 
+it('shows video metadata for each card', function (): void {
+    $this->get('/tfm/videos')
+        ->assertOk()
+        ->assertSee('Julio 2026')
+        ->assertSee('Agosto 2026')
+        ->assertSee('29 julio 2026')
+        ->assertSee('3 agosto 2026');
+});
+
 it('renders the videos page with responsive grid layout', function (): void {
     $this->get('/tfm/videos')
         ->assertOk()
